@@ -26,30 +26,20 @@
         
         .waiting-room-badge { background: var(--waiting); color: white; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .waiting-badge-sm { background: var(--waiting); color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
-
         .btn-del-sm { background: #fdeaea; color: var(--danger); border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        /* Modal Popup Styling */
-        #callModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border-radius:15px; box-shadow:0 0 50px rgba(0,0,0,0.5); z-index:3000; width:320px; }
-        #modalOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2999; }
 
         .section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
         .label { font-weight: bold; font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        
+        /* Date Filter Controls */
+        .filter-controls { display: flex; gap: 5px; margin-bottom: 10px; }
+        .btn-filter { background: var(--primary); color: white; padding: 8px; border-radius: 6px; font-size: 12px; flex: 1; border: none; cursor: pointer; }
+        .btn-reset { background: #666; color: white; padding: 8px; border-radius: 6px; font-size: 12px; border: none; cursor: pointer; }
+
         .img-thumb { width: 100%; height: 130px; object-fit: contain; border-radius: 10px; border: 2px solid #ddd; cursor: pointer; background: #fff; }
     </style>
 </head>
 <body>
-
-<div id="modalOverlay"></div>
-<div id="callModal">
-    <h3 style="margin-top:0;">Schedule Follow-up</h3>
-    <label class="label">Date for Call</label>
-    <input type="date" id="modalCallDate">
-    <label class="label">Reason for Call</label>
-    <input type="text" id="modalCallReason" placeholder="e.g. Discuss Labs">
-    <button onclick="submitToCallCenter()" style="background:var(--call); margin-bottom:10px;">Send to Secretary</button>
-    <button onclick="closeModal()" style="background:#888;">Cancel</button>
-</div>
 
 <div id="loginScreen">
     <h1>Saad Sabry Clinic</h1>
@@ -66,17 +56,24 @@
 <div id="mainContent" class="container" style="display:none;">
     <div class="sidebar">
         <div class="card">
-            <h3>New Patient</h3>
+            <h3>Register New Patient</h3>
             <input type="text" id="newName" placeholder="Full Name">
             <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
                 <input type="number" id="newAge" placeholder="Age">
                 <input type="tel" id="newPhone" placeholder="Phone">
             </div>
-            <button onclick="addPatient()">Add Patient</button>
+            <button onclick="addPatient()">Save & Add</button>
         </div>
         <div class="card">
             <h3>Clinic History <span id="waitCounter" class="waiting-room-badge">0</span></h3>
-            <input type="text" id="searchBox" placeholder="🔍 Search Patient Name..." oninput="renderList()">
+            
+            <div class="filter-controls">
+                <input type="date" id="dateSearch" style="padding:5px; font-size:12px; margin:0; flex:2;">
+                <button class="btn-filter" onclick="renderList()">🔍 Filter Date</button>
+                <button class="btn-reset" onclick="resetFilter()">Reset</button>
+            </div>
+            
+            <input type="text" id="searchBox" placeholder="🔍 Search by Name..." oninput="renderList()">
             <div id="patientList" style="max-height: 500px; overflow-y: auto;">Syncing...</div>
         </div>
     </div>
@@ -85,63 +82,43 @@
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
             <div class="card">
                 <h3>📅 Upcoming Operations</h3>
-                <div id="opCalendar" style="font-size: 13px;">No surgeries soon.</div>
+                <div id="opCalendar" style="font-size: 13px;">No surgeries scheduled.</div>
             </div>
             <div class="card">
-                <h3>🔔 Reminders</h3>
-                <input type="text" id="remSearch" placeholder="🔍 Find Task..." oninput="renderRems()">
-                <div id="remList" style="margin-top:10px; max-height: 200px; overflow-y: auto;"></div>
+                <h3>🔔 Priority Tasks</h3>
+                <div id="remList" style="max-height: 200px; overflow-y: auto;"></div>
             </div>
         </div>
 
-        <div class="card">
-            <h3>📞 Call Center (Sorted by Date)</h3>
-            <div id="callList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:10px;">Syncing...</div>
-        </div>
-
-        <div id="loadingMsg" style="display:none; text-align:center; padding: 20px; font-weight:bold;">Fetching Clinical Record...</div>
-        <div id="emptyState" class="card" style="text-align:center; padding: 50px 0; color: #999;"><p>Select a patient to begin.</p></div>
+        <div id="loadingMsg" style="display:none; text-align:center; padding: 20px; font-weight:bold;">Loading...</div>
+        <div id="emptyState" class="card" style="text-align:center; padding: 50px 0; color: #999;"><p>Select a patient record to begin.</p></div>
 
         <div id="fileView" class="card" style="display:none;">
             <div style="display:flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding: 5px;"></h2>
-                    <button onclick="openCallModal()" style="background:var(--call); color:white; padding:5px 10px; font-size:12px; border-radius:6px; border:none; margin-top:5px; cursor:pointer;">📞 ADD TO CALL CENTER</button>
+                    <label style="display:inline-flex; align-items:center; margin-top:5px; font-size:12px; cursor:pointer; color:var(--waiting);">
+                        <input type="checkbox" id="waitToggle" onchange="toggleWaiting(this)" style="width:16px; height:16px; margin-right:5px;"> 👤 MARK AS WAITING
+                    </label>
                 </div>
-                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● Saving...</div>
+                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● Auto-Syncing...</div>
             </div>
             
             <div id="visitInfo" style="background: var(--secondary); padding: 12px; border-radius: 8px; margin: 10px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <span class="label">Patient Info</span>
-                    <p id="viewContact" style="font-weight: bold; color: var(--primary); margin: 0; line-height: 1.4; font-size: 0.9em;"></p>
-                </div>
-                <div>
-                    <span class="label">Last Visits</span>
-                    <div id="visitHistoryLog" style="max-height: 60px; overflow-y: auto; font-size: 12px;"></div>
-                </div>
-            </div>
-
-            <div class="section" style="background: #fff8e1;">
-                <span class="label" style="color: var(--warning)">Linked Reminder</span>
-                <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:10px;">
-                    <input type="text" id="vRemText" placeholder="Task for this patient">
-                    <input type="date" id="vRemDate">
-                    <button onclick="addPatientReminder()" style="background:var(--warning); padding: 0 15px;">Add</button>
-                </div>
+                <div><span class="label">Patient Bio</span><p id="viewContact" style="font-weight: bold; color: var(--primary); margin: 0; line-height: 1.4; font-size: 0.9em;"></p></div>
+                <div><span class="label">Last Visits</span><div id="visitHistoryLog" style="max-height: 60px; overflow-y: auto; font-size: 11px;"></div></div>
             </div>
 
             <div class="section"><span class="label">Clinical History</span><textarea id="vPres" oninput="autoSyncTrigger()"></textarea></div>
-            <div class="section"><span class="label">Imaging</span>
+            <div class="section"><span class="label">Patient Imaging</span>
                 <button style="background:#607d8b; color:white; padding:12px;" onclick="document.getElementById('cam').click()">📷 SNAP PHOTO</button>
                 <input type="file" id="cam" accept="image/*" multiple style="display:none" onchange="processAndUpload(event)">
                 <div id="gallery" class="gallery"></div>
             </div>
-            <div class="section"><span class="label">Management</span><textarea id="vVisits" oninput="autoSyncTrigger()"></textarea></div>
-            <div class="section" style="background:#fff0f3;"><span class="label" style="color:var(--danger)">Surgery Plan</span>
+            <div class="section"><span class="label">Surgery Plan</span>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()"></div>
             </div>
-            <button onclick="saveAll(true)" style="background:var(--success)">SYNC ALL UPDATES</button>
+            <button onclick="saveAll(true)" style="background:var(--success)">SYNC ALL CHANGES</button>
         </div>
     </div>
 </div>
@@ -160,164 +137,134 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let patientsIndex = {};
+    let patientsDetails = {}; // Cached for date filtering
     let activeId = null;
     let syncTimeout = null;
-    let currentReminders = {};
 
     function checkPass() {
         if(document.getElementById('passCode').value === 'saad2026') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'grid';
             initSync();
-        } else { alert("Denied"); }
-    }
-
-    function autoResize(textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-    }
-
-    function autoSyncTrigger() {
-        document.getElementById('syncIndicator').style.display = 'block';
-        if (syncTimeout) clearTimeout(syncTimeout);
-        syncTimeout = setTimeout(() => saveAll(false), 2000);
+        } else { alert("Unauthorized"); }
     }
 
     function initSync() {
         db.ref('patientIndex').on('value', snap => {
             patientsIndex = snap.val() || {};
             renderList();
+        });
+        // We listen to details for accurate visit-date filtering
+        db.ref('patientDetails').on('value', snap => {
+            patientsDetails = snap.val() || {};
+            renderList();
             renderCalendar();
-            const count = Object.values(patientsIndex).filter(p => p.isWaiting).length;
-            document.getElementById('waitCounter').innerText = count;
         });
-        db.ref('reminders').on('value', snap => {
-            currentReminders = snap.val() || {};
-            renderRems();
+        db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
+    }
+
+    function resetFilter() {
+        document.getElementById('dateSearch').value = '';
+        renderList();
+    }
+
+    function renderList() {
+        const list = document.getElementById('patientList');
+        const nameQuery = document.getElementById('searchBox').value.toLowerCase();
+        const rawDate = document.getElementById('dateSearch').value;
+        const filterDate = rawDate ? new Date(rawDate).toLocaleDateString('en-GB') : null;
+        
+        list.innerHTML = '';
+        const sortedIds = Object.keys(patientsIndex).sort((a,b) => b - a);
+
+        sortedIds.forEach(id => {
+            const p = patientsIndex[id];
+            const detail = patientsDetails[id] || {};
+            const visitDates = detail.visitDates || [];
+            
+            const matchesName = p.name.toLowerCase().includes(nameQuery);
+            const matchesDate = !filterDate || p.dateAdded === filterDate || visitDates.includes(filterDate);
+
+            if (matchesName && matchesDate) {
+                const item = document.createElement('div');
+                item.className = `pt-item ${activeId == id ? 'active' : ''}`;
+                item.onclick = () => loadFullData(id);
+                
+                // Show why they match the date filter
+                let label = `Reg: ${p.dateAdded}`;
+                if (filterDate && visitDates.includes(filterDate) && p.dateAdded !== filterDate) {
+                    label = `Return Visit: ${filterDate}`;
+                }
+
+                item.innerHTML = `<div><strong>${p.name}</strong>${p.isWaiting ? '<span class="waiting-badge-sm">👤 WAITING</span>' : ''}<br><span style="font-size:10px; color:#999;">${label}</span></div>
+                                  <button class="btn-del-sm" onclick="deleteRec('${id}', event)">✕</button>`;
+                list.appendChild(item);
+            }
         });
-        db.ref('calls').on('value', snap => renderCalls(snap.val() || {}));
+        
+        const waitCount = Object.values(patientsIndex).filter(p => p.isWaiting).length;
+        document.getElementById('waitCounter').innerText = waitCount;
+    }
+
+    function loadFullData(id) {
+        activeId = id;
+        db.ref('patientIndex/' + id).update({ isWaiting: false });
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('fileView').style.display = 'block';
+        
+        const details = patientsDetails[id] || { visitDates: [] };
+        document.getElementById('viewName').innerText = patientsIndex[id].name;
+        document.getElementById('waitToggle').checked = false;
+        document.getElementById('viewContact').innerHTML = `AGE: ${patientsIndex[id].age || '--'} | PHONE: ${patientsIndex[id].phone || '--'}<br>REG: ${patientsIndex[id].dateAdded}`;
+        
+        const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
+        (details.visitDates || []).slice(-5).reverse().forEach(d => log.innerHTML += `<div style="border-bottom:1px solid #eee; padding:2px;">📅 ${d}</div>`);
+        
+        document.getElementById('vPres').value = details.presentation || '';
+        document.getElementById('vOpDate').value = details.opD || '';
+        document.getElementById('vOpDetail').value = details.opT || '';
+        renderGallery(details.images || []);
+        autoResize(document.getElementById('vPres'));
+    }
+
+    function saveAll(manual = true) {
+        if (!activeId) return;
+        const today = new Date().toLocaleDateString('en-GB');
+        const detailRef = db.ref('patientDetails/' + activeId);
+        
+        detailRef.once('value').then(snap => {
+            const data = snap.val() || {};
+            const dates = data.visitDates || [];
+            if(!dates.includes(today)) dates.push(today);
+            
+            detailRef.update({
+                presentation: document.getElementById('vPres').value,
+                opD: document.getElementById('vOpDate').value,
+                opT: document.getElementById('vOpDetail').value,
+                visitDates: dates
+            }).then(() => {
+                document.getElementById('syncIndicator').style.display = 'none';
+                if (manual) alert("Synced");
+            });
+        });
     }
 
     function addPatient() {
         const name = document.getElementById('newName').value;
         if(!name) return;
         const id = Date.now();
-        const date = new Date().toLocaleDateString('en-GB');
-        db.ref('patientIndex/' + id).set({ name, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, dateAdded: date, lastActivity: Date.now(), isWaiting: false });
-        db.ref('patientDetails/' + id).set({ name, presentation: '', visits: '', opD: '', opT: '', images: [], visitDates: [date] });
+        const dateStr = new Date().toLocaleDateString('en-GB');
+        db.ref('patientIndex/' + id).set({ name, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, dateAdded: dateStr, isWaiting: false });
+        db.ref('patientDetails/' + id).set({ name, presentation: '', opD: '', opT: '', images: [], visitDates: [dateStr] });
         ["newName", "newAge", "newPhone"].forEach(i => document.getElementById(i).value = '');
     }
 
-    function renderList() {
-        const list = document.getElementById('patientList');
-        const q = document.getElementById('searchBox').value.toLowerCase();
-        list.innerHTML = '';
-        const sortedIds = Object.keys(patientsIndex).sort((a,b) => {
-            if (patientsIndex[b].isWaiting !== patientsIndex[a].isWaiting) return patientsIndex[b].isWaiting ? 1 : -1;
-            return (patientsIndex[b].lastActivity || 0) - (patientsIndex[a].lastActivity || 0);
-        });
-        sortedIds.forEach(id => {
-            const p = patientsIndex[id];
-            if (p.name.toLowerCase().includes(q)) {
-                const item = document.createElement('div');
-                item.className = `pt-item ${activeId == id ? 'active' : ''}`;
-                item.onclick = () => loadFullData(id);
-                item.innerHTML = `<div><strong>${p.name}</strong>${p.isWaiting ? '<span class="waiting-badge-sm">👤 WAITING</span>' : ''}<br><span style="font-size:10px; color:#999;">Update: ${p.lastUpdateStr || p.dateAdded}</span></div>
-                                  <button class="btn-del-sm" onclick="deleteRec('${id}', event)">✕</button>`;
-                list.appendChild(item);
-            }
-        });
-    }
-
-    function loadFullData(id) {
-        activeId = id;
-        db.ref('patientIndex/' + id).update({ isWaiting: false, lastActivity: Date.now(), lastUpdateStr: new Date().toLocaleDateString('en-GB') });
-        document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('fileView').style.display = 'block';
-        db.ref('patientDetails/' + id).once('value').then(snap => {
-            const details = snap.val();
-            document.getElementById('viewName').innerText = patientsIndex[id].name;
-            document.getElementById('viewContact').innerHTML = `AGE: ${patientsIndex[id].age || '--'} | PHONE: ${patientsIndex[id].phone || '--'}<br>REG: ${patientsIndex[id].dateAdded}`;
-            const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
-            (details.visitDates || []).slice(-5).reverse().forEach(d => log.innerHTML += `<div style="border-bottom:1px solid #eee; padding:2px;">📅 ${d}</div>`);
-            const vPres = document.getElementById('vPres'); const vVisits = document.getElementById('vVisits');
-            vPres.value = details.presentation || ''; vVisits.value = details.visits || '';
-            document.getElementById('vOpDate').value = details.opD || ''; document.getElementById('vOpDetail').value = details.opT || '';
-            renderGallery(details.images || []);
-            renderList();
-            setTimeout(() => { autoResize(vPres); autoResize(vVisits); }, 100);
-        });
-    }
-
-    // CALL CENTER POPUP LOGIC
-    function openCallModal() {
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('callModal').style.display = 'block';
-    }
-
-    function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('callModal').style.display = 'none';
-    }
-
-    function submitToCallCenter() {
-        const date = document.getElementById('modalCallDate').value;
-        const reason = document.getElementById('modalCallReason').value;
-        if (!date || !activeId) { alert("Please set a date"); return; }
-        
-        db.ref('calls').push({
-            pt: patientsIndex[activeId].name,
-            num: patientsIndex[activeId].phone,
-            date: date,
-            reason: reason,
-            status: 'pending',
-            patientId: activeId
-        });
-        
-        closeModal();
-        document.getElementById('modalCallDate').value = '';
-        document.getElementById('modalCallReason').value = '';
-    }
-
-    function renderCalls(calls) {
-        const list = document.getElementById('callList'); list.innerHTML = '';
-        // SORT CALLS BY DATE (Soonest first)
-        const sortedCallIds = Object.keys(calls)
-            .filter(id => calls[id].status === 'pending')
-            .sort((a,b) => new Date(calls[a].date) - new Date(calls[b].date));
-
-        sortedCallIds.forEach(id => {
-            const c = calls[id];
-            list.innerHTML += `<div style="background:var(--secondary); padding:10px; border-radius:8px; border-left:4px solid var(--call); font-size:13px; cursor:pointer;" onclick="loadFullData('${c.patientId}')">
-                <strong style="color:var(--call)">${c.date || 'No Date'}</strong> | <strong>${c.pt}</strong><br>
-                <span>📞 ${c.num}</span><br>
-                <small>${c.reason}</small>
-                <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 8px; margin-top:-10px;" onclick="event.stopPropagation(); db.ref('calls/${id}').update({status:'done'})">DONE</button>
-            </div>`;
-        });
-    }
-
-    function saveAll(manual = true) {
-        if (!activeId) return;
-        const today = new Date().toLocaleDateString('en-GB');
-        db.ref('patientDetails/' + activeId).once('value').then(snap => {
-            const data = snap.val();
-            const dates = data.visitDates || [];
-            if(!dates.includes(today)) dates.push(today);
-            db.ref('patientIndex/' + activeId).update({ lastActivity: Date.now(), lastUpdateStr: today });
-            db.ref('patientDetails/' + activeId).update({
-                presentation: document.getElementById('vPres').value,
-                visits: document.getElementById('vVisits').value,
-                opD: document.getElementById('vOpDate').value,
-                opT: document.getElementById('vOpDetail').value,
-                visitDates: dates
-            }).then(() => {
-                document.getElementById('syncIndicator').style.display = 'none';
-                if (manual) alert("Synced Successfully");
-            });
-        });
-    }
-
+    function autoResize(textarea) { textarea.style.height = 'auto'; textarea.style.height = textarea.scrollHeight + 'px'; }
+    function autoSyncTrigger() { document.getElementById('syncIndicator').style.display = 'block'; if (syncTimeout) clearTimeout(syncTimeout); syncTimeout = setTimeout(() => saveAll(false), 2000); }
+    function toggleWaiting(cb) { if (activeId) db.ref('patientIndex/' + activeId).update({ isWaiting: cb.checked }); }
+    function updatePatientName(el) { if(activeId) { db.ref('patientIndex/' + activeId).update({ name: el.innerText.trim() }); db.ref('patientDetails/' + activeId).update({ name: el.innerText.trim() }); } }
+    function deleteRec(id, e) { e.stopPropagation(); if(confirm("Delete record?")) { db.ref('patientIndex/' + id).remove(); db.ref('patientDetails/' + id).remove(); } }
+    
     function processAndUpload(event) {
         const files = event.target.files; const today = new Date().toLocaleDateString('en-GB');
         for (let file of files) {
@@ -332,7 +279,6 @@
                     db.ref('patientDetails/' + activeId).once('value').then(snap => {
                         const d = snap.val(); const imgs = d.images || []; const dates = d.visitDates || [];
                         imgs.push(dataUrl); if(!dates.includes(today)) dates.push(today);
-                        db.ref('patientIndex/' + activeId).update({ lastActivity: Date.now(), lastUpdateStr: today });
                         db.ref('patientDetails/' + activeId).update({ images: imgs, visitDates: dates }).then(() => loadFullData(activeId));
                     });
                 };
@@ -348,29 +294,14 @@
         });
     }
 
-    function renderRems() {
-        const list = document.getElementById('remList');
-        const q = document.getElementById('remSearch').value.toLowerCase();
-        list.innerHTML = '';
-        const sortedRems = Object.keys(currentReminders)
-            .filter(id => currentReminders[id].status === 'pending')
-            .sort((a,b) => (new Date(currentReminders[a].date) || 0) - (new Date(currentReminders[b].date) || 0));
-        sortedRems.forEach(id => {
-            const rem = currentReminders[id];
-            if (rem.text.toLowerCase().includes(q)) {
-                list.innerHTML += `<div style="background:#fff9c4; padding:8px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--warning); font-size:13px; cursor:pointer;" onclick="loadFullData('${rem.patientId}')">
-                    <strong>${rem.date || 'No Date'}</strong>: ${rem.text}
-                    <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
-                </div>`;
-            }
+    function renderRems(rems) {
+        const list = document.getElementById('remList'); list.innerHTML = '';
+        Object.keys(rems).filter(id => rems[id].status === 'pending').forEach(id => {
+            list.innerHTML += `<div style="background:#fff9c4; padding:8px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--warning); font-size:12px;">
+                <strong>${rems[id].date || ''}</strong>: ${rems[id].text}
+                <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="db.ref('reminders/${id}').update({status:'done'})">✓</button>
+            </div>`;
         });
-    }
-
-    function addPatientReminder() {
-        const text = document.getElementById('vRemText').value; const date = document.getElementById('vRemDate').value;
-        if (!text || !activeId) return;
-        db.ref('reminders').push({ text: `[${patientsIndex[activeId].name}] ${text}`, date, status: 'pending', patientId: activeId });
-        ["vRemText", "vRemDate"].forEach(i => document.getElementById(i).value = '');
     }
 
     function renderCalendar() {
@@ -378,31 +309,16 @@
         const today = new Date(); const monthOut = new Date(); monthOut.setDate(today.getDate() + 30);
         let rows = ""; let count = 0;
         Object.keys(patientsIndex).forEach(id => {
-            db.ref('patientDetails/' + id).once('value').then(snap => {
-                const d = snap.val();
-                if(d && d.opD) {
-                    const opDate = new Date(d.opD);
-                    if(opDate >= today && opDate <= monthOut) {
-                        rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT || 'Procedure'}</td></tr>`;
-                        count++;
-                        cal.innerHTML = `<table><tr><th>Date</th><th>Patient</th><th>Operation</th></tr>${rows}</table>`;
-                    }
+            const d = patientsDetails[id] || {};
+            if(d.opD) {
+                const opDate = new Date(d.opD);
+                if(opDate >= today && opDate <= monthOut) {
+                    rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT || ''}</td></tr>`;
+                    count++;
                 }
-            });
+            }
         });
-        if(count === 0) cal.innerHTML = "No upcoming surgeries.";
-    }
-
-    function updatePatientName(el) {
-        const n = el.innerText.trim();
-        if(n && activeId) {
-            db.ref('patientIndex/' + activeId).update({ name: n, lastActivity: Date.now() });
-            db.ref('patientDetails/' + activeId).update({ name: n });
-        }
-    }
-
-    function deleteRec(id, e) {
-        e.stopPropagation(); if(confirm("Delete patient record?")) { db.ref('patientIndex/' + id).remove(); db.ref('patientDetails/' + id).remove(); }
+        cal.innerHTML = count > 0 ? `<table><tr><th>Date</th><th>Patient</th><th>Op</th></tr>${rows}</table>` : "No upcoming surgeries.";
     }
 </script>
 </body>
