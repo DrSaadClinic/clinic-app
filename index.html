@@ -14,33 +14,35 @@
         .container { max-width: 1400px; margin: auto; padding: 15px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
         @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
-        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.1em; display: flex; justify-content: space-between; }
+        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
         textarea { resize: none; overflow-y: auto; min-height: 80px; transition: height 0.2s; }
         button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
         #loginScreen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; }
-        .pt-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; background: #fff; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid transparent; }
+        .pt-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; background: #fff; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid transparent; }
         .pt-item.active { border-left-color: var(--success); background: var(--secondary); }
         
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
-        th { text-align: left; background: var(--secondary); padding: 8px; color: var(--primary); }
-        td { padding: 8px; border-bottom: 1px solid #eee; }
-
+        
         .section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
         .label { font-weight: bold; font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; }
         
-        .visit-log { max-height: 100px; overflow-y: auto; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 5px; margin-top: 5px; }
-        .visit-date { font-size: 0.85em; padding: 3px 8px; border-bottom: 1px solid #f0f0f0; color: #555; }
+        /* Compact Visit Log Search */
+        .visit-log-container { border: 1px solid #ddd; border-radius: 8px; background: white; padding: 8px; }
+        .visit-search { padding: 5px; font-size: 12px; margin-bottom: 5px; border: 1px solid #eee; border-radius: 4px; }
+        .visit-log { max-height: 80px; overflow-y: auto; }
+        .visit-date { font-size: 0.8em; padding: 3px; border-bottom: 1px solid #f9f9f9; color: #555; }
         
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 15px; }
+        /* Small Delete Button */
+        .btn-del-sm { background: #fdeaea; color: var(--danger); border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-del-sm:hover { background: var(--danger); color: white; }
+
         .img-thumb { width: 100%; height: 130px; object-fit: contain; border-radius: 10px; border: 2px solid #ddd; cursor: pointer; background: #fff; }
-        
-        #syncIndicator { font-size: 11px; color: var(--success); font-weight: bold; display: none; margin-bottom: 5px; }
-        .editable-name:hover { background: #f0f0f0; border-radius: 4px; cursor: text; }
+        #syncIndicator { font-size: 11px; color: var(--success); font-weight: bold; display: none; }
+        .small-meta { font-size: 10px; color: #999; }
     </style>
 </head>
 <body>
@@ -66,7 +68,6 @@
                 <input type="number" id="newAge" placeholder="Age">
                 <input type="tel" id="newPhone" placeholder="Phone">
             </div>
-            <input type="text" id="newComp" placeholder="Chief Complaint">
             <label class="label">Registration Date (Optional)</label>
             <input type="date" id="newRegDate">
             <button onclick="addPatient()">Add to History</button>
@@ -95,7 +96,8 @@
             </div>
             <div class="card">
                 <h3>🔔 General Reminders</h3>
-                <div id="remList" style="max-height: 250px; overflow-y: auto;">No pending tasks.</div>
+                <input type="text" id="remSearch" placeholder="🔍 Search Reminders by Name/Date..." oninput="renderRems()">
+                <div id="remList" style="margin-top:10px; max-height: 250px; overflow-y: auto;"></div>
             </div>
         </div>
 
@@ -104,42 +106,44 @@
 
         <div id="fileView" class="card" style="display:none;">
             <div style="display:flex; justify-content: space-between; align-items: flex-start;">
-                <h2 id="viewName" class="editable-name" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding: 5px;"></h2>
-                <div id="syncIndicator">● Auto-Syncing...</div>
+                <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding: 5px; border-radius: 4px;"></h2>
+                <div id="syncIndicator">● Saving...</div>
             </div>
             
             <div id="visitInfo" style="background: var(--secondary); padding: 12px; border-radius: 8px; margin: 10px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div>
                     <span class="label">Patient Info</span>
-                    <p id="viewContact" style="font-weight: bold; color: var(--primary); margin: 0; line-height: 1.4;"></p>
+                    <p id="viewContact" style="font-weight: bold; color: var(--primary); margin: 0; line-height: 1.4; font-size: 0.9em;"></p>
                 </div>
                 <div>
-                    <span class="label">Visit Dates</span>
-                    <div id="visitHistoryLog" class="visit-log"></div>
+                    <span class="label">Visit History</span>
+                    <div class="visit-log-container">
+                        <input type="text" id="visitSearch" class="visit-search" placeholder="🔍 Find Date..." oninput="filterVisits()">
+                        <div id="visitHistoryLog" class="visit-log"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="section" style="background: #fff8e1;">
-                <span class="label" style="color: var(--warning)">Add Reminder for this Patient</span>
+                <span class="label" style="color: var(--warning)">Set Reminder for this Patient</span>
                 <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:10px;">
-                    <input type="text" id="vRemText" placeholder="Task (e.g. Check biopsy)">
+                    <input type="text" id="vRemText" placeholder="Task description">
                     <input type="date" id="vRemDate">
                     <button onclick="addPatientReminder()" style="background:var(--warning); padding: 0 15px;">Add</button>
                 </div>
             </div>
 
-            <div class="section"><span class="label">Clinical History</span><textarea id="vPres" oninput="autoSyncTrigger(this)"></textarea></div>
+            <div class="section"><span class="label">Clinical History</span><textarea id="vPres" oninput="autoSyncTrigger()"></textarea></div>
             <div class="section"><span class="label">Imaging</span>
                 <button style="background:#607d8b; color:white; padding:12px;" onclick="document.getElementById('cam').click()">📷 SNAP PHOTO</button>
                 <input type="file" id="cam" accept="image/*" multiple style="display:none" onchange="processAndUpload(event)">
                 <div id="gallery" class="gallery"></div>
             </div>
-            <div class="section"><span class="label">Management</span><textarea id="vVisits" oninput="autoSyncTrigger(this)"></textarea></div>
-            <div class="section" style="background:#fff0f3;">
-                <span class="label" style="color:var(--danger)">Surgery Plan</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger(this)"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger(this)"></div>
+            <div class="section"><span class="label">Management</span><textarea id="vVisits" oninput="autoSyncTrigger()"></textarea></div>
+            <div class="section" style="background:#fff0f3;"><span class="label" style="color:var(--danger)">Surgery Plan</span>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()"></div>
             </div>
-            <button onclick="saveAll(true)" style="background:var(--success)">FORCE MANUAL SYNC</button>
+            <button onclick="saveAll(true)" style="background:var(--success)">SYNC ALL UPDATES</button>
         </div>
     </div>
 </div>
@@ -161,6 +165,8 @@
     let patientsIndex = {};
     let activeId = null;
     let syncTimeout = null;
+    let currentVisitDates = [];
+    let currentReminders = {};
 
     function checkPass() {
         if(document.getElementById('passCode').value === 'saad2026') {
@@ -170,17 +176,10 @@
         } else { alert("Unauthorized"); }
     }
 
-    function autoResize(textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-    }
-
     function autoSyncTrigger() {
         document.getElementById('syncIndicator').style.display = 'block';
         if (syncTimeout) clearTimeout(syncTimeout);
-        syncTimeout = setTimeout(() => {
-            saveAll(false);
-        }, 2000); // Saves 2 seconds after user stops typing
+        syncTimeout = setTimeout(() => saveAll(false), 2000);
     }
 
     function initSync() {
@@ -189,7 +188,10 @@
             renderList();
             renderCalendar();
         });
-        db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
+        db.ref('reminders').on('value', snap => {
+            currentReminders = snap.val() || {};
+            renderRems();
+        });
         db.ref('calls').on('value', snap => renderCalls(snap.val() || {}));
     }
 
@@ -197,75 +199,31 @@
         const name = document.getElementById('newName').value;
         if(!name) return;
         const id = Date.now();
-        const manualDate = document.getElementById('newRegDate').value;
-        const date = manualDate ? new Date(manualDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
-        db.ref('patientIndex/' + id).set({ name, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, dateAdded: date });
+        const date = document.getElementById('newRegDate').value ? new Date(document.getElementById('newRegDate').value).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
+        db.ref('patientIndex/' + id).set({ name, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, dateAdded: date, lastUpdate: Date.now() });
         db.ref('patientDetails/' + id).set({ name, presentation: '', visits: '', opD: '', opT: '', images: [], visitDates: [date] });
-        ["newName", "newAge", "newPhone", "newRegDate", "newComp"].forEach(i => document.getElementById(i).value = '');
-    }
-
-    function updatePatientName(element) {
-        const newName = element.innerText.trim();
-        if (newName && activeId) {
-            db.ref('patientIndex/' + activeId).update({ name: newName });
-            db.ref('patientDetails/' + activeId).update({ name: newName });
-        }
+        ["newName", "newAge", "newPhone", "newRegDate"].forEach(i => document.getElementById(i).value = '');
     }
 
     function renderList() {
         const list = document.getElementById('patientList');
-        const query = document.getElementById('searchBox').value.toLowerCase();
+        const q = document.getElementById('searchBox').value.toLowerCase();
         list.innerHTML = '';
-        Object.keys(patientsIndex).reverse().forEach(id => {
+        Object.keys(patientsIndex).sort((a,b) => (patientsIndex[b].lastUpdate || 0) - (patientsIndex[a].lastUpdate || 0)).forEach(id => {
             const p = patientsIndex[id];
-            if (p.name.toLowerCase().includes(query)) {
+            if (p.name.toLowerCase().includes(q)) {
                 const item = document.createElement('div');
                 item.className = `pt-item ${activeId == id ? 'active' : ''}`;
                 item.onclick = () => loadFullData(id);
-                item.innerHTML = `<div><span class="pt-meta">Reg: ${p.dateAdded}</span><br><strong>${p.name}</strong></div><button style="background:var(--danger); color:white; border:none; padding:5px; border-radius:4px;" onclick="deleteRec('${id}', event)">✕</button>`;
+                item.innerHTML = `<div><span class="pt-meta">Reg: ${p.dateAdded}</span><br><strong>${p.name}</strong></div>
+                                  <button class="btn-del-sm" onclick="deleteRec('${id}', event)">✕</button>`;
                 list.appendChild(item);
             }
         });
     }
 
-    function renderCalendar() {
-        const cal = document.getElementById('opCalendar');
-        const today = new Date(); const monthOut = new Date(); monthOut.setDate(today.getDate() + 30);
-        let rows = ""; let count = 0;
-        Object.keys(patientsIndex).forEach(id => {
-            db.ref('patientDetails/' + id).once('value').then(snap => {
-                const d = snap.val();
-                if(d && d.opD) {
-                    const opDate = new Date(d.opD);
-                    if(opDate >= today && opDate <= monthOut) {
-                        rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT || 'Procedure'}</td></tr>`;
-                        count++;
-                        cal.innerHTML = `<table><tr><th>Date</th><th>Patient</th><th>Operation</th></tr>${rows}</table>`;
-                    }
-                }
-            });
-        });
-        if(count === 0) cal.innerHTML = "No surgeries scheduled for the next 30 days.";
-    }
-
-    function addPatientReminder() {
-        const text = document.getElementById('vRemText').value;
-        const date = document.getElementById('vRemDate').value;
-        if (!text || !activeId) return;
-        const patientName = patientsIndex[activeId].name;
-        db.ref('reminders').push({ 
-            text: `[${patientName}] ${text}`, 
-            date, 
-            status: 'pending', 
-            patientId: activeId 
-        });
-        document.getElementById('vRemText').value = '';
-        document.getElementById('vRemDate').value = '';
-    }
-
     function loadFullData(id) {
         activeId = id;
-        const base = patientsIndex[id];
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('fileView').style.display = 'none';
         document.getElementById('loadingMsg').style.display = 'block';
@@ -273,16 +231,63 @@
             const details = snap.val();
             document.getElementById('loadingMsg').style.display = 'none';
             document.getElementById('fileView').style.display = 'block';
-            document.getElementById('viewName').innerText = base.name;
-            document.getElementById('viewContact').innerHTML = `AGE: ${base.age || '--'}<br>PHONE: ${base.phone || '--'}<br>REGISTERED: ${base.dateAdded || '--'}`;
-            const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
-            (details.visitDates || []).slice().reverse().forEach(d => log.innerHTML += `<div class="visit-date">📅 ${d}</div>`);
-            const vPres = document.getElementById('vPres'); const vVisits = document.getElementById('vVisits');
-            vPres.value = details.presentation || ''; vVisits.value = details.visits || '';
-            document.getElementById('vOpDate').value = details.opD || ''; document.getElementById('vOpDetail').value = details.opT || '';
+            document.getElementById('viewName').innerText = patientsIndex[id].name;
+            document.getElementById('viewContact').innerHTML = `AGE: ${patientsIndex[id].age || '--'} | PHONE: ${patientsIndex[id].phone || '--'}<br>REG: ${patientsIndex[id].dateAdded}`;
+            
+            currentVisitDates = details.visitDates || [];
+            filterVisits();
+            
+            document.getElementById('vPres').value = details.presentation || '';
+            document.getElementById('vVisits').value = details.visits || '';
+            document.getElementById('vOpDate').value = details.opD || '';
+            document.getElementById('vOpDetail').value = details.opT || '';
             renderGallery(details.images || []);
             renderList();
-            setTimeout(() => { autoResize(vPres); autoResize(vVisits); }, 100);
+        });
+    }
+
+    function filterVisits() {
+        const q = document.getElementById('visitSearch').value;
+        const log = document.getElementById('visitHistoryLog');
+        log.innerHTML = '';
+        currentVisitDates.slice().reverse().forEach(d => {
+            if (d.includes(q)) log.innerHTML += `<div class="visit-date">📅 ${d}</div>`;
+        });
+    }
+
+    function renderRems() {
+        const list = document.getElementById('remList');
+        const q = document.getElementById('remSearch').value.toLowerCase();
+        list.innerHTML = '';
+        Object.keys(currentReminders).forEach(id => {
+            const rem = currentReminders[id];
+            if (rem.status === 'pending' && (rem.text.toLowerCase().includes(q) || (rem.date && rem.date.includes(q)))) {
+                const isLinked = rem.patientId;
+                list.innerHTML += `<div style="background:#fff9c4; padding:10px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--warning); cursor: ${isLinked ? 'pointer' : 'default'};" onclick="${isLinked ? `loadFullData('${rem.patientId}')` : ''}">
+                    <span class="small-meta">${rem.date || 'No Date'}</span><br>${rem.text}
+                    <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
+                </div>`;
+            }
+        });
+    }
+
+    function saveAll(manual = true) {
+        if (!activeId) return;
+        const today = new Date().toLocaleDateString('en-GB');
+        db.ref('patientDetails/' + activeId).once('value').then(snap => {
+            const dates = snap.val().visitDates || [];
+            if(!dates.includes(today)) dates.push(today);
+            db.ref('patientIndex/' + activeId).update({ lastUpdate: Date.now() });
+            db.ref('patientDetails/' + activeId).update({
+                presentation: document.getElementById('vPres').value,
+                visits: document.getElementById('vVisits').value,
+                opD: document.getElementById('vOpDate').value,
+                opT: document.getElementById('vOpDetail').value,
+                visitDates: dates
+            }).then(() => {
+                document.getElementById('syncIndicator').style.display = 'none';
+                if (manual) alert("Record Synced");
+            });
         });
     }
 
@@ -300,6 +305,7 @@
                     db.ref('patientDetails/' + activeId).once('value').then(snap => {
                         const data = snap.val(); const imgs = data.images || []; const dates = data.visitDates || [];
                         imgs.push(dataUrl); if(!dates.includes(today)) dates.push(today);
+                        db.ref('patientIndex/' + activeId).update({ lastUpdate: Date.now() });
                         db.ref('patientDetails/' + activeId).update({ images: imgs, visitDates: dates }).then(() => loadFullData(activeId));
                     });
                 };
@@ -326,7 +332,7 @@
         const list = document.getElementById('callList'); list.innerHTML = '';
         Object.keys(calls).forEach(id => {
             if(calls[id].status === 'pending') {
-                list.innerHTML += `<div style="background:var(--secondary); padding:10px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--call);">
+                list.innerHTML += `<div style="background:var(--secondary); padding:8px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--call); font-size: 13px;">
                     <strong>${calls[id].pt}</strong>: <a href="tel:${calls[id].num}">${calls[id].num}</a><br><small>${calls[id].reason}</small>
                     <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="db.ref('calls/${id}').update({status:'done'})">DONE</button>
                 </div>`;
@@ -340,41 +346,48 @@
         document.getElementById('remText').value = '';
     }
 
-    function renderRems(rems) {
-        const list = document.getElementById('remList'); list.innerHTML = '';
-        Object.keys(rems).forEach(id => {
-            if(rems[id].status === 'pending') {
-                const isLinked = rems[id].patientId;
-                list.innerHTML += `<div style="background:#fff9c4; padding:10px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--warning); cursor: ${isLinked ? 'pointer' : 'default'};" onclick="${isLinked ? `loadFullData('${rems[id].patientId}')` : ''}">
-                    <strong>${rems[id].date || ''}</strong>: ${rems[id].text} ${isLinked ? '<br><small>(Click to open file)</small>' : ''}
-                    <button style="float:right; background:var(--success); color:white; border:none; border-radius:4px; padding:2px 5px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
-                </div>`;
-            }
-        });
+    function addPatientReminder() {
+        const text = document.getElementById('vRemText').value;
+        const date = document.getElementById('vRemDate').value;
+        if (!text || !activeId) return;
+        db.ref('reminders').push({ text: `[${patientsIndex[activeId].name}] ${text}`, date, status: 'pending', patientId: activeId });
+        ["vRemText", "vRemDate"].forEach(i => document.getElementById(i).value = '');
     }
 
-    function saveAll(manual = true) {
-        if (!activeId) return;
-        const today = new Date().toLocaleDateString('en-GB');
-        db.ref('patientDetails/' + activeId).once('value').then(snap => {
-            const dates = snap.val().visitDates || [];
-            if(!dates.includes(today)) dates.push(today);
-            db.ref('patientDetails/' + activeId).update({
-                presentation: document.getElementById('vPres').value,
-                visits: document.getElementById('vVisits').value,
-                opD: document.getElementById('vOpDate').value,
-                opT: document.getElementById('vOpDetail').value,
-                visitDates: dates
-            }).then(() => {
-                document.getElementById('syncIndicator').style.display = 'none';
-                if (manual) alert("Data Synced Manually");
-                renderList();
+    function renderCalendar() {
+        const cal = document.getElementById('opCalendar');
+        const today = new Date(); const monthOut = new Date(); monthOut.setDate(today.getDate() + 30);
+        let rows = ""; let count = 0;
+        Object.keys(patientsIndex).forEach(id => {
+            db.ref('patientDetails/' + id).once('value').then(snap => {
+                const d = snap.val();
+                if(d && d.opD) {
+                    const opDate = new Date(d.opD);
+                    if(opDate >= today && opDate <= monthOut) {
+                        rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT || 'Procedure'}</td></tr>`;
+                        count++;
+                        cal.innerHTML = `<table><tr><th>Date</th><th>Patient</th><th>Operation</th></tr>${rows}</table>`;
+                    }
+                }
             });
         });
+        if(count === 0) cal.innerHTML = "No upcoming surgeries.";
     }
 
     function deleteRec(id, e) {
-        e.stopPropagation(); if(confirm("Delete patient record?")) { db.ref('patientIndex/' + id).remove(); db.ref('patientDetails/' + id).remove(); }
+        e.stopPropagation();
+        if(confirm("Delete patient record?")) {
+            db.ref('patientIndex/' + id).remove();
+            db.ref('patientDetails/' + id).remove();
+        }
+    }
+
+    function updatePatientName(el) {
+        const n = el.innerText.trim();
+        if(n && activeId) {
+            db.ref('patientIndex/' + activeId).update({ name: n });
+            db.ref('patientDetails/' + activeId).update({ name: n });
+        }
     }
 </script>
 </body>
