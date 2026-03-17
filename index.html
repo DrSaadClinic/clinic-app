@@ -7,127 +7,124 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; --slate: #455a64; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f9; margin: 0; color: #2c3e50; }
+        :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; color: #333; }
         
-        header { background: var(--primary); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.15); }
-        .logo-header { height: 45px; width: 45px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .logo-large { width: 120px; height: 120px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid var(--secondary); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .logo-img { height: 50px; width: 50px; background: white; border-radius: 50%; padding: 2px; }
+        .logo-large { width: 120px; height: 120px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid var(--secondary); }
 
         .container { max-width: 1400px; margin: auto; padding: 15px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
         @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
         
-        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.05); }
-        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; font-size: 1.2em; letter-spacing: 0.5px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #333; }
         
-        input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid #e0e6ed; border-radius: 10px; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
-        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); }
-        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
-
-        #loginScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, var(--primary), #002d5e); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; }
-
-        /* Sidebar Styling */
-        .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid transparent; transition: 0.2s; }
-        .pt-item.active { border-left-color: var(--success); background: var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        textarea { resize: none; overflow-y: auto; min-height: 100px; transition: height 0.2s; border: 2px solid #eee; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* High-Yield Lab Styling */
-        .lab-order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; max-height: 180px; overflow-y: auto; background: #fdfdfd; padding: 10px; border-radius: 12px; border: 1px solid #eee; }
-        .lab-tag { background: #fff; border: 1px solid #d1d9e6; color: var(--slate); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; }
-        .lab-tag:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
-
-        .lab-res-card { padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.05); background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; }
-        .lab-res-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .lab-name { font-weight: 800; color: var(--slate); font-size: 14px; }
-        .lab-val { font-size: 18px; font-weight: 800; color: #333; }
+        #loginScreen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; }
         
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .dot-normal { background: var(--success); }
-        .dot-warning { background: var(--warning); }
-        .dot-danger { background: var(--danger); }
-        .dot-pending { background: #ccc; }
+        .pt-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; background: #fff; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid transparent; }
+        .pt-item.active { border-left-color: var(--success); background: var(--secondary); }
+        .pt-meta { font-size: 10px; color: #999; display: block; margin-top: 2px; }
 
-        .pending-text { color: #888; font-style: italic; font-size: 12px; }
-        .hist-entry { font-size: 11px; color: #666; display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid #f9f9f9; }
-        .edit-btn-sm { font-size: 10px; color: var(--primary); background: none; border: none; padding: 0; text-decoration: underline; cursor: pointer; width: auto; }
+        /* Labs & Pathology Styling */
+        .lab-tag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; max-height: 180px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .lab-btn-tag { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-align: center; cursor: pointer; }
+        .lab-res-card { padding: 12px; border-radius: 10px; margin-bottom: 8px; color: #333; background: #f9f9f9; border-left: 6px solid #ccc; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .lab-res-card b { color: var(--primary); font-size: 14px; }
+        .lab-history-row { font-size: 10px; color: #666; margin-top: 4px; padding-top: 4px; border-top: 1px solid #eee; display: flex; justify-content: space-between; }
+        
+        .res-normal { border-left-color: var(--success) !important; background: #e8f5e9; }
+        .res-warning { border-left-color: var(--warning) !important; background: #fffde7; }
+        .res-danger { border-left-color: var(--danger) !important; background: #ffebee; }
 
-        /* Visit Controls */
-        .visit-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #fff; border-radius: 8px; margin-bottom: 5px; border: 1px solid #eee; }
-        .complaint-box { background: #fff8e1; border: 1px solid #ffe0b2; padding: 14px; border-radius: 12px; margin-bottom: 20px; color: #856404; font-weight: 600; font-size: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+        .rem-item { background:#fff9c4; padding:15px; border-radius:10px; margin-bottom:10px; border-left:8px solid var(--warning); cursor:pointer; }
+        .wa-btn { background: #25d366; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; }
+        .visit-ctrl { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
+        .img-thumb { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin: 5px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
     <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h1 style="margin:0;">SAAD SABRY CLINIC</h1>
-    <p style="letter-spacing: 2px; font-size: 12px; opacity: 0.8; margin-top: 5px;">SURGICAL EXCELLENCE</p>
-    <input type="password" id="passCode" placeholder="Secure Access Code" style="width: 280px; text-align: center; margin-top: 30px;">
-    <button onclick="checkPass()" style="width: 280px; background: var(--success); margin-top: 10px;">Enter Dashboard</button>
+    <h1>Saad Sabry Clinic</h1>
+    <input type="password" id="passCode" placeholder="Access Code" style="width: 260px; text-align: center; border-radius: 10px;">
+    <button onclick="checkPass()" style="width: 260px; background: var(--success); margin-top: 10px; border-radius: 10px;">Login</button>
 </div>
 
 <header>
-    <img src="logo.jpg" class="logo-header" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin:0; font-size: 1.1em; letter-spacing: 1px;">Dr. Saad Sabry Alzubaidy</h2>
+    <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+    <h2 style="margin:0; font-size: 1.2em;">Dr. Saad Sabry Alzubaidy</h2>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
     <div class="sidebar">
         <div class="card">
-            <h3>New Registration</h3>
-            <input type="text" id="newName" placeholder="Patient Full Name">
+            <h3>Register Patient</h3>
+            <input type="text" id="newName" placeholder="Full Name">
             <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
                 <input type="number" id="newAge" placeholder="Age">
-                <input type="tel" id="newPhone" placeholder="Mobile">
+                <input type="tel" id="newPhone" placeholder="Phone">
             </div>
-            <input type="text" id="newComp" placeholder="Chief Complaint (Why today?)">
-            <button onclick="addPatient()">Register Patient</button>
+            <input type="text" id="newComp" placeholder="Chief Complaint">
+            <button onclick="addPatient()">Confirm Registration</button>
         </div>
         <div class="card">
-            <h3>Clinical History</h3>
-            <input type="text" id="searchBox" placeholder="🔍 Search patient name..." oninput="renderList()">
-            <div id="patientList" style="max-height: 500px; overflow-y: auto;"></div>
+            <h3>Clinic History</h3>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <input type="date" id="dateSearch" style="padding:8px; font-size:12px; flex:2; margin:0;">
+                <button onclick="renderList()" style="background:var(--primary); color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer;">Filter</button>
+                <button onclick="resetFilter()" style="background:#666; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer;">X</button>
+            </div>
+            <input type="text" id="searchBox" placeholder="🔍 Search Name..." oninput="renderList()">
+            <div id="patientList" style="max-height: 500px; overflow-y: auto;">Syncing...</div>
         </div>
     </div>
 
     <div class="content">
-        <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
-            <div class="card"><h3>📅 Operations</h3><div id="opCalendar" style="font-size: 13px;"></div></div>
-            <div class="card"><h3>🔔 Task Reminders</h3><div id="remList" style="max-height: 300px; overflow-y: auto;"></div></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div class="card"><h3>📅 Operations</h3><div id="opCalendar">Scanning...</div></div>
+            <div class="card"><h3>🔔 Reminders</h3><div id="remList"></div></div>
         </div>
 
-        <div id="emptyState" class="card" style="text-align:center; padding: 100px 0; color: #bdc3c7;"><p>Select a patient from the history to begin consultation.</p></div>
+        <div id="emptyState" class="card" style="text-align:center; padding: 50px 0; color: #999;"><p>Select a patient to begin.</p></div>
 
         <div id="fileView" class="card" style="display:none;">
-            <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display:flex; justify-content: space-between;">
                 <div>
-                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; font-size: 1.8em;"></h2>
-                    <div id="waArea" style="margin-top:10px;"></div>
+                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0;"></h2>
+                    <div id="waArea"></div>
                 </div>
-                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● SYNCING...</div>
+                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● Syncing...</div>
             </div>
             
-            <div class="complaint-box"><span class="label" style="color:#d68910;">Initial Complaint</span><span id="viewComplaint"></span></div>
-
-            <div id="visitInfo" style="background: var(--secondary); padding: 15px; border-radius: 12px; margin: 15px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div><span class="label">Patient Bio</span><p id="viewContact" style="font-weight: 600; color: var(--primary); margin:0;"></p></div>
-                <div><span class="label">Consultation Log</span><div id="visitHistoryLog" style="max-height: 100px; overflow-y: auto;"></div></div>
+            <div style="background:#fff3e0; padding:10px; border-radius:8px; margin:10px 0; font-weight:bold; color:#e65100;">
+                Complaint: <span id="viewComplaint"></span>
             </div>
 
-            <div class="section"><span class="label">Clinical Findings & History</span><textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartTimestamp(this)"></textarea></div>
-            <div class="section"><span class="label">Management & Post-Op Plan</span><textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartTimestamp(this)"></textarea></div>
+            <div id="visitInfo" style="background: var(--secondary); padding: 15px; border-radius: 10px; margin: 10px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div><span class="label">Bio</span><p id="viewContact" style="font-weight:bold;"></p></div>
+                <div><span class="label">Visits</span><div id="visitHistoryLog" style="max-height: 80px; overflow-y: auto;"></div></div>
+            </div>
+
+            <div class="section"><span class="label">Clinical History</span><textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea></div>
+            <div class="section"><span class="label">Timeline Management</span><textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea></div>
             
+            <div class="section" style="background:#fff0f3;"><span class="label">Surgery Plan</span>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()"></div>
+            </div>
+
             <div class="section" style="border-left: 5px solid var(--lab);">
-                <span class="label" style="color:var(--lab)">🧪 Advanced Pathology Suite</span>
-                <div class="lab-order-grid" id="labSelector"></div>
+                <span class="label" style="color:var(--lab)">🧪 Pathology Suite (Click to Order)</span>
+                <div class="lab-tag-grid" id="labSelector"></div>
                 <div id="labResultsList" style="margin-top:15px;"></div>
             </div>
 
-            <div class="section" style="background:#fff0f3;"><span class="label" style="color:var(--danger)">Planned Procedure</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Operation name" oninput="autoSyncTrigger()"></div>
-            </div>
-
-            <button onclick="manualSync()" style="background:var(--success); font-size: 16px; height: 55px; box-shadow: 0 4px 15px rgba(40,167,69,0.2);">💾 SECURE CLOUD SYNC</button>
+            <button onclick="manualSync()" style="background:var(--success); height: 50px;">💾 SECURE MANUAL SYNC</button>
         </div>
     </div>
 </div>
@@ -147,22 +144,13 @@
     const db = firebase.database();
     let patientsIndex = {}; let patientsDetails = {}; let activeId = null; let syncTimeout = null;
 
+    const labList = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","ESR","CRP TITER","S.Iron","S.Ferrtin","GUE","FBS","HbA1C","S.uric acid","B.Ur","S.Cr","TSH","SGOT","SGPT","ALP","TSB","S.Ca","Viral marker","PSA","LH","FSH","S.Testerone"];
     const labRef = {
-        "CBC": {u:"g/dL",min:12,max:17.5}, "S.CHOLESTEROL": {u:"mg/dL",max:200}, "FBS": {u:"mg/dL",min:70,max:100,b:125}, "TSH": {u:"mIU/L",min:0.4,max:4.0}, "S.Cr": {u:"mg/dL",max:1.3}
+        "CBC": {u:"g/dL",min:12,max:17.5}, "S.CHOLESTEROL": {u:"mg/dL",max:200}, "FBS": {u:"mg/dL",min:70,max:100,b:125}, 
+        "HbA1C": {u:"%",max:5.6,b:6.4}, "S.Cr": {u:"mg/dL",max:1.3}, "TSH": {u:"mIU/L",min:0.4,max:4.0}
     };
-    const labList = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","Total lipid profile","ESR","CRP TITER","Latex test","S.Iron","S.Ferrtin","GUE","FBS","HbA1C","S.uric acid","B.Ur","S.Cr","F.T3","F.T4","TSH","S Amylase","S.Lipase","SGOT","SGPT","ALP","TSB(direct. indirect)","S.Ca","LDH","ANA","PT/PTT/INR","Bl.gp&Rh","Viral marker","D.DIMER","BT","BHCG","GSE","Stool for H.pylori","Stool for Calprotectin","Stool for H.pylori titer","S.H.Pylori","Urin for C+S","ASO TITER","Rose Bengal test","IgG/M for Sallmonela","S.Vit.D","S.Vit.B12","S.Prolactin","LH","FSH","S.Testerone","PSA"];
 
-    function smartTimestamp(t) {
-        const today = new Date().toLocaleDateString('en-GB');
-        const stamp = `\n📅 ${today} - Visit:\n`;
-        if (!t.value.includes(`📅 ${today}`)) {
-            const start = t.selectionStart;
-            t.value = t.value.slice(0, start) + stamp + t.value.slice(start);
-            autoSyncTrigger();
-        }
-    }
-
-    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainContent').style.display = 'grid'; initSync(); genLabButtons(); } else { alert("Access Denied"); } }
+    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainContent').style.display = 'grid'; initSync(); genLabButtons(); } else { alert("Denied"); } }
 
     function initSync() {
         db.ref('patientIndex').on('value', snap => { patientsIndex = snap.val() || {}; renderList(); });
@@ -170,15 +158,22 @@
         db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
     }
 
+    function smartStamp(t) {
+        const today = new Date().toLocaleDateString('en-GB');
+        if (!t.value.includes(today)) {
+            const start = t.selectionStart;
+            t.value = t.value.slice(0, start) + `\n📅 ${today} - Visit:\n` + t.value.slice(start);
+            autoSyncTrigger();
+        }
+    }
+
     function genLabButtons() {
         const grid = document.getElementById('labSelector'); grid.innerHTML = '';
         labList.forEach(name => {
-            const div = document.createElement('div'); div.className = 'lab-tag'; div.innerText = name;
+            const div = document.createElement('div'); div.className = 'lab-btn-tag'; div.innerText = name;
             div.onclick = () => {
                 if(!activeId) return;
-                const labs = patientsDetails[activeId].labs || {};
-                labs[name] = { status: 'pending', date: new Date().toLocaleDateString('en-GB') };
-                db.ref('patientDetails/'+activeId+'/labs').set(labs);
+                db.ref('patientDetails/'+activeId+'/labs/'+name).update({ status: 'pending', date: new Date().toLocaleDateString('en-GB') });
                 db.ref('patientIndex/'+activeId).update({ hasPendingLab: true });
             };
             grid.appendChild(div);
@@ -189,69 +184,65 @@
         const list = document.getElementById('labResultsList'); list.innerHTML = '';
         Object.keys(labs).forEach(name => {
             const data = labs[name]; const ref = labRef[name] || {min:0, max:99999};
-            let statusDot = 'dot-pending';
+            let cls = '';
             if (data.status === 'done') {
                 const v = parseFloat(data.value);
-                if (v >= (ref.min||0) && v <= ref.max) statusDot = 'dot-normal';
-                else if (ref.b && v <= ref.b) statusDot = 'dot-warning';
-                else statusDot = 'dot-danger';
+                if (v >= (ref.min||0) && v <= ref.max) cls = 'res-normal';
+                else if (ref.b && v <= ref.b) cls = 'res-warning';
+                else cls = 'res-danger';
             }
 
-            const card = document.createElement('div');
-            card.className = 'lab-res-card';
-            card.innerHTML = `
-                <div class="lab-res-header">
-                    <div><span class="status-dot ${statusDot}"></span><span class="lab-name">${name}</span></div>
-                    <div class="lab-val">${data.status === 'pending' ? '<span class="pending-text">PENDING</span>' : data.value + ' ' + (ref.u || '')}</div>
-                </div>
-                <div style="display:flex; gap:10px; margin-top:5px;">
-                    <button class="edit-btn-sm" onclick="editLab('${name}')">${data.status === 'pending' ? 'Enter Result' : 'Edit'}</button>
-                    <button class="edit-btn-sm" style="color:var(--danger)" onclick="deleteLab('${name}')">Delete</button>
-                </div>
-                <div style="margin-top:10px; font-size:10px; color:#999;">Ordered: ${data.date}</div>
-                <div id="hist-${name}" style="margin-top:5px;"></div>
-            `;
-            
-            const histBox = card.querySelector(`#hist-${name}`);
-            (data.history || []).slice().reverse().forEach(h => {
-                histBox.innerHTML += `<div class="hist-entry"><span>${h.val} ${ref.u || ''}</span> <span>${h.date}</span></div>`;
-            });
-            list.appendChild(card);
+            let histHtml = ''; (data.history || []).slice().reverse().forEach(h => histHtml += `<div class="lab-history-row"><span>${h.val} ${ref.u || ''}</span><span>${h.date}</span></div>`);
+
+            list.innerHTML += `
+                <div class="lab-res-card ${cls}">
+                    <div class="lab-res-header">
+                        <span><b>${name}</b> <small>(${data.date})</small></span>
+                        <span>${data.status === 'pending' ? '<span style="color:red">PENDING</span>' : data.value + ' ' + (ref.u || '')}</span>
+                    </div>
+                    <div style="margin-top:5px; display:flex; gap:10px;">
+                        <button class="edit-btn-sm" style="color:blue; background:none; border:none; padding:0; text-decoration:underline; cursor:pointer;" onclick="editLab('${name}')">${data.status === 'pending' ? 'Enter Result' : 'Edit Entry'}</button>
+                        <button style="color:red; background:none; border:none; padding:0; text-decoration:underline; cursor:pointer;" onclick="deleteLab('${name}')">✕ Delete</button>
+                    </div>
+                    ${histHtml}
+                </div>`;
         });
     }
 
     function editLab(name) {
         const current = patientsDetails[activeId].labs[name];
-        const val = prompt(`Enter ${name} result:`, current.value || "");
-        const date = prompt("Set Date (DD/MM/YYYY):", current.date || new Date().toLocaleDateString('en-GB'));
+        const val = prompt(`Result for ${name}:`, current.value || "");
+        const date = prompt(`Date (DD/MM/YYYY):`, current.date || new Date().toLocaleDateString('en-GB'));
         if (val !== null) {
-            const labs = patientsDetails[activeId].labs;
-            const hist = labs[name].history || [];
-            if(labs[name].value) hist.push({ val: labs[name].value, date: labs[name].date });
-            labs[name] = { value: val, date: date, status: 'done', history: hist };
-            db.ref('patientDetails/'+activeId+'/labs').set(labs);
+            const hist = current.history || [];
+            if(current.value) hist.push({ val: current.value, date: current.date });
+            db.ref('patientDetails/'+activeId+'/labs/'+name).update({ value: val, date: date, status: 'done', history: hist });
         }
     }
 
-    function deleteLab(name) { if(confirm(`Delete all ${name} records?`)) { db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); } }
+    function deleteLab(name) { if(confirm("Remove this lab record?")) db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); }
 
     function loadFullData(id) {
-        activeId = id; db.ref('patientIndex/'+id).update({ isWaiting:false, hasPendingLab:false });
+        activeId = id; db.ref('patientIndex/'+id).update({ isWaiting: false, hasPendingLab: false });
         document.getElementById('emptyState').style.display = 'none'; document.getElementById('fileView').style.display = 'block';
         const d = patientsDetails[id] || {}; const b = patientsIndex[id] || {};
         document.getElementById('viewName').innerText = b.name;
-        document.getElementById('viewComplaint').innerText = b.complaint || "Routine Checkup";
-        document.getElementById('viewContact').innerHTML = `AGE: ${b.age || '--'} | PHONE: ${b.phone || '--'}`;
+        document.getElementById('viewComplaint').innerText = b.complaint || "Routine";
+        document.getElementById('viewContact').innerHTML = `Age: ${b.age} | Phone: ${b.phone}`;
         const wa = b.phone ? b.phone.replace(/\D/g,'') : '';
-        document.getElementById('waArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" style="background:#25d366; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:bold;">💬 WhatsApp Business</a>` : '';
+        document.getElementById('waArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" class="wa-btn">💬 WhatsApp Business</a>` : '';
         
         const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
-        (d.visitDates || []).slice().reverse().forEach((dt, i) => {
-            const realIdx = (d.visitDates.length - 1) - i;
-            log.innerHTML += `<div class="visit-row"><span class="visit-date-txt">📅 ${dt}</span><div>
-                <button class="edit-btn-sm" onclick="editVisit(${realIdx})">Edit</button>
-                <button class="edit-btn-sm" style="color:var(--danger); margin-left:10px;" onclick="deleteVisit(${realIdx})">✕</button>
-            </div></div>`;
+        (d.visitDates || []).slice().reverse().forEach((dt, idx) => {
+            const realIdx = (d.visitDates.length - 1) - idx;
+            log.innerHTML += `
+                <div class="visit-ctrl">
+                    <span>📅 ${dt}</span>
+                    <div>
+                        <span onclick="editVisit(${realIdx})" style="cursor:pointer; margin-right:8px;">✎</span>
+                        <span onclick="deleteVisit(${realIdx})" style="cursor:pointer; color:red;">✕</span>
+                    </div>
+                </div>`;
         });
         document.getElementById('vPres').value = d.presentation || ''; document.getElementById('vVisits').value = d.visits || '';
         document.getElementById('vOpDate').value = d.opD || ''; document.getElementById('vOpDetail').value = d.opT || '';
@@ -259,18 +250,23 @@
 
     function editVisit(idx) {
         const dates = patientsDetails[activeId].visitDates;
-        const n = prompt("Edit date:", dates[idx]);
+        const n = prompt("Edit Date:", dates[idx]);
         if(n) { dates[idx] = n; db.ref('patientDetails/'+activeId+'/visitDates').set(dates); }
     }
-    function deleteVisit(idx) { if(confirm("Remove visit?")) { const d = patientsDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
-    
-    function saveAll(manual = false) {
-        if (!activeId) return; const today = new Date().toLocaleDateString('en-GB');
-        const detailRef = db.ref('patientDetails/'+activeId);
-        detailRef.once('value').then(snap => {
-            const d = snap.val() || {}; const dates = d.visitDates || []; if(!dates.includes(today)) dates.push(today);
-            detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
-            document.getElementById('syncIndicator').style.display = 'none'; if (manual) alert("Sync Success");
+    function deleteVisit(idx) { if(confirm("Delete visit?")) { const d = patientsDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
+
+    function renderList() {
+        const list = document.getElementById('patientList'); const nQ = document.getElementById('searchBox').value.toLowerCase();
+        const rawD = document.getElementById('dateSearch').value; const dQ = rawD ? new Date(rawD).toLocaleDateString('en-GB') : null;
+        list.innerHTML = '';
+        Object.keys(patientsIndex).sort((a,b) => b-a).forEach(id => {
+            const p = patientsIndex[id]; const d = patientsDetails[id] || {};
+            const mN = p.name.toLowerCase().includes(nQ); const mD = !dQ || p.dateAdded === dQ || (d.visitDates || []).includes(dQ);
+            if (mN && mD) {
+                list.innerHTML += `<div class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
+                    <strong>${p.name}</strong>${p.isWaiting ? ' <small style="color:blue">(WAIT)</small>' : ''}${p.hasPendingLab ? ' 🧪' : ''}
+                    <span class="pt-meta">Reg: ${p.dateAdded}</span></div>`;
+            }
         });
     }
 
@@ -282,40 +278,39 @@
         ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
     }
 
-    function renderList() {
-        const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
-        Object.keys(patientsIndex).sort((a,b) => b-a).forEach(id => {
-            const p = patientsIndex[id]; if (p.name.toLowerCase().includes(q)) {
-                list.innerHTML += `<div class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
-                    <strong>${p.name}</strong>${p.isWaiting ? '<span style="background:var(--waiting); color:white; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px;">👤 WAIT</span>' : ''}${p.hasPendingLab ? '<span style="background:var(--lab); color:white; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px;">🧪 LAB</span>' : ''}</div>`;
-            }
+    function saveAll(manual = false) {
+        if (!activeId) return; const today = new Date().toLocaleDateString('en-GB');
+        const detailRef = db.ref('patientDetails/'+activeId);
+        detailRef.once('value').then(snap => {
+            const d = snap.val() || {}; const dates = d.visitDates || []; if(!dates.includes(today)) dates.push(today);
+            detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
+            document.getElementById('syncIndicator').style.display = 'none'; if (manual) alert("Sync Complete");
         });
     }
 
     function renderRems(rems) {
         const list = document.getElementById('remList'); list.innerHTML = '';
         Object.keys(rems).filter(id => rems[id].status === 'pending').forEach(id => {
-            const r = rems[id]; list.innerHTML += `<div style="background:#fff; border-left:8px solid var(--warning); padding:15px; border-radius:12px; margin-bottom:10px; box-shadow:0 4px 10px rgba(0,0,0,0.05); cursor:pointer;" onclick="loadFullData('${r.patientId}')">
-                <button style="float:right; background:var(--success); color:white; border:none; border-radius:8px; padding:8px 12px;" onclick="event.stopPropagation(); if(confirm('Done?')) db.ref('reminders/${id}').update({status:'done'})">✓</button>
-                <strong style="color:#d68910">${r.date || 'URGENT'}</strong><p style="margin:5px 0 0;">${r.text}</p></div>`;
+            const r = rems[id]; list.innerHTML += `<div class="rem-item" onclick="loadFullData('${r.patientId}')">
+                <button style="float:right; background:var(--success); color:white; border:none; padding:5px 10px; border-radius:4px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
+                <strong>${r.date || 'URGENT'}</strong><p>${r.text}</p></div>`;
         });
     }
 
     function renderCalendar() {
-        const cal = document.getElementById('opCalendar'); const today = new Date(); const monthOut = new Date(); monthOut.setDate(today.getDate() + 30);
+        const cal = document.getElementById('opCalendar'); const today = new Date(); const mOut = new Date(); mOut.setDate(today.getDate() + 30);
         let rows = ""; let count = 0;
         Object.keys(patientsIndex).forEach(id => {
-            const d = patientsDetails[id] || {}; if(d.opD) {
-                const opDate = new Date(d.opD); if(opDate >= today && opDate <= monthOut) {
-                    rows += `<tr><td style="padding:5px;">${d.opD}</td><td style="padding:5px;">${patientsIndex[id].name}</td><td style="padding:5px;">${d.opT || ''}</td></tr>`; count++;
-                }
+            const d = patientsDetails[id] || {}; if(d.opD && new Date(d.opD) >= today && new Date(d.opD) <= mOut) {
+                rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT}</td></tr>`; count++;
             }
         });
-        cal.innerHTML = count > 0 ? `<table style="width:100%; text-align:left; font-size:12px;"><tr><th>Date</th><th>Pt</th><th>Op</th></tr>${rows}</table>` : "No surgeries.";
+        cal.innerHTML = count > 0 ? `<table style="width:100%; font-size:12px; text-align:left;"><tr><th>Date</th><th>Pt</th><th>Op</th></tr>${rows}</table>` : "No surgeries scheduled.";
     }
 
-    function manualSync() { if (confirm("Cloud Sync?")) saveAll(true); }
+    function manualSync() { if (confirm("Confirm Manual Cloud Sync?")) saveAll(true); }
     function autoSyncTrigger() { document.getElementById('syncIndicator').style.display = 'block'; if (syncTimeout) clearTimeout(syncTimeout); syncTimeout = setTimeout(() => saveAll(false), 2000); }
+    function resetFilter() { document.getElementById('dateSearch').value = ''; renderList(); }
     function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
 </script>
 </body>
