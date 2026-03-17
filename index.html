@@ -9,7 +9,7 @@
     <style>
         :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; }
         body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; color: #333; overflow-x: hidden; }
-        header { background: var(--primary); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        header { background: var(--primary); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo-img { height: 45px; width: 45px; background: white; border-radius: 50%; padding: 2px; }
         .logo-large { width: 100px; height: 100px; border-radius: 50%; background: white; margin-bottom: 15px; border: 3px solid var(--secondary); }
 
@@ -24,36 +24,43 @@
         .scroll-card { max-height: 300px; overflow-y: auto; }
 
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        textarea { resize: none; min-height: 120px; line-height: 1.6; transition: 0.2s; }
+        textarea { resize: none; min-height: 120px; line-height: 1.6; transition: 0.2s; font-family: inherit; }
         button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* Sidebar Active Focus */
+        /* Sidebar Highlighting */
         .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 10px; margin-bottom: 6px; border-left: 5px solid transparent; transition: 0.2s; position: relative; }
-        .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; }
-        .btn-del-pt { position: absolute; right: 10px; top: 18px; color: var(--danger); font-size: 18px; opacity: 0.5; }
+        .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        .btn-del-pt { position: absolute; right: 10px; top: 18px; color: var(--danger); font-size: 18px; opacity: 0.5; cursor: pointer; }
+        .btn-del-pt:hover { opacity: 1; }
 
-        /* Labs & Pathology UI */
-        .lab-accordion { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-        .lab-header { background: #f8f9fa; padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; }
-        .lab-body { display: none; padding: 12px; border-top: 1px solid #eee; }
-        .lab-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f9f9f9; }
+        /* Pathology Accordion */
+        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
+        .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; }
+        .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
+        .lab-accordion { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .lab-header { background: #f8f9fa; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; }
+        .lab-header:hover { background: #eef4fb; }
+        .lab-body { display: none; padding: 15px; border-top: 1px solid #eee; background: #fff; }
+        .lab-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f9f9f9; align-items: center; }
 
-        .rem-item { background: #fff8e1; border-left: 6px solid var(--warning); padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .rem-item { background: #fff8e1; border-left: 6px solid var(--warning); padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: transform 0.1s; }
+        .rem-item:active { transform: scale(0.98); }
         .ai-box { background: #f0f4f8; border: 1.5px solid #d1d9e6; border-radius: 10px; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-family: 'Times New Roman', serif; color: #2c3e50; line-height: 1.5; }
+        .action-btn { background: none; border: none; padding: 0; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index:2000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;">
     <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2>Saad Sabry Surgical Master Pro</h2>
-    <input type="password" id="passCode" placeholder="Access Code" style="width:220px; text-align:center;">
-    <button onclick="checkPass()" style="width:220px; background:var(--success); margin-top:10px;">Login</button>
+    <h2 style="margin-bottom:20px;">Surgical Suite MASTER</h2>
+    <input type="password" id="passCode" placeholder="Access Code" style="width:250px; text-align:center; border:none; border-radius:10px;">
+    <button onclick="checkPass()" style="width:250px; background:var(--success); margin-top:10px; border-radius:10px;">Login</button>
 </div>
 
 <header>
     <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin:0; font-size:1.1em;">Dr. Saad Sabry Alzubaidy</h2>
+    <h2 style="margin:0; font-size:1.2em;">Dr. Saad Sabry Alzubaidy</h2>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
@@ -66,28 +73,28 @@
                 <input type="tel" id="newPhone" placeholder="Mobile">
             </div>
             <input type="text" id="newComp" placeholder="Chief Complaint">
-            <button onclick="addPatient()">Add Patient</button>
+            <button onclick="addPatient()">Add to Registry</button>
         </div>
         
         <div class="card" style="background:var(--secondary)">
-            <h3>BMI Tools</h3>
+            <h3>BMI Calculator</h3>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-                <input type="number" id="bmiW" placeholder="kg" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="cm" oninput="calcBMI()">
+                <input type="number" id="bmiW" placeholder="Wt(kg)" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="Ht(cm)" oninput="calcBMI()">
             </div>
-            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:5px; font-size:1.2em;">--</div>
+            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:5px; font-size:1.2em; color:var(--primary);">--</div>
         </div>
 
         <div class="card">
             <h3>History <span id="waitCounter" style="background:var(--waiting); color:white; padding:2px 8px; border-radius:10px; font-size:10px;">0</span></h3>
-            <input type="text" id="searchBox" placeholder="🔍 Name or Date..." oninput="renderList()">
-            <div id="patientList" style="max-height:400px; overflow-y:auto;"></div>
+            <input type="text" id="searchBox" placeholder="🔍 Search Name or Date..." oninput="renderList()">
+            <div id="patientList" style="max-height:400px; overflow-y:auto; margin-top:10px;"></div>
         </div>
     </div>
 
     <div class="content">
         <div class="dash-grid">
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
-            <div class="card"><h3>📅 Operations</h3><div id="opCalendar" class="scroll-card">No surgeries today.</div></div>
+            <div class="card"><h3>📅 Operations</h3><div id="opCalendar" class="scroll-card">No surgeries scheduled.</div></div>
         </div>
 
         <div id="emptyState" class="card" style="text-align:center; padding:80px 0; color:#bdc3c7;"><p>Select a patient to begin clinical review.</p></div>
@@ -95,59 +102,76 @@
         <div id="fileView" class="card" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
-                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0;"></h2>
-                    <div id="waArea" style="margin-top:10px;"></div>
+                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:5px;"></h2>
+                    <div id="waArea" style="margin-top:5px;"></div>
                 </div>
-                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● SYNC ACTIVE</div>
+                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none; padding:5px;">● SAVING...</div>
             </div>
 
-            <div id="visitInfo" style="background:var(--secondary); padding:15px; border-radius:12px; margin:20px 0; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div><span class="label">BIO</span><p id="viewContact" style="font-weight:bold; margin:0;"></p></div>
-                <div><span class="label">VISIT AUDIT</span><div id="visitHistoryLog" style="max-height:100px; overflow-y:auto;"></div></div>
+            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:15px 0; border-left:5px solid #ff9800;">
+                <span style="font-size:11px; color:#e65100; font-weight:bold; display:block;">CHIEF COMPLAINT</span>
+                <span id="viewComplaint" style="font-weight:bold; font-size:16px;"></span>
             </div>
 
-            <div class="card" style="background:#fffde7; border:1px solid #fdd835;">
-                <span class="label">Set Patient Task</span>
+            <div style="background:var(--secondary); padding:15px; border-radius:12px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1.5fr; gap:20px;">
+                <div><span style="font-size:11px; font-weight:bold; color:#666;">BIO</span><p id="viewContact" style="font-weight:bold; margin:5px 0 0 0;"></p></div>
+                <div><span style="font-size:11px; font-weight:bold; color:#666;">VISIT AUDIT (EDIT/DELETE)</span><div id="visitHistoryLog" style="max-height:100px; overflow-y:auto; margin-top:5px;"></div></div>
+            </div>
+
+            <div class="card" style="background:#fffde7; border:1px solid #fdd835; margin-bottom:15px; padding:15px;">
+                <span style="font-size:11px; font-weight:bold; color:#f57f17; display:block; margin-bottom:5px;">SCHEDULE PATIENT TASK</span>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="vRemText" placeholder="Follow-up visit" style="margin:0;">
-                    <button onclick="addPatientReminder()" style="width:100px; background:var(--warning);">Set</button>
+                    <input type="text" id="vRemText" placeholder="e.g. Follow-up visit" style="margin:0;">
+                    <input type="date" id="vRemDate" style="width:180px; margin:0;">
+                    <button onclick="addPatientReminder()" style="width:100px; background:var(--warning); margin:0;">Set</button>
                 </div>
             </div>
 
-            <div class="section"><span class="label">History</span><textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea></div>
-            <div class="section"><span class="label">Management (Mx)</span><textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea></div>
+            <div class="section" style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                <span style="font-weight:bold; font-size:11px; color:#666;">CLINICAL HISTORY</span>
+                <textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+            </div>
+            
+            <div class="section" style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                <span style="font-weight:bold; font-size:11px; color:#666;">MANAGEMENT (Mx)</span>
+                <textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+            </div>
 
-            <div class="section" style="background:#eef4fb; border:1px solid #d1d9e6;">
-                <span class="label" style="color:var(--primary)">📋 AI Surgical Referral Engine</span>
-                <button onclick="generateReferral()" style="background:var(--primary); margin-bottom:10px;">Generate Professional Letter</button>
+            <div class="section" style="background:#eef4fb; border:1px solid #d1d9e6; padding:15px; border-radius:10px; margin-bottom:15px;">
+                <span style="font-weight:bold; font-size:11px; color:var(--primary); display:block; margin-bottom:5px;">📋 AI SURGICAL REFERRAL ENGINE</span>
+                <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
                 <div id="referralResult" class="ai-box" style="display:none;"></div>
             </div>
 
-            <div class="section" style="background:#fff0f3; border-left:5px solid var(--danger);">
-                <span class="label" style="color:var(--danger)">Planned & Registry</span>
-                <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:5px;">
-                    <input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()">
-                    <button onclick="archiveSurgery()" style="background:var(--danger); padding:0 15px;">Log</button>
+            <div class="section" style="background:#fff0f3; border-left:5px solid var(--danger); padding:15px; border-radius:10px; margin-bottom:15px;">
+                <span style="font-weight:bold; font-size:11px; color:var(--danger); display:block; margin-bottom:5px;">PLANNED & HISTORICAL PROCEDURES</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:10px;">
+                    <input type="date" id="vOpDate" onchange="autoSyncTrigger()" style="margin:0;">
+                    <input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()" style="margin:0;">
+                    <button onclick="archiveSurgery()" style="background:var(--danger); margin:0; padding:0 20px;">Archive</button>
                 </div>
-                <div id="opHistoryList" style="margin-top:10px; font-size:12px;"></div>
+                <div id="opHistoryList" style="margin-top:15px; font-size:13px;"></div>
             </div>
 
-            <div class="section" style="border-left:5px solid var(--lab);">
-                <span class="label" style="color:var(--lab)">🧪 Advanced Pathology (Click for History)</span>
-                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(95px, 1fr)); gap:5px;" id="labSelector"></div>
-                <button onclick="addNewCustomLab()" style="background:#666; margin-top:10px; padding:5px; font-size:11px;">+ Create New Test Type</button>
+            <div class="section" style="border-left:5px solid var(--lab); padding:15px; border-radius:10px; margin-bottom:15px; background:#f8f9fa;">
+                <span style="font-weight:bold; font-size:11px; color:var(--lab); display:block; margin-bottom:5px;">🧪 ADVANCED PATHOLOGY (CLICK TO EXPAND)</span>
+                <div class="lab-tag-box" id="labSelector"></div>
+                <button onclick="addNewCustomLab()" style="background:#607d8b; margin-top:10px; padding:8px; font-size:12px; width:auto;">+ Create New Test Type</button>
                 <div id="labResultsList" style="margin-top:15px;"></div>
             </div>
 
-            <div class="section" style="border-left:5px solid #607d8b;">
-                <span class="label">⚖️ Weight & BP Trends</span>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:5px;">
-                    <input type="text" id="vW" placeholder="kg"><input type="text" id="vBP" placeholder="BP"><input type="date" id="vVDt"><button onclick="addVital()" style="padding:0 10px;">Log</button>
+            <div class="section" style="border-left:5px solid #607d8b; padding:15px; border-radius:10px; margin-bottom:15px; background:#f8f9fa;">
+                <span style="font-weight:bold; font-size:11px; color:#607d8b; display:block; margin-bottom:5px;">⚖️ WEIGHT & BP TRENDS</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px;">
+                    <input type="text" id="vW" placeholder="Wt(kg)" style="margin:0;">
+                    <input type="text" id="vBP" placeholder="BP" style="margin:0;">
+                    <input type="date" id="vVDt" style="margin:0;">
+                    <button onclick="addVital()" style="padding:0 20px; background:#607d8b; margin:0;">Log</button>
                 </div>
-                <div id="vitalList" style="margin-top:10px;"></div>
+                <div id="vitalList" style="margin-top:15px;"></div>
             </div>
 
-            <button onclick="manualSync()" style="background:var(--success); height:55px; margin-top:20px;">💾 SECURE SYNC TO CLOUD</button>
+            <button onclick="manualSync()" style="background:var(--success); height:60px; font-size:16px; margin-top:10px; box-shadow: 0 4px 15px rgba(40,167,69,0.2);">💾 FORCE CLOUD DATABASE SYNC</button>
         </div>
     </div>
 </div>
@@ -165,32 +189,43 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let ptIdx = {}; let ptDetails = {}; let activeId = null; let syncTimeout = null;
+    let ptIdx = {}; let ptDetails = {}; let activeId = null; let syncTimeout = null; let activeListener = null;
 
     const defaultLabs = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","ESR","CRP TITER","S.Iron","GUE","FBS","HbA1C","S.uric acid","S.Cr","TSH","PSA","Viral marker","Testosterone"];
+    const labDefaults = {"CBC":{u:"g/dL",r:"12-17.5"},"S.Cr":{u:"mg/dL",r:"0.7-1.3"},"TSH":{u:"mIU/L",r:"0.4-4.0"},"PSA":{u:"ng/mL",r:"0-4"},"FBS":{u:"mg/dL",r:"70-100"}};
 
-    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genLabTags(); } else { alert("Denied"); } }
+    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genLabTags(); } else { alert("Access Denied"); } }
 
     function initSync() {
-        db.ref('patientIndex').on('value', snap => { ptIdx = snap.val() || {}; renderList(); });
+        db.ref('patientIndex').on('value', snap => { ptIdx = snap.val() || {}; renderList(); renderCalendar(); });
         db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
     }
 
     function loadFullData(id) {
+        if(activeListener) activeListener.off(); // Detach previous listener
         activeId = id; 
         db.ref('patientIndex/'+id).update({ isWaiting:false, hasPendingLab:false });
         
-        // REAL-TIME LISTENER FOR ACTIVE FILE
-        db.ref('patientDetails/'+id).on('value', snap => {
+        // HIGHLIGHT SIDEBAR
+        document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
+        if(document.getElementById('pt-'+id)) document.getElementById('pt-'+id).classList.add('active');
+
+        // REAL-TIME LISTENER FOR THIS PATIENT
+        activeListener = db.ref('patientDetails/'+id);
+        activeListener.on('value', snap => {
             const d = snap.val() || {}; const b = ptIdx[id] || {};
             ptDetails[id] = d;
+            
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('fileView').style.display = 'block';
-            document.getElementById('viewName').innerText = b.name;
-            document.getElementById('viewContact').innerHTML = `Age: ${b.age} | Mobile: ${b.phone}`;
+            document.getElementById('referralResult').style.display = 'none';
+            
+            document.getElementById('viewName').innerText = b.name || "Unknown";
+            document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
+            document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} | Mobile: ${b.phone || '--'}`;
             
             const wa = b.phone ? b.phone.replace(/\D/g,'') : '';
-            document.getElementById('waArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" style="background:#25d366; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:bold;">💬 WhatsApp Business</a>` : '';
+            document.getElementById('waArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" style="background:#25d366; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:bold; box-shadow:0 2px 5px rgba(37,211,102,0.3);">💬 WhatsApp Direct</a>` : '';
             
             document.getElementById('vPres').value = d.presentation || '';
             document.getElementById('vVisits').value = d.visits || '';
@@ -201,24 +236,45 @@
             renderLabs(d.labs || {});
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
-            renderList(); // Highlighting sidebar
         });
     }
 
+    // FIXED: Smart Stamp appends to bottom for correct chronology
     function smartStamp(t) {
         const today = new Date().toLocaleDateString('en-GB');
-        if (!t.value.includes(today)) {
-            // APPEND TO BOTTOM: Grouped Old to New
-            t.value = t.value + `\n\n--- Visit: ${today} ---\n`;
+        const stamp = `--- Visit: ${today} ---`;
+        if (!t.value.includes(stamp)) {
+            t.value = t.value + (t.value ? "\n\n" : "") + `${stamp}\n`;
             t.scrollTop = t.scrollHeight;
             autoSyncTrigger();
         }
     }
 
+    function renderVisitLog(dates) {
+        const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
+        dates.slice().reverse().forEach((dt, i) => {
+            const rIdx = (dates.length-1)-i;
+            log.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:6px 0; border-bottom:1px solid #eee;">
+                    <span>📅 ${dt}</span>
+                    <div>
+                        <button class="action-btn" style="color:var(--primary); margin-right:12px;" onclick="editVisit(${rIdx})">✎ Edit</button>
+                        <button class="action-btn" style="color:var(--danger);" onclick="deleteVisit(${rIdx})">✕ Del</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function editVisit(idx) {
+        const dates = ptDetails[activeId].visitDates;
+        const n = prompt("Edit Date (DD/MM/YYYY):", dates[idx]);
+        if(n) { dates[idx] = n; db.ref('patientDetails/'+activeId+'/visitDates').set(dates); }
+    }
+    function deleteVisit(idx) { if(confirm("Remove this visit date?")) { const d = ptDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
+
     function generateReferral() {
         const b = ptIdx[activeId]; const d = ptDetails[activeId];
-        const date = new Date().toLocaleDateString('en-GB');
-        const text = `Date: ${date}\nTo: Specialist Colleague\nFrom: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nRE: Referral for ${b.name} (Age: ${b.age})\n\nPresenting Complaint: ${b.complaint || "Routine Evaluation"}\n\nSurgical History & Findings:\n${d.presentation || "None recorded"}\n\nManagement to Date:\n${d.visits || "Observation"}\n\nPlease evaluate for further clinical intervention.\n\nBest Regards,\nDr. Saad Sabry Alzubaidy`;
+        const text = `Date: ${new Date().toLocaleDateString('en-GB')}\nTo: Specialist Colleague\nFrom: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nRE: Referral for ${b.name} (Age: ${b.age})\n\nPresenting Complaint: ${b.complaint || "Clinical Evaluation"}\n\nClinical History:\n${d.presentation || "See attached."}\n\nManagement Plan:\n${d.visits || "Observation."}\n\nPlease evaluate for further clinical intervention.\n\nBest Regards,\nDr. Saad Sabry Alzubaidy`;
         document.getElementById('referralResult').innerText = text;
         document.getElementById('referralResult').style.display = 'block';
     }
@@ -226,24 +282,27 @@
     function genLabTags() {
         const grid = document.getElementById('labSelector'); grid.innerHTML = '';
         defaultLabs.forEach(name => {
-            const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = name; btn.style.border='1px solid var(--lab)'; btn.style.padding='5px'; btn.style.fontSize='10px'; btn.style.borderRadius='5px'; btn.style.cursor='pointer';
-            btn.onclick = () => orderLab(name); grid.appendChild(btn);
+            const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = name;
+            btn.onclick = () => orderLab(name, labDefaults[name] ? labDefaults[name].r : "N/A", labDefaults[name] ? labDefaults[name].u : "");
+            grid.appendChild(btn);
         });
     }
 
-    function orderLab(name, range="Not Set") {
+    function orderLab(name, range="N/A", unit="") {
         if(!activeId) return;
         const labs = ptDetails[activeId].labs || {};
-        if(!labs[name]) labs[name] = { history: [], range: range };
+        if(!labs[name]) labs[name] = { history: [], range: range, unit: unit };
         labs[name].pending = true;
         db.ref('patientDetails/'+activeId+'/labs/'+name).set(labs[name]);
         db.ref('patientIndex/'+activeId).update({ hasPendingLab:true });
     }
 
     function addNewCustomLab() {
-        const name = prompt("Enter Test Name:");
-        const range = prompt("Enter Normal Range (optional):");
-        if(name) orderLab(name, range);
+        const name = prompt("Enter New Test Name (e.g., Amylase):");
+        if(name) {
+            const range = prompt("Enter Normal Range (e.g., 0-100):") || "N/A";
+            orderLab(name, range);
+        }
     }
 
     function renderLabs(labs) {
@@ -252,20 +311,27 @@
             const data = labs[name];
             let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
                 const rIdx = (data.history.length-1)-idx;
-                hHtml += `<div class="lab-row"><span>${h.dt}: <b>${h.val}</b></span> <div><span onclick="editLabEntry('${name}', ${rIdx})" style="color:blue; cursor:pointer; margin-right:8px;">✎</span><span onclick="deleteLabEntry('${name}', ${rIdx})" style="color:red; cursor:pointer;">✕</span></div></div>`;
+                hHtml += `
+                    <div class="lab-row">
+                        <span>${h.dt}: <b style="font-size:15px;">${h.val} ${data.unit||''}</b></span> 
+                        <div>
+                            <button class="action-btn" style="color:var(--primary); margin-right:10px;" onclick="editLabEntry('${name}', ${rIdx})">✎ Edit</button>
+                            <button class="action-btn" style="color:var(--danger);" onclick="deleteLabEntry('${name}', ${rIdx})">✕</button>
+                        </div>
+                    </div>`;
             });
 
             list.innerHTML += `
                 <div class="lab-accordion">
                     <div class="lab-header" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='block'?'none':'block')">
-                        <span>${name} ${data.pending ? '<small style="color:red">(PENDING)</small>':''}</span>
-                        <span style="font-size:10px; color:#666;">Ref: ${data.range || 'N/A'}</span>
+                        <span style="font-size:15px;">${name} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
+                        <span style="font-size:11px; color:#666; font-weight:normal;">Ref Range: ${data.range || 'N/A'} ▼</span>
                     </div>
                     <div class="lab-body">
-                        <div style="display:flex; gap:5px; margin-bottom:10px;">
-                            <button onclick="addLabVal('${name}')" style="background:var(--lab); padding:5px; font-size:11px;">+ Entry</button>
-                            <button onclick="editLabMeta('${name}')" style="background:#666; padding:5px; font-size:11px;">✎ Range</button>
-                            <button onclick="deleteFullLab('${name}')" style="background:var(--danger); padding:5px; font-size:11px;">✕ Delete Test</button>
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <button onclick="addLabVal('${name}')" style="background:var(--lab); padding:8px 12px; font-size:12px; width:auto;">+ Add Result</button>
+                            <button onclick="editLabMeta('${name}')" style="background:#607d8b; padding:8px 12px; font-size:12px; width:auto;">✎ Edit Range/Unit</button>
+                            <button onclick="deleteFullLab('${name}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:8px 12px; font-size:12px; width:auto;">✕ Delete Test</button>
                         </div>
                         ${hHtml}
                     </div>
@@ -274,17 +340,33 @@
     }
 
     function addLabVal(name) {
-        const v = prompt("Value:"); const dt = prompt("Date:", new Date().toLocaleDateString('en-GB'));
+        const v = prompt(`Enter value for ${name}:`); 
         if(v) {
+            const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
             const h = ptDetails[activeId].labs[name].history || [];
             h.push({ val: v, dt: dt });
             db.ref('patientDetails/'+activeId+'/labs/'+name).update({ pending: false, history: h });
         }
     }
 
-    function editLabMeta(name) { const nR = prompt("New Normal Range:", ptDetails[activeId].labs[name].range); if(nR) db.ref('patientDetails/'+activeId+'/labs/'+name).update({ range: nR }); }
-    function deleteFullLab(name) { if(confirm(`Delete ALL records for ${name}?`)) db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); }
-    function deleteLabEntry(name, idx) { const h = ptDetails[activeId].labs[name].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+name+'/history').set(h); }
+    function editLabEntry(name, idx) {
+        const entry = ptDetails[activeId].labs[name].history[idx];
+        const newVal = prompt("Edit Value:", entry.val);
+        const newDt = prompt("Edit Date:", entry.dt);
+        if(newVal && newDt) {
+            const h = ptDetails[activeId].labs[name].history;
+            h[idx] = { val: newVal, dt: newDt };
+            db.ref('patientDetails/'+activeId+'/labs/'+name+'/history').set(h);
+        }
+    }
+
+    function editLabMeta(name) { 
+        const nR = prompt("New Range:", ptDetails[activeId].labs[name].range); 
+        const nU = prompt("New Unit (e.g. mg/dL):", ptDetails[activeId].labs[name].unit);
+        if(nR !== null) db.ref('patientDetails/'+activeId+'/labs/'+name).update({ range: nR, unit: nU }); 
+    }
+    function deleteFullLab(name) { if(confirm(`Permanently delete all ${name} records for this patient?`)) db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); }
+    function deleteLabEntry(name, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[name].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+name+'/history').set(h); } }
 
     function addVital() {
         const w = document.getElementById('vW').value; const bp = document.getElementById('vBP').value; const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
@@ -292,17 +374,21 @@
         const vits = ptDetails[activeId].vitals || [];
         vits.push({ w, bp, dt });
         db.ref('patientDetails/'+activeId+'/vitals').set(vits);
+        document.getElementById('vW').value=''; document.getElementById('vBP').value='';
     }
 
     function renderVitals(vits) {
         const list = document.getElementById('vitalList'); list.innerHTML = '';
         vits.slice().reverse().forEach((v, idx) => {
             const rIdx = (vits.length-1)-idx;
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:12px; background:#eef4fb; padding:5px; margin-bottom:3px; border-radius:5px;"><span><b>${v.dt}</b>: ${v.w||'--'}kg | BP: ${v.bp||'--'}</span><span onclick="deleteVital(${rIdx})" style="color:red; cursor:pointer;">✕</span></div>`;
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; background:#eef4fb; padding:10px; margin-bottom:5px; border-radius:8px;">
+                <span>📅 <b>${v.dt}</b> | Wt: <b>${v.w||'--'}</b>kg | BP: <b>${v.bp||'--'}</b></span>
+                <button class="action-btn" style="color:var(--danger);" onclick="deleteVital(${rIdx})">✕</button>
+            </div>`;
         });
     }
 
-    function deleteVital(idx) { const v = ptDetails[activeId].vitals; v.splice(idx,1); db.ref('patientDetails/'+activeId+'/vitals').set(v); }
+    function deleteVital(idx) { if(confirm("Delete vitals?")) { const v = ptDetails[activeId].vitals; v.splice(idx,1); db.ref('patientDetails/'+activeId+'/vitals').set(v); } }
 
     function archiveSurgery() {
         const d = document.getElementById('vOpDate').value; const t = document.getElementById('vOpDetail').value;
@@ -310,23 +396,28 @@
         const hist = ptDetails[activeId].surgicalHistory || [];
         hist.push({ d, t });
         db.ref('patientDetails/'+activeId+'/surgicalHistory').set(hist);
+        document.getElementById('vOpDate').value=''; document.getElementById('vOpDetail').value='';
     }
 
     function renderOpHistory(hist) {
-        const list = document.getElementById('opHistoryList'); list.innerHTML = '<b>Surgery Registry:</b>';
-        hist.slice().reverse().forEach(h => list.innerHTML += `<div style="background:#fff; border:1px solid #ffcdd2; padding:5px; margin-top:3px; border-radius:5px;">📅 ${h.d} - ${h.t}</div>`);
+        const list = document.getElementById('opHistoryList'); list.innerHTML = '<b style="color:#666; margin-bottom:5px; display:block;">Surgery Registry:</b>';
+        hist.slice().reverse().forEach(h => list.innerHTML += `<div style="background:#fff; border-left:4px solid #ffcdd2; padding:10px; margin-bottom:5px; border-radius:6px; font-weight:bold;">📅 ${h.d} - ${h.t}</div>`);
     }
 
     function renderList() {
         const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
         Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
             const p = ptIdx[id]; const d = ptDetails[id] || {};
-            const visitMatch = (d.visitDates || []).some(dt => dt.includes(q));
-            if (p.name.toLowerCase().includes(q) || p.dateAdded.includes(q) || visitMatch) {
-                list.innerHTML += `<div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
-                    <strong>${p.name}</strong>${p.isWaiting?' <small style="color:blue">(WAIT)</small>':''}${p.hasPendingLab?' 🧪':''}
-                    <span class="pt-meta">Reg: ${p.dateAdded}</span>
-                    <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span></div>`;
+            // Unified Search Check
+            const match = p.name.toLowerCase().includes(q) || (p.dateAdded && p.dateAdded.includes(q)) || (d.visitDates || []).some(dt => dt.includes(q));
+            
+            if (match) {
+                list.innerHTML += `
+                    <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
+                        <strong style="font-size:15px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:2px 5px; border-radius:4px; font-size:9px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}
+                        <span class="pt-meta">Reg: ${p.dateAdded}</span>
+                        <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span>
+                    </div>`;
             }
         });
         document.getElementById('waitCounter').innerText = Object.values(ptIdx).filter(x => x.isWaiting).length;
@@ -342,21 +433,38 @@
 
     function addPatientReminder() {
         const t = document.getElementById('vRemText').value || "Follow-up visit";
-        db.ref('reminders').push({ text: `[${ptIdx[activeId].name}] ${t}`, date: new Date().toLocaleDateString('en-GB'), status: 'pending', ptId: activeId });
-        document.getElementById('vRemText').value = '';
+        const d = document.getElementById('vRemDate').value || new Date().toLocaleDateString('en-GB');
+        db.ref('reminders').push({ text: `[${ptIdx[activeId].name}] ${t}`, date: d, status: 'pending', ptId: activeId });
+        document.getElementById('vRemText').value = ''; document.getElementById('vRemDate').value = '';
     }
 
     function renderRems(rems) {
         const list = document.getElementById('remList'); list.innerHTML = '';
-        Object.keys(rems).filter(id => rems[id].status === 'pending').forEach(id => {
-            const r = rems[id]; list.innerHTML += `<div class="rem-item" onclick="loadFullData('${r.ptId}')"><b>${r.date}</b>: ${r.text}</div>`;
+        Object.keys(rems).filter(id => rems[id].status === 'pending').sort((a,b) => new Date(rems[a].date) - new Date(rems[b].date)).forEach(id => {
+            const r = rems[id]; 
+            list.innerHTML += `
+                <div class="rem-item" onclick="loadFullData('${r.ptId}')">
+                    <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:6px 12px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
+                    <strong style="color:var(--danger); display:block; margin-bottom:4px;">${r.date}</strong>${r.text}
+                </div>`;
         });
+        if(list.innerHTML === '') list.innerHTML = "<p style='color:#999; padding:10px;'>No pending tasks.</p>";
+    }
+
+    function renderCalendar() {
+        const cal = document.getElementById('opCalendar'); const today = new Date(); let rows = "";
+        Object.keys(ptIdx).forEach(id => {
+            const d = ptDetails[id] || {}; if(d.opD && new Date(d.opD) >= today) {
+                rows += `<tr><td style="padding:6px; border-bottom:1px solid #eee;">${d.opD}</td><td style="padding:6px; border-bottom:1px solid #eee;"><b>${ptIdx[id].name}</b></td><td style="padding:6px; border-bottom:1px solid #eee;">${d.opT}</td></tr>`;
+            }
+        });
+        cal.innerHTML = rows ? `<table style="width:100%; font-size:13px; text-align:left; border-collapse:collapse;"><tr><th>Date</th><th>Patient</th><th>Procedure</th></tr>${rows}</table>` : "<p style='color:#999; padding:10px;'>No upcoming surgeries.</p>";
     }
 
     function autoSyncTrigger() { 
         document.getElementById('syncIndicator').style.display = 'block';
         if (syncTimeout) clearTimeout(syncTimeout); 
-        syncTimeout = setTimeout(() => saveAll(false), 3000); 
+        syncTimeout = setTimeout(() => saveAll(false), 2000); 
     }
 
     function saveAll(manual = false) {
@@ -370,10 +478,9 @@
     }
 
     function manualSync() { saveAll(true); }
-    function deletePt(id) { if(confirm("Delete patient?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); } }
-    function deleteVisit(idx) { if(confirm("Remove visit date?")) { const d = ptDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
+    function deletePt(id) { if(confirm("Permanently delete this patient?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); if(activeId===id) { document.getElementById('fileView').style.display='none'; document.getElementById('emptyState').style.display='block'; } } }
     function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
-    function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } }
+    function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
 </script>
 </body>
 </html>
