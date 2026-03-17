@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr. Saad Sabry Alzubaidy - Dr.Saad Sabry Alzubaidy Surgical Clinic </title>
+    <title>Dr. Saad Sabry Alzubaidy - Surgical Clinic</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
@@ -13,10 +13,9 @@
         .logo-img { height: 40px; width: 40px; background: white; border-radius: 50%; padding: 2px; object-fit: cover; }
         .logo-large { width: 90px; height: 90px; border-radius: 50%; background: white; margin-bottom: 15px; border: 3px solid var(--secondary); object-fit: cover; }
 
-        /* FLUID CROSS-DEVICE CONTAINER */
         .container { max-width: 1500px; margin: auto; padding: 15px; display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 1024px) { .container { grid-template-columns: 300px 1fr; } } /* iPad Portrait */
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } } /* iPhone */
+        @media (max-width: 1024px) { .container { grid-template-columns: 300px 1fr; } } 
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } } 
         
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; border: 1px solid #eaeaea; }
         @media (max-width: 768px) { .card { padding: 15px; } }
@@ -27,14 +26,12 @@
         @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; gap: 15px; } }
         .scroll-card { max-height: 300px; overflow-y: auto; padding-right: 5px; }
 
-        /* 16px Font prevents iOS Auto-Zoom */
         input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; transition: border 0.2s; }
         input:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
         textarea { resize: none; overflow-y: hidden; min-height: 100px; line-height: 1.6; font-family: inherit; } 
         button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
         button:active { opacity: 0.8; }
         
-        /* Sidebar Highlighting */
         .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 10px; margin-bottom: 6px; border-left: 5px solid transparent; transition: 0.2s; position: relative; }
         .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
         .pt-meta { font-size: 11px; color: #777; display: block; margin-top: 6px; }
@@ -45,7 +42,6 @@
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: rgba(255,255,255,0.8); border-radius: 4px; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); }
 
-        /* Pathology Accordion */
         .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 10px; max-height: 250px; overflow-y: auto; }
         .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
@@ -62,7 +58,6 @@
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
         
-        /* Mobile adjustments for grids inside patient file */
         @media (max-width: 768px) {
             .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; }
         }
@@ -72,7 +67,7 @@
 
 <div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index:2000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;">
     <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin-bottom:20px; text-align: center;">Surgical Suite MASTER</h2>
+    <h2 style="margin-bottom:20px; text-align: center;">Surgical Clinic</h2>
     <input type="password" id="passCode" placeholder="Access Code" style="width:280px; text-align:center; border:none; border-radius:10px;">
     <button onclick="checkPass()" style="width:280px; background:var(--success); margin-top:10px; border-radius:10px;">Login</button>
 </div>
@@ -377,9 +372,14 @@
     }
     function deleteVisit(idx) { if(confirm("Remove this visit date?")) { const d = ptDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
 
+    // UPDATED: ENHANCED AI PROFESSIONAL REFERRAL LETTER
     function generateReferral() {
-        const b = ptIdx[activeId]; const d = ptDetails[activeId];
-        const text = `Date: ${new Date().toLocaleDateString('en-GB')}\nTo: Specialist Colleague\nFrom: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nRE: Comprehensive Surgical Referral for ${b.name} (Age: ${b.age})\n\n*** Chief Complaint / Reason for Referral ***\n${b.complaint || "Surgical Evaluation"}\n\n*** History of Present Illness & Clinical Findings ***\n${d.presentation || "[No history recorded in system. Please consult directly.]"}\n\n*** Management, Investigations, and Proposed Plan ***\n${d.visits || "[No management recorded in system.]"}\n\n*** Clinical Request ***\nI am referring this patient for your specialist evaluation and co-management. Please find the clinical summary detailed above. I would appreciate your expert opinion regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon`;
+        const b = ptIdx[activeId] || {}; const d = ptDetails[activeId] || {};
+        const date = new Date().toLocaleDateString('en-GB');
+        const ageStr = b.age ? `${b.age} years old` : "Unknown age";
+        
+        const text = `DATE: ${date}\nTO: Specialist Colleague\nFROM: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nSUBJECT: Comprehensive Surgical Referral for ${b.name} (${ageStr})\n\n------------------------------------------------------------\n\nCHIEF COMPLAINT / REASON FOR REFERRAL:\n${b.complaint || "Referred for specialist surgical evaluation."}\n\nHISTORY OF PRESENT ILLNESS & OBJECTIVE FINDINGS:\n${d.presentation || "[No specific history recorded in system. Please consult directly with patient.]"}\n\nPROPOSED MANAGEMENT & INVESTIGATIONS TO DATE:\n${d.visits || "[No management recorded in system.]"}\n\nCLINICAL REQUEST:\nDear Colleague, \nI am referring this patient to your esteemed clinic for specialist evaluation and potential co-management. Please review the clinical summary detailed above. I would greatly appreciate your expert opinion and feedback regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon`;
+        
         document.getElementById('referralResult').innerText = text;
         document.getElementById('referralResult').style.display = 'block';
     }
@@ -514,9 +514,9 @@
         Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
             const p = ptIdx[id]; const d = ptDetails[id] || {};
             
-            // CALCULATE LAST VISIT (Default to Reg Date if no visits exist)
+            // UPDATED: CALCULATE LAST VISIT (Default to Reg Date if no visits exist)
             const visits = d.visitDates || [];
-            const lastVisit = visits.length > 0 ? visits[visits.length - 1] : p.dateAdded;
+            const lastVisit = (visits && visits.length > 0) ? visits[visits.length - 1] : (p.dateAdded || "N/A");
 
             // Search by Name, Reg Date, Complaint, or Visit Dates
             const match = p.name.toLowerCase().includes(q) 
@@ -540,7 +540,7 @@
         const n = document.getElementById('newName').value; if(!n) return;
         const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
         db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, isWaiting: true });
-        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [d] });
+        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); // Start with empty visit dates to force 'Last Visit' to show Reg Date initially
         ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
     }
 
