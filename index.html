@@ -24,18 +24,19 @@
         .scroll-card { max-height: 300px; overflow-y: auto; }
 
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        textarea { resize: none; min-height: 120px; line-height: 1.6; transition: 0.2s; font-family: inherit; }
+        textarea { resize: none; min-height: 120px; line-height: 1.6; transition: 0.2s; font-family: inherit; overflow-y: hidden; } /* Hide internal scroll for auto-expand */
         button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* Sidebar Highlighting */
+        /* Sidebar Highlighting & New Meta */
         .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 10px; margin-bottom: 6px; border-left: 5px solid transparent; transition: 0.2s; position: relative; }
         .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        .pt-meta { font-size: 10px; color: #888; display: block; margin-top: 4px; border-top: 1px dashed #eee; padding-top: 4px; }
         .btn-del-pt { position: absolute; right: 10px; top: 18px; color: var(--danger); font-size: 18px; opacity: 0.5; cursor: pointer; }
         .btn-del-pt:hover { opacity: 1; }
 
         /* Pathology Accordion */
-        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
-        .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; }
+        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; background: #f9f9f9; padding: 10px; border-radius: 10px; max-height: 200px; overflow-y: auto; }
+        .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; }
         .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
         .lab-accordion { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .lab-header { background: #f8f9fa; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; }
@@ -109,12 +110,16 @@
             </div>
 
             <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:15px 0; border-left:5px solid #ff9800;">
-                <span style="font-size:11px; color:#e65100; font-weight:bold; display:block;">CHIEF COMPLAINT</span>
-                <span id="viewComplaint" style="font-weight:bold; font-size:16px;"></span>
+                <span style="font-size:11px; color:#e65100; font-weight:bold; display:block;">CHIEF COMPLAINT (Click to edit)</span>
+                <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:bold; font-size:16px; display:inline-block; min-width:50px;"></span>
             </div>
 
             <div style="background:var(--secondary); padding:15px; border-radius:12px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1.5fr; gap:20px;">
-                <div><span style="font-size:11px; font-weight:bold; color:#666;">BIO</span><p id="viewContact" style="font-weight:bold; margin:5px 0 0 0;"></p></div>
+                <div>
+                    <span style="font-size:11px; font-weight:bold; color:#666;">BIO</span>
+                    <p id="viewContact" style="font-weight:bold; margin:5px 0 0 0;"></p>
+                    <span style="font-size:11px; color:#555; display:block; margin-top:8px;">Registered: <span id="viewRegDate" style="cursor:pointer; color:var(--primary); font-weight:bold;" onclick="editRegDate()"></span></span>
+                </div>
                 <div><span style="font-size:11px; font-weight:bold; color:#666;">VISIT AUDIT (EDIT/DELETE)</span><div id="visitHistoryLog" style="max-height:100px; overflow-y:auto; margin-top:5px;"></div></div>
             </div>
 
@@ -129,18 +134,18 @@
 
             <div class="section" style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
                 <span style="font-weight:bold; font-size:11px; color:#666;">CLINICAL HISTORY</span>
-                <textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+                <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
             </div>
             
             <div class="section" style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
                 <span style="font-weight:bold; font-size:11px; color:#666;">MANAGEMENT (Mx)</span>
-                <textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+                <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
             </div>
 
             <div class="section" style="background:#eef4fb; border:1px solid #d1d9e6; padding:15px; border-radius:10px; margin-bottom:15px;">
                 <span style="font-weight:bold; font-size:11px; color:var(--primary); display:block; margin-bottom:5px;">📋 AI SURGICAL REFERRAL ENGINE</span>
                 <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
-                <div id="referralResult" class="ai-box" style="display:none;"></div>
+                <div id="referralResult" class="ai-box" style="display:none;" contenteditable="true"></div>
             </div>
 
             <div class="section" style="background:#fff0f3; border-left:5px solid var(--danger); padding:15px; border-radius:10px; margin-bottom:15px;">
@@ -191,8 +196,28 @@
     const db = firebase.database();
     let ptIdx = {}; let ptDetails = {}; let activeId = null; let syncTimeout = null; let activeListener = null;
 
-    const defaultLabs = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","ESR","CRP TITER","S.Iron","GUE","FBS","HbA1C","S.uric acid","S.Cr","TSH","PSA","Viral marker","Testosterone"];
-    const labDefaults = {"CBC":{u:"g/dL",r:"12-17.5"},"S.Cr":{u:"mg/dL",r:"0.7-1.3"},"TSH":{u:"mIU/L",r:"0.4-4.0"},"PSA":{u:"ng/mL",r:"0-4"},"FBS":{u:"mg/dL",r:"70-100"}};
+    // COMPREHENSIVE BAGHDAD/INTERNATIONAL LAB DICTIONARY
+    const labRef = {
+        "CBC (M)":{u:"g/dL",r:"Hb:13.5-17.5 | PCV:41-50%"}, "CBC (F)":{u:"g/dL",r:"Hb:12-15.5 | PCV:36-44%"}, 
+        "ESR (M)":{u:"mm/hr",r:"0-15"}, "ESR (F)":{u:"mm/hr",r:"0-20"},
+        "CRP TITER":{u:"mg/L",r:"< 6"}, "ASO TITER":{u:"IU/mL",r:"< 200"}, "LATEX (RF)":{u:"IU/mL",r:"< 14"}, "ROSE BENGAL":{u:"",r:"Negative"},
+        "S.IRON":{u:"µg/dL",r:"M:65-175 F:50-170"}, "S.FERRITIN":{u:"ng/mL",r:"M:30-400 F:15-150"},
+        "PT":{u:"sec",r:"11-13.5"}, "PTT":{u:"sec",r:"25-35"}, "INR":{u:"",r:"0.8-1.2"}, "BT":{u:"min",r:"2-7"}, "D-DIMER":{u:"µg/mL",r:"< 0.5"},
+        "S.CHOLESTEROL":{u:"mg/dL",r:"< 200"}, "S.TRIGLYCERIDE":{u:"mg/dL",r:"< 150"}, "TOTAL LIPID":{u:"mg/dL",r:"400-800"},
+        "FBS":{u:"mg/dL",r:"70-100"}, "HbA1C":{u:"%",r:"4.0-5.6"}, "S.URIC ACID":{u:"mg/dL",r:"M:3.5-7.2 F:2.6-6.0"},
+        "B.UREA":{u:"mg/dL",r:"15-45"}, "S.CREATININE":{u:"mg/dL",r:"M:0.7-1.3 F:0.6-1.1"}, "S.CALCIUM":{u:"mg/dL",r:"8.5-10.5"},
+        "S.AMYLASE":{u:"U/L",r:"30-110"}, "S.LIPASE":{u:"U/L",r:"0-160"}, "LDH":{u:"U/L",r:"140-280"},
+        "SGOT":{u:"U/L",r:"5-40"}, "SGPT":{u:"U/L",r:"7-56"}, "ALP":{u:"U/L",r:"44-147"}, 
+        "TSB":{u:"mg/dL",r:"0.2-1.2"}, "DIRECT BIL":{u:"mg/dL",r:"< 0.3"}, "INDIRECT BIL":{u:"mg/dL",r:"0.2-0.8"},
+        "TSH":{u:"mIU/L",r:"0.4-4.5"}, "FREE T3":{u:"pg/mL",r:"2.3-4.2"}, "FREE T4":{u:"ng/dL",r:"0.8-1.8"},
+        "S.PROLACTIN":{u:"ng/mL",r:"F:<25 M:<15"}, "LH":{u:"mIU/mL",r:"M:1.7-8.6"}, "FSH":{u:"mIU/mL",r:"M:1.5-12.4"},
+        "S.TESTOSTERONE":{u:"ng/dL",r:"M:300-1000 F:15-70"}, "PSA":{u:"ng/mL",r:"< 4.0"}, "B-HCG":{u:"mIU/mL",r:"< 5"},
+        "S.VIT D":{u:"ng/mL",r:"30-100"}, "S.VIT B12":{u:"pg/mL",r:"200-900"},
+        "GUE":{u:"",r:"Normal"}, "URINE C+S":{u:"",r:"No growth"}, "GSE":{u:"",r:"Normal"}, 
+        "STOOL H.PYLORI":{u:"",r:"Negative"}, "STOOL CALPROTECTIN":{u:"µg/g",r:"< 50"}, "S.H.PYLORI":{u:"",r:"Negative"},
+        "SALMONELLA":{u:"",r:"Negative"}, "VIRAL MARKER":{u:"",r:"Non-reactive"}, "ANA":{u:"",r:"Negative"}, "BL.GP & RH":{u:"",r:"--"}
+    };
+    const defaultLabs = Object.keys(labRef);
 
     function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genLabTags(); } else { alert("Access Denied"); } }
 
@@ -201,16 +226,26 @@
         db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
     }
 
+    // AUTO EXPANDING TEXT AREAS
+    function autoExpand(field) {
+        field.style.height = 'inherit';
+        const computed = window.getComputedStyle(field);
+        const height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+                     + parseInt(computed.getPropertyValue('padding-top'), 10)
+                     + field.scrollHeight
+                     + parseInt(computed.getPropertyValue('padding-bottom'), 10)
+                     + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+        field.style.height = height + 'px';
+    }
+
     function loadFullData(id) {
-        if(activeListener) activeListener.off(); // Detach previous listener
+        if(activeListener) activeListener.off(); 
         activeId = id; 
         db.ref('patientIndex/'+id).update({ isWaiting:false, hasPendingLab:false });
         
-        // HIGHLIGHT SIDEBAR
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
         if(document.getElementById('pt-'+id)) document.getElementById('pt-'+id).classList.add('active');
 
-        // REAL-TIME LISTENER FOR THIS PATIENT
         activeListener = db.ref('patientDetails/'+id);
         activeListener.on('value', snap => {
             const d = snap.val() || {}; const b = ptIdx[id] || {};
@@ -223,12 +258,14 @@
             document.getElementById('viewName').innerText = b.name || "Unknown";
             document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
             document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} | Mobile: ${b.phone || '--'}`;
+            document.getElementById('viewRegDate').innerText = `${b.dateAdded || '--'} ✎`;
             
             const wa = b.phone ? b.phone.replace(/\D/g,'') : '';
             document.getElementById('waArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" style="background:#25d366; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:bold; box-shadow:0 2px 5px rgba(37,211,102,0.3);">💬 WhatsApp Direct</a>` : '';
             
-            document.getElementById('vPres').value = d.presentation || '';
-            document.getElementById('vVisits').value = d.visits || '';
+            const presBox = document.getElementById('vPres'); presBox.value = d.presentation || ''; autoExpand(presBox);
+            const visitsBox = document.getElementById('vVisits'); visitsBox.value = d.visits || ''; autoExpand(visitsBox);
+            
             document.getElementById('vOpDate').value = d.opD || '';
             document.getElementById('vOpDetail').value = d.opT || '';
             
@@ -239,13 +276,25 @@
         });
     }
 
-    // FIXED: Smart Stamp appends to bottom for correct chronology
+    function editRegDate() {
+        const current = ptIdx[activeId].dateAdded;
+        const n = prompt("Edit Registration Date (DD/MM/YYYY):", current);
+        if (n && n !== current) db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+    }
+
+    function updateComplaint(el) {
+        if(activeId) {
+            const txt = el.innerText.trim();
+            db.ref('patientIndex/'+activeId).update({ complaint: txt });
+        }
+    }
+
     function smartStamp(t) {
         const today = new Date().toLocaleDateString('en-GB');
         const stamp = `--- Visit: ${today} ---`;
         if (!t.value.includes(stamp)) {
             t.value = t.value + (t.value ? "\n\n" : "") + `${stamp}\n`;
-            t.scrollTop = t.scrollHeight;
+            autoExpand(t);
             autoSyncTrigger();
         }
     }
@@ -283,7 +332,7 @@
         const grid = document.getElementById('labSelector'); grid.innerHTML = '';
         defaultLabs.forEach(name => {
             const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = name;
-            btn.onclick = () => orderLab(name, labDefaults[name] ? labDefaults[name].r : "N/A", labDefaults[name] ? labDefaults[name].u : "");
+            btn.onclick = () => orderLab(name, labRef[name] ? labRef[name].r : "N/A", labRef[name] ? labRef[name].u : "");
             grid.appendChild(btn);
         });
     }
@@ -362,7 +411,7 @@
 
     function editLabMeta(name) { 
         const nR = prompt("New Range:", ptDetails[activeId].labs[name].range); 
-        const nU = prompt("New Unit (e.g. mg/dL):", ptDetails[activeId].labs[name].unit);
+        const nU = prompt("New Unit:", ptDetails[activeId].labs[name].unit);
         if(nR !== null) db.ref('patientDetails/'+activeId+'/labs/'+name).update({ range: nR, unit: nU }); 
     }
     function deleteFullLab(name) { if(confirm(`Permanently delete all ${name} records for this patient?`)) db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); }
@@ -408,14 +457,18 @@
         const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
         Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
             const p = ptIdx[id]; const d = ptDetails[id] || {};
-            // Unified Search Check
-            const match = p.name.toLowerCase().includes(q) || (p.dateAdded && p.dateAdded.includes(q)) || (d.visitDates || []).some(dt => dt.includes(q));
+            
+            // CALCULATE LAST VISIT
+            const visits = d.visitDates || [];
+            const lastVisit = visits.length > 0 ? visits[visits.length - 1] : "None";
+
+            const match = p.name.toLowerCase().includes(q) || (p.dateAdded && p.dateAdded.includes(q)) || visits.some(dt => dt.includes(q));
             
             if (match) {
                 list.innerHTML += `
                     <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
                         <strong style="font-size:15px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:2px 5px; border-radius:4px; font-size:9px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}
-                        <span class="pt-meta">Reg: ${p.dateAdded}</span>
+                        <span class="pt-meta">Reg: ${p.dateAdded} | Last: ${lastVisit}</span>
                         <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span>
                     </div>`;
             }
