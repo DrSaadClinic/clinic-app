@@ -67,14 +67,15 @@
 
 <div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index:2000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;">
     <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin-bottom:20px; text-align: center;">Surgical Clinic</h2>
+    <h2 style="margin-bottom:5px; text-align: center; font-size: 1.5em;">Dr. Saad Sabry Alzubaidy</h2>
+    <h3 style="margin-top:0; margin-bottom:20px; text-align: center; color:var(--secondary); font-weight: normal;">Surgical Clinic</h3>
     <input type="password" id="passCode" placeholder="Access Code" style="width:280px; text-align:center; border:none; border-radius:10px;">
     <button onclick="checkPass()" style="width:280px; background:var(--success); margin-top:10px; border-radius:10px;">Login</button>
 </div>
 
 <header>
     <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin:0; font-size:1.2em; font-weight: 600;">Dr. Saad Sabry Alzubaidy</h2>
+    <h2 style="margin:0; font-size:1.2em; font-weight: 600;">Dr. Saad Sabry Alzubaidy - Surgical Clinic</h2>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
@@ -125,6 +126,8 @@
                 </div>
                 <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none; padding:5px; white-space: nowrap;">● SAVING</div>
             </div>
+
+            <div id="activeReminderBanner" style="display:none; background:#fff3cd; border-left:5px solid #ff9800; padding:12px 15px; border-radius:8px; margin-top:15px; color:#d84315; font-weight:bold; font-size:14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"></div>
 
             <div style="background:#fff3e0; padding:15px; border-radius:10px; margin:20px 0; border-left:5px solid #ff9800;">
                 <span style="font-size:11px; color:#e65100; font-weight:bold; display:block; text-transform: uppercase;">Chief Complaint (Click to edit)</span>
@@ -213,7 +216,13 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let ptIdx = {}; let ptDetails = {}; let activeId = null; let syncTimeout = null; let activeListener = null;
+    
+    let ptIdx = {}; 
+    let ptDetails = {}; 
+    let allReminders = {}; 
+    let activeId = null; 
+    let syncTimeout = null; 
+    let activeListener = null;
 
     // COMPREHENSIVE BAGHDAD/INTERNATIONAL LAB DICTIONARY
     const labRef = {
@@ -277,7 +286,7 @@
 
     function initSync() {
         db.ref('patientIndex').on('value', snap => { ptIdx = snap.val() || {}; renderList(); renderCalendar(); });
-        db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
+        db.ref('reminders').on('value', snap => { allReminders = snap.val() || {}; renderRems(); checkActiveReminderBanner(); });
     }
 
     // AUTO EXPANDING TEXT AREAS
@@ -293,6 +302,8 @@
         
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
         if(document.getElementById('pt-'+id)) document.getElementById('pt-'+id).classList.add('active');
+
+        checkActiveReminderBanner();
 
         activeListener = db.ref('patientDetails/'+id);
         activeListener.on('value', snap => {
@@ -325,6 +336,20 @@
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
         });
+    }
+
+    // CHECK FOR ACTIVE TASKS FOR THIS PATIENT
+    function checkActiveReminderBanner() {
+        if(!activeId) return;
+        const banner = document.getElementById('activeReminderBanner');
+        const activeRem = Object.values(allReminders).find(r => (r.ptId === activeId || r.patientId === activeId) && r.status === 'pending');
+        
+        if(activeRem) {
+            banner.innerHTML = `⚠️ CLINICAL ALERT / TASK: ${activeRem.text} <span style="float:right;">${activeRem.date}</span>`;
+            banner.style.display = 'block';
+        } else {
+            banner.style.display = 'none';
+        }
     }
 
     function editRegDate() {
@@ -368,11 +393,23 @@
     function editVisit(idx) {
         const dates = ptDetails[activeId].visitDates;
         const n = prompt("Edit Date (DD/MM/YYYY):", dates[idx]);
-        if(n) { dates[idx] = n; db.ref('patientDetails/'+activeId+'/visitDates').set(dates); }
+        if(n) { 
+            dates[idx] = n; 
+            db.ref('patientDetails/'+activeId+'/visitDates').set(dates); 
+            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] }); // Force Update Index
+        }
     }
-    function deleteVisit(idx) { if(confirm("Remove this visit date?")) { const d = ptDetails[activeId].visitDates; d.splice(idx,1); db.ref('patientDetails/'+activeId+'/visitDates').set(d); } }
+    
+    function deleteVisit(idx) { 
+        if(confirm("Remove this visit date?")) { 
+            const d = ptDetails[activeId].visitDates; 
+            d.splice(idx,1); 
+            db.ref('patientDetails/'+activeId+'/visitDates').set(d); 
+            const lastV = d.length > 0 ? d[d.length - 1] : ptIdx[activeId].dateAdded;
+            db.ref('patientIndex/'+activeId).update({ lastVisit: lastV }); // Update Index Last Visit
+        } 
+    }
 
-    // UPDATED: ENHANCED AI PROFESSIONAL REFERRAL LETTER
     function generateReferral() {
         const b = ptIdx[activeId] || {}; const d = ptDetails[activeId] || {};
         const date = new Date().toLocaleDateString('en-GB');
@@ -486,11 +523,29 @@
         const list = document.getElementById('vitalList'); list.innerHTML = '';
         vits.slice().reverse().forEach((v, idx) => {
             const rIdx = (vits.length-1)-idx;
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; background:#eef4fb; padding:12px; margin-bottom:8px; border-radius:8px;">
-                <span>📅 <b>${v.dt}</b> | Wt: <b style="font-size:16px;">${v.w||'--'}</b>kg | BP: <b style="font-size:16px;">${v.bp||'--'}</b></span>
-                <button class="action-btn" style="color:var(--danger); font-size:16px;" onclick="deleteVital(${rIdx})">✕</button>
-            </div>`;
+            list.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; background:#eef4fb; padding:12px; margin-bottom:8px; border-radius:8px;">
+                    <span>📅 <b>${v.dt}</b> | Wt: <b style="font-size:16px;">${v.w||'--'}</b>kg | BP: <b style="font-size:16px;">${v.bp||'--'}</b></span>
+                    <div>
+                        <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:14px;" onclick="editVital(${rIdx})">✎ Edit</button>
+                        <button class="action-btn" style="color:var(--danger); font-size:16px;" onclick="deleteVital(${rIdx})">✕</button>
+                    </div>
+                </div>`;
         });
+    }
+
+    // NEW: Fully Editable Vitals
+    function editVital(idx) {
+        const v = ptDetails[activeId].vitals[idx];
+        const w = prompt("Edit Weight (kg):", v.w || "");
+        const bp = prompt("Edit BP:", v.bp || "");
+        const dt = prompt("Edit Date:", v.dt || "");
+        
+        if(w !== null && bp !== null && dt !== null) {
+            const vits = ptDetails[activeId].vitals;
+            vits[idx] = { w: w, bp: bp, dt: dt };
+            db.ref('patientDetails/'+activeId+'/vitals').set(vits);
+        }
     }
 
     function deleteVital(idx) { if(confirm("Delete vitals?")) { const v = ptDetails[activeId].vitals; v.splice(idx,1); db.ref('patientDetails/'+activeId+'/vitals').set(v); } }
@@ -512,17 +567,16 @@
     function renderList() {
         const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
         Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
-            const p = ptIdx[id]; const d = ptDetails[id] || {};
+            const p = ptIdx[id];
             
-            // UPDATED: CALCULATE LAST VISIT (Default to Reg Date if no visits exist)
-            const visits = d.visitDates || [];
-            const lastVisit = (visits && visits.length > 0) ? visits[visits.length - 1] : (p.dateAdded || "N/A");
+            // ACCURATE LAST VISIT LOGIC: Prioritizes the saved lastVisit variable updated by the Sync Engine
+            const lastVisit = p.lastVisit || p.dateAdded || "N/A";
 
-            // Search by Name, Reg Date, Complaint, or Visit Dates
+            // Search by Name, Reg Date, Complaint, or Last Visit Date
             const match = p.name.toLowerCase().includes(q) 
                 || (p.dateAdded && p.dateAdded.includes(q)) 
                 || (p.complaint && p.complaint.toLowerCase().includes(q))
-                || visits.some(dt => dt.includes(q));
+                || lastVisit.includes(q);
             
             if (match) {
                 list.innerHTML += `
@@ -539,8 +593,9 @@
     function addPatient() {
         const n = document.getElementById('newName').value; if(!n) return;
         const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
-        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, isWaiting: true });
-        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); // Start with empty visit dates to force 'Last Visit' to show Reg Date initially
+        // Save initial patient index with lastVisit identical to Registration Date
+        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true });
+        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); 
         ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
     }
 
@@ -551,11 +606,11 @@
         document.getElementById('vRemText').value = ''; document.getElementById('vRemDate').value = '';
     }
 
-    function renderRems(rems) {
+    function renderRems() {
         const list = document.getElementById('remList'); list.innerHTML = '';
-        Object.keys(rems).filter(id => rems[id].status === 'pending').sort((a,b) => new Date(rems[a].date) - new Date(rems[b].date)).forEach(id => {
-            const r = rems[id]; 
-            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders
+        Object.keys(allReminders).filter(id => allReminders[id].status === 'pending').sort((a,b) => new Date(allReminders[a].date) - new Date(allReminders[b].date)).forEach(id => {
+            const r = allReminders[id]; 
+            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders for proper routing
             list.innerHTML += `
                 <div class="rem-item" onclick="loadFullData('${targetId}')">
                     <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:8px 12px; font-size:14px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
@@ -586,7 +641,13 @@
         const detailRef = db.ref('patientDetails/'+activeId);
         detailRef.once('value').then(snap => {
             const d = snap.val() || {}; const dates = d.visitDates || []; if(!dates.includes(today)) dates.push(today);
+            
+            // Sync Medical Text Data
             detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
+            
+            // Sync Last Visit to Index for proper Sidebar Rendering
+            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
+
             document.getElementById('syncIndicator').style.display = 'none'; if (manual) alert("Cloud Sync OK");
         });
     }
