@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr. Saad Sabry Alzubaidy - Surgical Suite MASTER</title>
+    <title>Dr. Saad Sabry Alzubaidy - Dr.Saad Sabry Alzubaidy Surgical Clinic </title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
@@ -287,14 +287,8 @@
 
     // AUTO EXPANDING TEXT AREAS
     function autoExpand(field) {
-        field.style.height = 'inherit';
-        const computed = window.getComputedStyle(field);
-        const height = parseInt(computed.getPropertyValue('border-top-width'), 10)
-                     + parseInt(computed.getPropertyValue('padding-top'), 10)
-                     + field.scrollHeight
-                     + parseInt(computed.getPropertyValue('padding-bottom'), 10)
-                     + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
-        field.style.height = height + 'px';
+        field.style.height = 'auto'; // Reset
+        field.style.height = (field.scrollHeight) + 'px';
     }
 
     function loadFullData(id) {
@@ -385,7 +379,7 @@
 
     function generateReferral() {
         const b = ptIdx[activeId]; const d = ptDetails[activeId];
-        const text = `Date: ${new Date().toLocaleDateString('en-GB')}\nTo: Specialist Colleague\nFrom: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nRE: Referral for ${b.name} (Age: ${b.age})\n\nPresenting Complaint: ${b.complaint || "Clinical Evaluation"}\n\nClinical History:\n${d.presentation || "See attached."}\n\nManagement Plan:\n${d.visits || "Observation."}\n\nPlease evaluate for further clinical intervention.\n\nBest Regards,\nDr. Saad Sabry Alzubaidy`;
+        const text = `Date: ${new Date().toLocaleDateString('en-GB')}\nTo: Specialist Colleague\nFrom: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nRE: Comprehensive Surgical Referral for ${b.name} (Age: ${b.age})\n\n*** Chief Complaint / Reason for Referral ***\n${b.complaint || "Surgical Evaluation"}\n\n*** History of Present Illness & Clinical Findings ***\n${d.presentation || "[No history recorded in system. Please consult directly.]"}\n\n*** Management, Investigations, and Proposed Plan ***\n${d.visits || "[No management recorded in system.]"}\n\n*** Clinical Request ***\nI am referring this patient for your specialist evaluation and co-management. Please find the clinical summary detailed above. I would appreciate your expert opinion regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon`;
         document.getElementById('referralResult').innerText = text;
         document.getElementById('referralResult').style.display = 'block';
     }
@@ -561,7 +555,7 @@
         const list = document.getElementById('remList'); list.innerHTML = '';
         Object.keys(rems).filter(id => rems[id].status === 'pending').sort((a,b) => new Date(rems[a].date) - new Date(rems[b].date)).forEach(id => {
             const r = rems[id]; 
-            const targetId = r.ptId || r.patientId; // Legacy catch for old reminders
+            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders
             list.innerHTML += `
                 <div class="rem-item" onclick="loadFullData('${targetId}')">
                     <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:8px 12px; font-size:14px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
