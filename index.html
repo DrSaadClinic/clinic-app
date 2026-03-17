@@ -22,45 +22,43 @@
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
         textarea { resize: none; overflow-y: auto; min-height: 120px; transition: height 0.2s; border: 2px solid #eee; font-family: inherit; line-height: 1.5; }
-        textarea:focus { border-color: var(--primary); outline: none; background: #fff; }
         
         #loginScreen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; text-align: center; }
         
-        /* Dashboard Priority Layout */
-        .dash-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 20px; }
-        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
-
-        /* Aesthetic Reminders */
-        .rem-item { background: #fff; border-left: 8px solid var(--warning); padding: 18px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.1s; }
-        .rem-item:active { transform: scale(0.98); }
+        .rem-item { background: #fff; border-left: 8px solid var(--warning); padding: 18px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; }
         .rem-item strong { display: block; font-size: 16px; color: #d68910; margin-bottom: 5px; }
-        .rem-item p { margin: 0; font-size: 15px; font-weight: 500; color: #444; line-height: 1.4; }
-        .check-btn { float:right; background: var(--success); color: white; border: none; border-radius: 8px; padding: 10px 18px; font-weight: bold; cursor: pointer; margin-top: -5px; }
 
         .pt-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; background: #fff; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid transparent; }
         .pt-item.active { border-left-color: var(--success); background: var(--secondary); }
-        .waiting-badge-sm { background: var(--waiting); color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
         
-        .wa-btn { background: #25d366; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(37,211,102,0.3); }
-        
+        /* Labs UI */
         .lab-tag { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; text-align: center; cursor: pointer; }
-        .lab-res-card { padding: 12px; border-radius: 10px; margin-bottom: 8px; color: white; font-weight: bold; }
-        .hist-line { font-size: 10px; padding: 3px; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 4px; display: flex; justify-content: space-between; }
+        .lab-res-card { padding: 10px; border-radius: 8px; margin-bottom: 5px; color: white; font-weight: bold; }
+        
+        /* Visit Controls */
+        .visit-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 5px 0; }
+        .visit-date-txt { font-weight: bold; font-size: 13px; color: #555; }
+        .visit-btn { border:none; background:none; cursor:pointer; font-size:14px; padding: 5px; }
 
-        .complaint-box { background: #fff3e0; border: 1px solid #ffe0b2; padding: 12px; border-radius: 10px; margin-bottom: 15px; color: #e65100; font-weight: bold; }
+        .section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
+        .label { font-weight: bold; font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
+        .img-thumb { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; background: #eee; }
+        
+        #uploadingOverlay { display:none; color:var(--success); font-weight:bold; font-size:12px; margin-bottom:10px; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
-    <img src="Gemini_Generated_Image_cit3qacit3qacit3.jpg" class="logo-large" alt="Logo">
-    <h1 style="margin-bottom:10px;">Saad Sabry Clinic</h1>
+    <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+    <h1>Saad Sabry Clinic</h1>
     <input type="password" id="passCode" placeholder="Access Code" style="width: 260px; text-align: center; border-radius:10px;">
     <button onclick="checkPass()" style="width: 260px; background: var(--success); margin-top: 10px; border-radius:10px;">Enter Clinic</button>
 </div>
 
 <header>
-    <img src="Gemini_Generated_Image_cit3qacit3qacit3.jpg" class="logo-header" alt="Logo">
+    <img src="logo.jpg" class="logo-header" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
     <h2 style="margin:0; font-size: 1.1em;">Dr. Saad Sabry Alzubaidy</h2>
 </header>
 
@@ -84,54 +82,49 @@
     </div>
 
     <div class="content">
-        <div class="dash-grid">
-            <div class="card" style="border-top: 5px solid var(--primary);">
-                <h3>📅 Operations</h3>
-                <div id="opCalendar" style="font-size: 13px;">Scanning...</div>
-            </div>
-            <div class="card" style="border-top: 5px solid var(--warning);">
-                <h3>🔔 Priority Reminders</h3>
-                <div id="remList" style="max-height: 400px; overflow-y: auto;">No pending tasks.</div>
-            </div>
+        <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:20px;">
+            <div class="card"><h3>📅 Operations</h3><div id="opCalendar" style="font-size: 13px;">Scanning...</div></div>
+            <div class="card"><h3>🔔 Reminders</h3><div id="remList" style="max-height: 300px; overflow-y: auto;">No tasks.</div></div>
         </div>
 
-        <div id="emptyState" class="card" style="text-align:center; padding: 60px 0; color: #999;"><p>Select a patient to begin consultation.</p></div>
+        <div id="emptyState" class="card" style="text-align:center; padding: 60px 0; color: #999;"><p>Select a patient to begin.</p></div>
 
         <div id="fileView" class="card" style="display:none;">
-            <div style="display:flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0;"></h2>
-                    <div id="viewContactArea" style="margin-top:8px;"></div>
-                </div>
+            <div style="display:flex; justify-content: space-between;">
+                <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0;"></h2>
                 <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none;">● Auto-Syncing...</div>
             </div>
             
-            <div class="complaint-box">
-                <span class="label" style="color:#e65100; margin-bottom:2px;">Chief Complaint</span>
-                <span id="viewComplaint"></span>
+            <div id="visitInfo" style="background: var(--secondary); padding: 15px; border-radius: 10px; margin: 15px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div><span class="label">Patient Profile</span><p id="viewContact" style="font-weight: bold; color: var(--primary); margin:0; font-size: 0.9em;"></p></div>
+                <div><span class="label">Visit Audit (Edit/Delete)</span><div id="visitHistoryLog" style="max-height: 80px; overflow-y: auto;"></div></div>
             </div>
 
-            <div id="visitInfo" style="background: var(--secondary); padding: 15px; border-radius: 10px; margin: 15px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div><span class="label">Patient Bio</span><p id="viewContact" style="font-weight: bold; color: var(--primary); margin:0; font-size: 0.95em;"></p></div>
-                <div><span class="label">History of Visits</span><div id="visitHistoryLog" style="max-height: 80px; overflow-y: auto; font-size: 11px;"></div></div>
+            <div class="section"><span class="label">Clinical History & Findings</span>
+                <textarea id="vPres" oninput="autoSyncTrigger()" onfocus="smartTimestamp(this)"></textarea>
+            </div>
+
+            <div class="section"><span class="label">Medical Imaging (Turbo Load)</span>
+                <div id="uploadingOverlay">Optimizing Photo...</div>
+                <button style="background:#607d8b; color:white; padding:12px; font-weight:bold;" onclick="document.getElementById('cam').click()">📷 SNAP PHOTO</button>
+                <input type="file" id="cam" accept="image/*" multiple style="display:none" onchange="processAndUpload(event)">
+                <div id="gallery" class="gallery"></div>
+            </div>
+
+            <div class="section"><span class="label">Management Timeline (Mx)</span>
+                <textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="smartTimestamp(this)"></textarea>
+            </div>
+            
+            <div class="section" style="background:#fff0f3;"><span class="label" style="color:var(--danger)">Surgery Plan</span>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()"></div>
             </div>
 
             <div class="section" style="border-left: 5px solid var(--lab);">
-                <span class="label" style="color:var(--lab)">🧪 Lab History & Progression</span>
+                <span class="label" style="color:var(--lab)">🧪 Lab Suite (History)</span>
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 5px; max-height: 150px; overflow-y: auto;" id="labSelector"></div>
                 <div id="labResultsList" style="margin-top:10px;"></div>
             </div>
 
-            <div class="section"><span class="label">Clinical History & Findings</span>
-                <textarea id="vPres" oninput="autoSyncTrigger()" onfocus="insertVisitHeader(this)"></textarea>
-            </div>
-            <div class="section"><span class="label">Management Timeline (Mx)</span>
-                <textarea id="vVisits" oninput="autoSyncTrigger()" onfocus="insertVisitHeader(this)"></textarea>
-            </div>
-            
-            <div class="section" style="background:#fff0f3;"><span class="label" style="color:var(--danger)">Surgery Plan</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="vOpDate" onchange="autoSyncTrigger()"><input type="text" id="vOpDetail" placeholder="Operation" oninput="autoSyncTrigger()"></div>
-            </div>
             <button onclick="manualSync()" style="background:var(--success); font-size: 16px; height: 50px;">💾 SYNC CHANGES (Manual Confirm)</button>
         </div>
     </div>
@@ -152,8 +145,8 @@
     const db = firebase.database();
     let patientsIndex = {}; let patientsDetails = {}; let activeId = null; let syncTimeout = null;
 
-    const labList = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","Total lipid profile","ESR","CRP TITER","Latex test","S.Iron","S.Ferrtin","GUE","FBS","HbA1C","S.uric acid","B.Ur","S.Cr","F.T3","F.T4","TSH","S Amylase","S.Lipase","SGOT","SGPT","ALP","TSB(direct. indirect)","S.Ca","LDH","ANA","PT/PTT/INR","Bl.gp&Rh","Viral marker","D.DIMER","BT","BHCG","GSE","Stool for H.pylori","Stool for Calprotectin","Stool for H.pylori titer","S.H.Pylori","Urin for C+S","ASO TITER","Rose Bengal test","IgG/M for Sallmonela","S.Vit.D","S.Vit.B12","S.Prolactin","LH","FSH","S.Testerone","PSA"];
-    const labRef = {"CBC":{u:"g/dL",min:12,max:17.5},"S.CHOLESTEROL":{u:"mg/dL",max:200},"S.TRIGLYCERID":{u:"mg/dL",max:150},"ESR":{u:"mm/hr",max:20},"CRP TITER":{u:"mg/L",max:10},"FBS":{u:"mg/dL",min:70,max:100,b:125},"HbA1C":{u:"%",min:4,max:5.6,b:6.4},"S.Cr":{u:"mg/dL",min:0.7,max:1.3},"TSH":{u:"mIU/L",min:0.4,max:4.0},"PSA":{u:"ng/mL",max:4}};
+    const labList = ["CBC","S.CHOLESTEROL","S.TRIGLYCERID","Total lipid profile","ESR","CRP TITER","S.Iron","S.Ferrtin","GUE","FBS","HbA1C","S.uric acid","B.Ur","S.Cr","TSH","SGOT","SGPT","ALP","S.Ca","PSA"];
+    const labRef = {"CBC":{u:"g/dL",min:12,max:17.5},"S.CHOLESTEROL":{u:"mg/dL",max:200},"FBS":{u:"mg/dL",min:70,max:100,b:125},"TSH":{u:"mIU/L",min:0.4,max:4.0}};
 
     function checkPass() {
         if(document.getElementById('passCode').value === 'saad2026') {
@@ -163,57 +156,57 @@
         } else { alert("Denied"); }
     }
 
-    // NEW: Auto-timestamping logic
-    function insertVisitHeader(t) {
-        const today = new Date().toLocaleDateString('en-GB');
-        const headerText = `📅 ${today} - Visit:\n`;
-        if (!t.value.startsWith(headerText)) {
-            t.value = headerText + t.value;
-            autoSyncTrigger(); 
-        }
-    }
-
     function initSync() {
         db.ref('patientIndex').on('value', snap => { patientsIndex = snap.val() || {}; renderList(); });
         db.ref('patientDetails').on('value', snap => { patientsDetails = snap.val() || {}; renderList(); renderCalendar(); });
         db.ref('reminders').on('value', snap => renderRems(snap.val() || {}));
     }
 
-    function genLabButtons() {
-        const grid = document.getElementById('labSelector');
-        labList.forEach(name => {
-            const div = document.createElement('div'); div.className = 'lab-tag'; div.innerText = name;
-            div.onclick = () => orderLab(name); grid.appendChild(div);
-        });
+    // UPDATED: Cursor-based timestamping
+    function smartTimestamp(t) {
+        const today = new Date().toLocaleDateString('en-GB');
+        const stamp = `\n📅 ${today} - Visit:\n`;
+        if (!t.value.includes(`📅 ${today}`)) {
+            const start = t.selectionStart;
+            t.value = t.value.slice(0, start) + stamp + t.value.slice(start);
+            autoSyncTrigger();
+        }
     }
 
-    function orderLab(name) {
-        if(!activeId) return;
-        const ptLabs = patientsDetails[activeId].labs || {};
-        if(!ptLabs[name]) ptLabs[name] = { history: [] };
-        ptLabs[name].status = 'pending'; ptLabs[name].date = new Date().toLocaleDateString('en-GB');
-        db.ref('patientDetails/'+activeId+'/labs/'+name).set(ptLabs[name]);
-        db.ref('patientIndex/'+activeId).update({ hasPendingLab: true });
-    }
+    // NEW: Turbo Image Compression Engine
+    function processAndUpload(event) {
+        const files = event.target.files;
+        const today = new Date().toLocaleDateString('en-GB');
+        document.getElementById('uploadingOverlay').style.display = 'block';
 
-    function addPatient() {
-        const n = document.getElementById('newName').value; if(!n) return;
-        const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
-        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, isWaiting: true });
-        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', opD: '', opT: '', visitDates: [d] });
-        ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
-    }
-
-    function renderList() {
-        const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
-        Object.keys(patientsIndex).sort((a,b) => b-a).forEach(id => {
-            const p = patientsIndex[id]; const matchN = p.name.toLowerCase().includes(q);
-            if (matchN) {
-                list.innerHTML += `<div class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
-                    <div><strong>${p.name}</strong>${p.isWaiting ? '<span class="waiting-badge-sm">👤 WAIT</span>' : ''}${p.hasPendingLab ? '<span style="background:var(--lab); color:white; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px;">🧪 LAB</span>' : ''}<br><span style="font-size:10px; color:#999;">Added: ${p.dateAdded}</span></div>
-                    <button style="background:#fdeaea; color:var(--danger); border:none; padding:5px; border-radius:4px;" onclick="event.stopPropagation(); deleteRec('${id}')">✕</button></div>`;
-            }
-        });
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Optimal speed for mobile
+                    let width = img.width; let height = img.height;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+                    else { if (height > MAX_WIDTH) { width *= MAX_WIDTH / height; height = MAX_WIDTH; } }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5); // Fast quality
+                    
+                    db.ref('patientDetails/'+activeId).once('value').then(snap => {
+                        const d = snap.val(); const imgs = d.images || [];
+                        imgs.push(dataUrl);
+                        db.ref('patientDetails/'+activeId).update({ images: imgs }).then(() => {
+                            document.getElementById('uploadingOverlay').style.display = 'none';
+                            loadFullData(activeId);
+                        });
+                    });
+                };
+            };
+        }
     }
 
     function loadFullData(id) {
@@ -221,16 +214,67 @@
         document.getElementById('emptyState').style.display = 'none'; document.getElementById('fileView').style.display = 'block';
         const d = patientsDetails[id] || {}; const b = patientsIndex[id] || {};
         document.getElementById('viewName').innerText = b.name;
-        document.getElementById('viewComplaint').innerText = b.complaint || "Routine Checkup";
-        document.getElementById('viewContact').innerHTML = `AGE: ${b.age || '--'} | PHONE: ${b.phone || '--'}`;
-        const wa = b.phone ? b.phone.replace(/\D/g,'') : '';
-        document.getElementById('viewContactArea').innerHTML = wa ? `<a href="https://wa.me/${wa}" target="_blank" class="wa-btn">💬 WhatsApp Business</a>` : '';
+        document.getElementById('viewContact').innerHTML = `AGE: ${b.age || '--'} | PHONE: ${b.phone || '--'}<br>REG: ${b.dateAdded || '--'}`;
+        
+        // NEW: Date Edit/Delete controls
         const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
-        (d.visitDates || []).slice().reverse().forEach(dt => log.innerHTML += `<div style="border-bottom:1px solid #eee; padding:2px;">📅 ${dt}</div>`);
+        (d.visitDates || []).slice().reverse().forEach((dt, index) => {
+            const realIdx = (d.visitDates.length - 1) - index;
+            log.innerHTML += `
+                <div class="visit-row">
+                    <span class="visit-date-txt">📅 ${dt}</span>
+                    <div>
+                        <button class="visit-btn" style="color:var(--primary)" onclick="editVisit(${realIdx})">✎</button>
+                        <button class="visit-btn" style="color:var(--danger)" onclick="deleteVisit(${realIdx})">✕</button>
+                    </div>
+                </div>`;
+        });
+        
         document.getElementById('vPres').value = d.presentation || ''; document.getElementById('vVisits').value = d.visits || '';
         document.getElementById('vOpDate').value = d.opD || ''; document.getElementById('vOpDetail').value = d.opT || '';
+        renderGallery(d.images || []);
         renderLabs(d.labs || {});
         setTimeout(() => { autoResize(document.getElementById('vPres')); autoResize(document.getElementById('vVisits')); }, 100);
+    }
+
+    function editVisit(idx) {
+        const current = patientsDetails[activeId].visitDates[idx];
+        const newVal = prompt("Edit Visit Date (DD/MM/YYYY):", current);
+        if(newVal && newVal !== current) {
+            const dates = patientsDetails[activeId].visitDates;
+            dates[idx] = newVal;
+            db.ref('patientDetails/'+activeId+'/visitDates').set(dates);
+        }
+    }
+
+    function deleteVisit(idx) {
+        if(confirm("Delete this visit entry?")) {
+            const dates = patientsDetails[activeId].visitDates;
+            dates.splice(idx, 1);
+            db.ref('patientDetails/'+activeId+'/visitDates').set(dates);
+        }
+    }
+
+    function renderGallery(imgs) {
+        const g = document.getElementById('gallery'); g.innerHTML = '';
+        imgs.forEach(src => {
+            const img = document.createElement('img'); img.src = src; img.className = 'img-thumb';
+            img.onclick = () => window.open(src); g.appendChild(img);
+        });
+    }
+
+    // Standard Lab Logic
+    function genLabButtons() {
+        const grid = document.getElementById('labSelector');
+        labList.forEach(name => {
+            const div = document.createElement('div'); div.className = 'lab-tag'; div.innerText = name;
+            div.onclick = () => {
+                if(!activeId) return;
+                db.ref('patientDetails/'+activeId+'/labs/'+name).update({ status: 'pending', date: new Date().toLocaleDateString('en-GB') });
+                db.ref('patientIndex/'+activeId).update({ hasPendingLab: true });
+            };
+            grid.appendChild(div);
+        });
     }
 
     function renderLabs(labs) {
@@ -244,13 +288,13 @@
                 else if (ref.b && v <= ref.b) cls = 'lab-res-border';
                 else cls = 'lab-res-critical';
             }
-            let histHtml = ''; (data.history || []).slice().reverse().forEach(h => histHtml += `<div class="hist-line"><span>${h.val} ${ref.u || ''}</span> <span>${h.date}</span></div>`);
-            list.innerHTML += `<div class="lab-res-card ${cls}">
+            let hHtml = ''; (data.history || []).slice().reverse().forEach(h => hHtml += `<div style="font-size:10px; opacity:0.8; border-top:1px solid rgba(255,255,255,0.2); margin-top:3px;">${h.val} ${ref.u || ''} (${h.date})</div>`);
+            list.innerHTML += `<div class="lab-res-card ${cls}" style="padding:10px; border-radius:8px; margin-bottom:5px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span>${name}</span>
-                    ${data.status === 'pending' ? `<input type="number" step="any" placeholder="Enter" style="width:90px; margin:0;" onchange="updateLab('${name}', this.value)">` : `<span>${data.value} ${ref.u || ''}</span>`}
+                    ${data.status === 'pending' ? `<input type="number" step="any" placeholder="Result" style="width:90px; margin:0;" onchange="updateLab('${name}', this.value)">` : `<span>${data.value} ${ref.u || ''}</span>`}
                 </div>
-                ${histHtml ? `<div style="margin-top:5px; border-top:1px dashed white; padding-top:5px;">${histHtml}</div>` : ''}
+                ${hHtml}
             </div>`;
         });
     }
@@ -258,9 +302,9 @@
     function updateLab(name, val) {
         const d = new Date().toLocaleDateString('en-GB');
         const currentData = patientsDetails[activeId].labs[name];
-        const newHistory = currentData.history || [];
-        if (currentData.value) newHistory.push({ val: currentData.value, date: currentData.date || d });
-        db.ref('patientDetails/'+activeId+'/labs/'+name).update({ value: val, status: 'done', date: d, history: newHistory });
+        const hist = currentData.history || [];
+        if (currentData.value) hist.push({ val: currentData.value, date: currentData.date || d });
+        db.ref('patientDetails/'+activeId+'/labs/'+name).update({ value: val, status: 'done', date: d, history: hist });
     }
 
     function saveAll(manual = false) {
@@ -273,13 +317,30 @@
         });
     }
 
+    function renderList() {
+        const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
+        Object.keys(patientsIndex).sort((a,b) => b-a).forEach(id => {
+            const p = patientsIndex[id]; if (p.name.toLowerCase().includes(q)) {
+                list.innerHTML += `<div class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
+                    <div><strong>${p.name}</strong>${p.isWaiting ? '<span style="background:var(--waiting); color:white; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px;">👤 WAIT</span>' : ''}${p.hasPendingLab ? '<span style="background:var(--lab); color:white; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px;">🧪 LAB</span>' : ''}</div>
+                    <button style="background:#fdeaea; color:var(--danger); border:none; padding:5px; border-radius:4px;" onclick="event.stopPropagation(); deleteRec('${id}')">✕</button></div>`;
+            }
+        });
+    }
+
+    function addPatient() {
+        const n = document.getElementById('newName').value; if(!n) return;
+        const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
+        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, dateAdded: d, isWaiting: true });
+        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', opD: '', opT: '', visitDates: [d] });
+        ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
+    }
+
     function renderRems(rems) {
         const list = document.getElementById('remList'); list.innerHTML = '';
-        const sorted = Object.keys(rems).filter(id => rems[id].status === 'pending').sort((a,b) => new Date(rems[a].date) - new Date(rems[b].date));
-        sorted.forEach(id => {
-            const r = rems[id];
-            list.innerHTML += `<div class="rem-item" onclick="loadFullData('${r.patientId}')">
-                <button class="check-btn" onclick="event.stopPropagation(); if(confirm('Task done?')) db.ref('reminders/${id}').update({status:'done'})">✓ DONE</button>
+        Object.keys(rems).filter(id => rems[id].status === 'pending').sort((a,b) => new Date(rems[a].date) - new Date(rems[b].date)).forEach(id => {
+            const r = rems[id]; list.innerHTML += `<div class="rem-item" onclick="loadFullData('${r.patientId}')">
+                <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:8px 12px; cursor:pointer;" onclick="event.stopPropagation(); if(confirm('Done?')) db.ref('reminders/${id}').update({status:'done'})">✓</button>
                 <strong>${r.date || 'URGENT'}</strong><p>${r.text}</p></div>`;
         });
     }
@@ -288,18 +349,16 @@
         const cal = document.getElementById('opCalendar'); const today = new Date(); const monthOut = new Date(); monthOut.setDate(today.getDate() + 30);
         let rows = ""; let count = 0;
         Object.keys(patientsIndex).forEach(id => {
-            const d = patientsDetails[id] || {};
-            if(d.opD) {
-                const opDate = new Date(d.opD);
-                if(opDate >= today && opDate <= monthOut) {
+            const d = patientsDetails[id] || {}; if(d.opD) {
+                const opDate = new Date(d.opD); if(opDate >= today && opDate <= monthOut) {
                     rows += `<tr><td>${d.opD}</td><td>${patientsIndex[id].name}</td><td>${d.opT || ''}</td></tr>`; count++;
                 }
             }
         });
-        cal.innerHTML = count > 0 ? `<table><tr><th>Date</th><th>Patient</th><th>Procedure</th></tr>${rows}</table>` : "No upcoming surgeries.";
+        cal.innerHTML = count > 0 ? `<table style="width:100%; border-collapse:collapse;"><tr><th>Date</th><th>Pt</th><th>Op</th></tr>${rows}</table>` : "No upcoming surgeries.";
     }
 
-    function manualSync() { if (confirm("Save all patient updates?")) saveAll(true); }
+    function manualSync() { if (confirm("Confirm Cloud Sync?")) saveAll(true); }
     function autoSyncTrigger() { document.getElementById('syncIndicator').style.display = 'block'; if (syncTimeout) clearTimeout(syncTimeout); syncTimeout = setTimeout(() => saveAll(false), 2000); }
     function autoResize(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 5) + 'px'; }
     function deleteRec(id) { if(confirm("Delete record?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); } }
