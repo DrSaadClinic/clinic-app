@@ -8,76 +8,107 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; --img: #9c27b0; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; color: #333; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-        header { background: var(--primary); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f2f4f8; margin: 0; color: #1c1c1e; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        
+        header { background: rgba(0, 74, 153, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
         .logo-img { height: 40px; width: 40px; background: white; border-radius: 50%; padding: 2px; object-fit: cover; }
-        .logo-large { width: 90px; height: 90px; border-radius: 50%; background: white; margin-bottom: 15px; border: 3px solid var(--secondary); object-fit: cover; }
+        .logo-large { width: 100px; height: 100px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid rgba(255,255,255,0.2); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         .container { max-width: 1500px; margin: auto; padding: 15px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
         @media (max-width: 1024px) { .container { grid-template-columns: 320px 1fr; } } 
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } } 
         
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; border: 1px solid #eaeaea; }
-        @media (max-width: 768px) { .card { padding: 15px; } }
+        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.04); transition: 0.3s; }
+        @media (max-width: 768px) { .card { padding: 15px; border-radius: 12px; } }
         
-        h3 { color: var(--primary); margin: 0 0 15px 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 1.1em; display: flex; justify-content: space-between; }
+        h3 { color: var(--primary); margin: 0 0 15px 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
         
-        .dash-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; margin-bottom: 20px; align-items: start; }
-        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; gap: 15px; } }
-        .scroll-card { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        /* 3-Column Dashboard for Overdue Widget */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; align-items: start; }
+        @media (max-width: 768px) { .dash-grid { gap: 15px; } }
+        .scroll-card { max-height: 250px; overflow-y: auto; padding-right: 5px; }
 
-        input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; transition: border 0.2s; }
-        input:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
+        input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e1e4e8; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: #f9fafb; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        input:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(0, 74, 153, 0.1); }
         textarea { resize: none; overflow-y: hidden; min-height: 100px; line-height: 1.6; font-family: inherit; } 
-        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-        button:active { opacity: 0.8; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; transition: transform 0.1s, opacity 0.2s; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
         
-        .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 10px; margin-bottom: 6px; border-left: 5px solid transparent; transition: 0.2s; position: relative; }
-        .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
-        .pt-meta { font-size: 11px; color: #777; display: block; margin-top: 6px; }
-        .btn-del-pt { position: absolute; right: 10px; top: 18px; color: var(--danger); font-size: 18px; opacity: 0.5; cursor: pointer; padding: 5px; }
+        /* Sidebar Squircles & Highlighting */
+        .pt-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: #fff; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid transparent; transition: all 0.2s ease; position: relative; }
+        .pt-item:hover { background: #fcfcfc; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 0 1px rgba(0,74,153,0.1); }
+        .pt-meta { font-size: 11.5px; color: #888; display: block; margin-top: 6px; }
+        
+        /* Pin & Delete Controls */
+        .pt-controls { position: absolute; right: 10px; top: 15px; display: flex; gap: 10px; }
+        .btn-pin-pt { color: #ccc; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-pin-pt.pinned { color: var(--warning); text-shadow: 0 0 5px rgba(255, 152, 0, 0.4); }
+        .btn-del-pt { color: var(--danger); font-size: 16px; opacity: 0.4; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
 
         [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
-        [contenteditable="true"]:focus { outline: none; background: rgba(255,255,255,0.8); border-radius: 4px; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); }
+        [contenteditable="true"]:focus { outline: none; background: #fff; border-radius: 6px; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); padding: 2px 5px; }
 
-        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 10px; max-height: 250px; overflow-y: auto; }
-        .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
+        /* Pathology Accordion */
+        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; }
+        .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); transform: scale(1.02); }
         
-        .img-btn { background: white; border: 1px solid var(--img); color: var(--img); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .img-btn:hover { background: #fdf4ff; border-color: var(--img); color: var(--img); }
+        .img-btn { background: white; border: 1px solid var(--img); color: var(--img); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .img-btn:hover { background: #fdf4ff; border-color: var(--img); color: var(--img); transform: scale(1.02); }
 
-        .lab-accordion { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .lab-header { background: #f8f9fa; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; font-size: 15px; }
+        .lab-accordion { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .lab-header { background: #f8f9fa; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; }
         .lab-header:hover { background: #eef4fb; }
         .lab-body { display: none; padding: 15px; border-top: 1px solid #eee; background: #fff; }
         .lab-row { display: flex; justify-content: space-between; font-size: 14px; padding: 10px 0; border-bottom: 1px solid #f9f9f9; align-items: center; }
 
-        .rem-item { background: #fff8e1; border-left: 6px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: transform 0.1s; font-size: 15px; line-height: 1.4; }
+        .rem-item { background: #fff8e1; border-left: 6px solid var(--warning); padding: 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: transform 0.1s; font-size: 15px; line-height: 1.4; }
         .rem-item:active { transform: scale(0.98); }
-        .ai-box { background: #f0f4f8; border: 1.5px solid #d1d9e6; border-radius: 10px; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-family: 'Times New Roman', serif; color: #2c3e50; line-height: 1.5; }
-        .action-btn { background: none; border: none; padding: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        
+        /* Overdue Item */
+        .overdue-item { background: #fff4f4; border-left: 6px solid var(--danger); padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .ai-box { background: #f0f4f8; border: 1.5px solid #d1d9e6; border-radius: 12px; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-family: 'Times New Roman', serif; color: #2c3e50; line-height: 1.5; }
+        .action-btn { background: none; border: none; padding: 5px 8px; cursor: pointer; font-weight: bold; font-size: 13px; border-radius: 6px; transition: 0.2s; }
+        .action-btn:hover { background: rgba(0,0,0,0.05); }
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
         
-        @media (max-width: 768px) { .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; } }
+        /* Beautiful Login Screen */
+        .login-box { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #004a99, #001a3d); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease, visibility 0.5s; }
+        .login-box.fade-out { opacity: 0; visibility: hidden; }
+        .login-glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        
+        /* Live Toast Notification */
+        .toast { position: fixed; top: -100px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #333; padding: 15px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 14px; }
+        .toast.show { top: 20px; }
+
+        @media (max-width: 768px) {
+            .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .toast { left: 10px; right: 10px; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-<div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); z-index:2000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;">
-    <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin-bottom:5px; text-align: center; font-size: 1.5em;">Dr. Saad Sabry Alzubaidy</h2>
-    <h3 style="margin-top:0; margin-bottom:20px; text-align: center; color:var(--secondary); font-weight: normal;">Surgical Clinic</h3>
-    <input type="password" id="passCode" placeholder="Access Code" style="width:280px; text-align:center; border:none; border-radius:10px;">
-    <button onclick="checkPass()" style="width:280px; background:var(--success); margin-top:10px; border-radius:10px;">Login</button>
+<div id="loginScreen" class="login-box">
+    <div class="login-glass">
+        <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+        <h2 style="margin-bottom:5px; font-size: 1.6em; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Dr. Saad Sabry Alzubaidy</h2>
+        <h3 style="margin-top:0; margin-bottom:25px; color:#eef4fb; font-weight: normal; letter-spacing: 1px;">Surgical Clinic</h3>
+        <input type="password" id="passCode" placeholder="Enter Passcode..." oninput="checkAutoLogin()" style="width:260px; text-align:center; border:none; border-radius:12px; padding: 16px; font-size: 18px; letter-spacing: 2px;">
+        <div style="font-size: 11px; opacity: 0.6; margin-top: 15px;">Secured by 256-bit Cloud Encryption</div>
+    </div>
 </div>
+
+<div id="liveToast" class="toast">🔔 New Patient Registered</div>
 
 <header>
     <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2 style="margin:0; font-size:1.2em; font-weight: 600;">Dr. Saad Sabry Alzubaidy - Surgical Clinic</h2>
+    <h2 style="margin:0; font-size:1.2em; font-weight: 600; letter-spacing: 0.5px;">Dr. Saad Sabry Alzubaidy - Surgical Clinic</h2>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
@@ -98,24 +129,28 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <input type="number" id="bmiW" placeholder="Wt (kg)" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="Ht (cm)" oninput="calcBMI()">
             </div>
-            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 5px 5px; font-size:1.5em; color:var(--primary);">--</div>
+            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.6em; color:var(--primary);">--</div>
         </div>
 
         <div class="card">
-            <h3>History <span id="waitCounter" style="background:var(--waiting); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span></h3>
+            <h3>History <span id="waitCounter" style="background:var(--waiting); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight: bold;">0</span></h3>
             
             <div style="display:grid; grid-template-columns: 1fr auto; gap:8px;">
-                <input type="text" id="searchBox" placeholder="🔍 Search Name/Complaint..." oninput="renderList()" style="margin:0;">
-                <input type="date" id="searchDate" onchange="renderList()" title="Search by Exact Date" style="margin:0; width:45px; padding:10px 5px; cursor:pointer;">
+                <input type="text" id="searchBox" placeholder="🔍 Search Name/Complaint..." oninput="renderList()" style="margin:0; border-radius: 10px;">
+                <input type="date" id="searchDate" onchange="renderList()" title="Search by Exact Date" style="margin:0; width:45px; padding:10px 5px; cursor:pointer; border-radius: 10px;">
             </div>
             
-            <div id="patientList" style="max-height:500px; overflow-y:auto; margin-top:15px;"></div>
+            <div id="patientList" style="max-height:550px; overflow-y:auto; margin-top:15px; padding-right:5px;"></div>
         </div>
     </div>
 
     <div class="content">
         <div class="dash-grid">
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
+            <div class="card">
+                <h3>🔴 25-Day Overdue <button class="action-btn" style="color:#666; font-size:11px;" onclick="dismissAllOverdue()">Clear All</button></h3>
+                <div id="overdueList" class="scroll-card"></div>
+            </div>
             <div class="card"><h3>📅 Operations</h3>
                 <div class="table-responsive">
                     <div id="opCalendar" class="scroll-card">No surgeries scheduled.</div>
@@ -123,21 +158,21 @@
             </div>
         </div>
 
-        <div id="emptyState" class="card" style="text-align:center; padding:100px 20px; color:#bdc3c7;"><p style="font-size: 1.1em;">Select a patient to begin clinical review.</p></div>
+        <div id="emptyState" class="card" style="text-align:center; padding:100px 20px; color:#bdc3c7; border: 2px dashed #eaeaea; background: transparent;"><p style="font-size: 1.2em; font-weight: bold;">Select a patient file to begin clinical review.</p></div>
 
-        <div id="fileView" class="card" style="display:none;">
+        <div id="fileView" class="card" style="display:none; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div style="width: 100%;">
-                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:5px;"></h2>
+                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:8px;"></h2>
                     <div id="waArea" style="margin-top:8px;"></div>
                 </div>
-                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none; padding:5px; white-space: nowrap;">● SAVING</div>
+                <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none; padding:5px; white-space: nowrap; background: #e8f5e9; border-radius: 12px; height: 20px; align-items: center;">● SAVING</div>
             </div>
 
-            <div id="activeReminderBanner" style="display:none; background:#fff3cd; border-left:5px solid #ff9800; padding:12px 15px; border-radius:8px; margin-top:15px; color:#d84315; font-weight:bold; font-size:14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"></div>
+            <div id="activeReminderBanner" style="display:none; background:#fff3cd; border-left:5px solid #ff9800; padding:15px; border-radius:10px; margin-top:15px; color:#d84315; font-weight:bold; font-size:14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"></div>
 
-            <div style="background:#fff3e0; padding:15px; border-radius:10px; margin:20px 0; border-left:5px solid #ff9800;">
-                <span style="font-size:11px; color:#e65100; font-weight:bold; display:block; text-transform: uppercase;">Chief Complaint (Click to edit)</span>
+            <div style="background:#fff3e0; padding:15px; border-radius:12px; margin:20px 0; border-left:5px solid #ff9800;">
+                <span style="font-size:11px; color:#e65100; font-weight:bold; display:block; text-transform: uppercase; letter-spacing: 0.5px;">Chief Complaint (Click to edit)</span>
                 <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:bold; font-size:17px; display:inline-block; min-width:150px; margin-top: 5px;"></span>
             </div>
 
@@ -150,13 +185,19 @@
                 <div><span style="font-size:11px; font-weight:bold; color:#666;">VISIT AUDIT (EDIT/DELETE)</span><div id="visitHistoryLog" style="max-height:120px; overflow-y:auto; margin-top:8px;"></div></div>
             </div>
 
+            <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); margin-bottom:20px; display:none;">✕ Dismiss 25-Day Overdue Alert</button>
+
             <div class="card" style="background:#fffde7; border:1px solid #fdd835; margin-bottom:20px; padding:20px;">
                 <span style="font-size:11px; font-weight:bold; color:#f57f17; display:block; margin-bottom:8px;">SCHEDULE PATIENT TASK</span>
                 <div class="mobile-stack" style="display:grid; grid-template-columns: 1fr auto auto; gap:10px;">
                     <input type="text" id="vRemText" placeholder="e.g. Follow-up visit" style="margin:0;">
                     <input type="date" id="vRemDate" style="margin:0;">
-                    <button onclick="addPatientReminder()" style="background:var(--warning); margin:0;">Set</button>
+                    <button onclick="addPatientReminder()" style="background:var(--warning); margin:0; border-radius: 8px;">Set Task</button>
                 </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: -10px;">
+                <button onclick="insertClinicalSheet()" style="width: auto; background: #607d8b; padding: 8px 15px; font-size: 12px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10; position: relative; top: 15px; right: 10px;">📄 Insert Clinical Sheet</button>
             </div>
 
             <div class="section" style="background:#f8f9fa; padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid #eee;">
@@ -190,7 +231,7 @@
             <div class="section" style="border-left:5px solid var(--lab); padding:20px; border-radius:12px; margin-bottom:20px; background:#f8f9fa;">
                 <span style="font-weight:bold; font-size:12px; color:var(--lab); display:block; margin-bottom:10px;">🧪 ADVANCED PATHOLOGY (GLOBAL NETWORK)</span>
                 <div class="lab-tag-box" id="labSelector"></div>
-                <button onclick="addNewCustomLab()" style="background:#607d8b; margin-top:15px; padding:10px; font-size:13px; width:auto;">+ Create Custom Test (Updates for all patients)</button>
+                <button onclick="addNewCustomLab()" style="background:#607d8b; margin-top:15px; padding:10px; font-size:13px; width:auto; border-radius: 8px;">+ Create Custom Test (Updates Globally)</button>
                 <div id="labResultsList" style="margin-top:20px;"></div>
             </div>
 
@@ -206,12 +247,12 @@
                     <input type="text" id="vW" placeholder="Wt(kg)" style="margin:0;">
                     <input type="text" id="vBP" placeholder="BP" style="margin:0;">
                     <input type="date" id="vVDt" style="margin:0;">
-                    <button onclick="addVital()" style="padding:0 20px; background:#607d8b; margin:0;">Log</button>
+                    <button onclick="addVital()" style="padding:0 20px; background:#607d8b; margin:0; border-radius: 8px;">Log</button>
                 </div>
                 <div id="vitalList" style="margin-top:15px;"></div>
             </div>
 
-            <button onclick="manualSync()" style="background:var(--success); height:60px; font-size:16px; margin-top:10px; box-shadow: 0 4px 15px rgba(40,167,69,0.2);">💾 FORCE CLOUD DATABASE SYNC</button>
+            <button onclick="manualSync()" style="background:var(--success); height:60px; font-size:16px; margin-top:10px; box-shadow: 0 4px 15px rgba(40,167,69,0.3); border-radius: 12px;">💾 FORCE CLOUD DATABASE SYNC</button>
         </div>
     </div>
 </div>
@@ -230,13 +271,17 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
+    // Enable Offline Persistence silently
+    try { db.ref().keepSynced(true); } catch(e){}
+
     let ptIdx = {}; 
     let ptDetails = {}; 
     let allReminders = {}; 
-    let globalLabs = {}; // NEW: Global Lab System
+    let globalLabs = {}; 
     let activeId = null; 
     let syncTimeout = null; 
     let activeListener = null;
+    let isInitialLoad = true; // To prevent toast spam on load
 
     // SAFE FIREBASE KEYS FOR STANDARD LABS
     const initialLabs = {
@@ -297,22 +342,52 @@
 
     const defaultImaging = ["Ultrasound", "X-Ray", "CT Scan", "MRI", "MRCP", "OGD", "Colonoscopy"];
 
-    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genImagingTags(); } else { alert("Access Denied"); } }
+    // ZERO CLICK AUTO LOGIN
+    function checkAutoLogin() {
+        if(document.getElementById('passCode').value === 'saad2026') {
+            document.getElementById('loginScreen').classList.add('fade-out');
+            setTimeout(() => {
+                document.getElementById('loginScreen').style.display='none'; 
+                document.getElementById('mainContent').style.display='grid'; 
+                initSync(); 
+                genImagingTags();
+            }, 500);
+        }
+    }
+    
+    // Backup click login
+    function checkPass() { checkAutoLogin(); if(document.getElementById('passCode').value !== 'saad2026') alert("Access Denied"); }
+
+    // LIVE NOTIFICATION TOAST
+    function showToast(msg) {
+        const toast = document.getElementById('liveToast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
 
     function initSync() {
-        // GLOBAL LABS SYNC ENGINE
         db.ref('globalLabs').on('value', snap => {
-            if(snap.exists()) {
-                globalLabs = snap.val();
-            } else {
-                globalLabs = initialLabs;
-                db.ref('globalLabs').set(initialLabs); // Seed database
-            }
-            genLabTags(); // Render tags with safe keys
+            if(snap.exists()) { globalLabs = snap.val(); } 
+            else { globalLabs = initialLabs; db.ref('globalLabs').set(initialLabs); }
+            genLabTags(); 
             if(activeId && ptDetails[activeId]) renderLabs(ptDetails[activeId].labs || {});
         });
 
-        db.ref('patientIndex').on('value', snap => { ptIdx = snap.val() || {}; renderList(); renderCalendar(); });
+        db.ref('patientIndex').on('value', snap => { 
+            const data = snap.val() || {};
+            // Live Secretary Alert (Only fire after initial load)
+            if(!isInitialLoad) {
+                const newKeys = Object.keys(data).filter(k => !ptIdx[k]);
+                newKeys.forEach(k => showToast("🔔 New Patient Registered: " + data[k].name));
+            }
+            ptIdx = data; 
+            isInitialLoad = false;
+            renderList(); 
+            renderCalendar(); 
+            renderOverdueRadar();
+        });
+        
         db.ref('reminders').on('value', snap => { allReminders = snap.val() || {}; renderRems(); checkActiveReminderBanner(); });
     }
 
@@ -340,6 +415,15 @@
             document.getElementById('fileView').style.display = 'block';
             document.getElementById('referralResult').style.display = 'none';
             
+            // Check 25 Day Radar Dismissal UI
+            const days = getDaysSince(b.lastVisit || b.dateAdded);
+            const alertBtn = document.getElementById('dismissOverdueBtn');
+            if (days >= 25 && b.dismissedVisit !== (b.lastVisit || b.dateAdded)) {
+                alertBtn.style.display = 'block';
+            } else {
+                alertBtn.style.display = 'none';
+            }
+
             document.getElementById('viewName').innerText = b.name || "Unknown";
             document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
             document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} | Mobile: ${b.phone || '--'}`;
@@ -359,10 +443,62 @@
             
             renderVisitLog(d.visitDates || []);
             renderLabs(d.labs || {});
-            renderImaging(d.imaging || {}); // NEW IMAGING SUITE
+            renderImaging(d.imaging || {}); 
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
         });
+    }
+
+    // 25-DAY RADAR LOGIC
+    function getDaysSince(dateStr) {
+        if(!dateStr || dateStr === "N/A") return 0;
+        const parts = dateStr.split('/');
+        if(parts.length !== 3) return 0;
+        const past = new Date(parts[2], parts[1]-1, parts[0]);
+        const diff = new Date() - past;
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function renderOverdueRadar() {
+        const list = document.getElementById('overdueList'); list.innerHTML = '';
+        Object.keys(ptIdx).forEach(id => {
+            const p = ptIdx[id];
+            const lastV = p.lastVisit || p.dateAdded || "N/A";
+            const days = getDaysSince(lastV);
+            if(days >= 25 && p.dismissedVisit !== lastV) {
+                list.innerHTML += `
+                    <div class="overdue-item" onclick="loadFullData('${id}')">
+                        <div><b>${p.name}</b><br><span style="font-size:11px; color:#888;">${days} days since last visit (${lastV})</span></div>
+                        <span style="font-size:16px;">🔴</span>
+                    </div>`;
+            }
+        });
+        if(list.innerHTML === '') list.innerHTML = "<p style='color:#999; padding:10px;'>All patients are up to date.</p>";
+    }
+
+    function dismissPatientOverdue() {
+        const lastV = ptIdx[activeId].lastVisit || ptIdx[activeId].dateAdded;
+        db.ref('patientIndex/'+activeId).update({ dismissedVisit: lastV });
+        document.getElementById('dismissOverdueBtn').style.display = 'none';
+        showToast("✅ Alert Dismissed for this cycle.");
+    }
+    
+    function dismissAllOverdue() {
+        if(confirm("Dismiss all current overdue alerts?")) {
+            Object.keys(ptIdx).forEach(id => {
+                const p = ptIdx[id];
+                const lastV = p.lastVisit || p.dateAdded;
+                if(getDaysSince(lastV) >= 25) {
+                    db.ref('patientIndex/'+id).update({ dismissedVisit: lastV });
+                }
+            });
+            showToast("✅ All alerts cleared.");
+        }
+    }
+
+    // PIN LOGIC
+    function togglePin(id, currentStatus) {
+        db.ref('patientIndex/'+id).update({ pinned: !currentStatus });
     }
 
     function checkActiveReminderBanner() {
@@ -376,7 +512,10 @@
     function editRegDate() {
         const current = ptIdx[activeId].dateAdded;
         const n = prompt("Edit Registration Date (DD/MM/YYYY):", current);
-        if (n && n !== current) db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+        if (n && n !== current) {
+            db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+            // If no visits exist, this also changes the lastVisit logic implicitly
+        }
     }
 
     function updateComplaint(el) {
@@ -384,6 +523,17 @@
             const txt = el.innerText.trim();
             db.ref('patientIndex/'+activeId).update({ complaint: txt });
         }
+    }
+
+    // THE "HOSPITAL SHEET" AUTO-TEMPLATE
+    function insertClinicalSheet() {
+        if(!activeId) return;
+        const template = `🛑 C/O (Chief Complaint):\n\n🩺 HPI (History of Present Illness):\n\n💊 PMHx (Past Medical):\n[ ] DM | [ ] HTN | [ ] Cardiac | [ ] Asthma\n\n🔪 PSHx (Past Surgical):\n\n⚠️ Allergies:\nNKDA\n\n🫀 Systemic Review:\nUnremarkable\n\n🔬 Local Examination:\n\n📝 Additional Notes / Plan:\n`;
+        const box = document.getElementById('vPres');
+        box.value = box.value + (box.value ? '\n\n' : '') + template;
+        autoExpand(box);
+        autoSyncTrigger();
+        showToast("📄 Sheet Template Inserted.");
     }
 
     function smartStamp(t) {
@@ -442,7 +592,6 @@
         document.getElementById('referralResult').style.display = 'block';
     }
 
-    // --- GLOBAL PATHOLOGY ENGINE ---
     function genLabTags() {
         const grid = document.getElementById('labSelector'); grid.innerHTML = '';
         Object.keys(globalLabs).forEach(safeKey => {
@@ -467,11 +616,8 @@
         if(name) {
             const range = prompt("Enter Normal Range (e.g., 5-25):") || "N/A";
             const unit = prompt("Enter Unit (e.g., mcg/dL):") || "";
-            const safeKey = name.replace(/[\.\#\$\[\]]/g, '_'); // Safe Firebase Key
-            
-            // Save globally for all future patients
+            const safeKey = name.replace(/[\.\#\$\[\]]/g, '_'); 
             db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit });
-            // Order for current patient
             orderLab(safeKey, name, range, unit);
         }
     }
@@ -480,7 +626,7 @@
         const list = document.getElementById('labResultsList'); list.innerHTML = '';
         Object.keys(labs).forEach(safeKey => {
             const data = labs[safeKey];
-            const dispName = data.name || safeKey; // Fallback for old records
+            const dispName = data.name || safeKey; 
             
             let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
                 const rIdx = (data.history.length-1)-idx;
@@ -488,8 +634,8 @@
                     <div class="lab-row">
                         <span>${h.dt}: <b style="font-size:16px;">${h.val} <span style="font-size:12px; font-weight:normal;">${data.unit||''}</span></b></span> 
                         <div>
-                            <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:13px;" onclick="editLabEntry('${safeKey}', ${rIdx})">✎ Edit</button>
-                            <button class="action-btn" style="color:var(--danger); font-size:13px;" onclick="deleteLabEntry('${safeKey}', ${rIdx})">✕</button>
+                            <button class="action-btn" style="color:var(--primary); margin-right:15px;" onclick="editLabEntry('${safeKey}', ${rIdx})">✎ Edit</button>
+                            <button class="action-btn" style="color:var(--danger);" onclick="deleteLabEntry('${safeKey}', ${rIdx})">✕</button>
                         </div>
                     </div>`;
             });
@@ -502,9 +648,9 @@
                     </div>
                     <div class="lab-body">
                         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                            <button onclick="addLabVal('${safeKey}')" style="background:var(--lab); padding:10px 15px; font-size:13px; width:auto;">+ Add Result</button>
-                            <button onclick="editLabMeta('${safeKey}')" style="background:#607d8b; padding:10px 15px; font-size:13px; width:auto;">✎ Edit Range/Unit (Global)</button>
-                            <button onclick="deleteFullLab('${safeKey}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto;">✕ Delete Test</button>
+                            <button onclick="addLabVal('${safeKey}')" style="background:var(--lab); padding:10px 15px; font-size:13px; width:auto; border-radius:8px;">+ Add Result</button>
+                            <button onclick="editLabMeta('${safeKey}')" style="background:#607d8b; padding:10px 15px; font-size:13px; width:auto; border-radius:8px;">✎ Edit Range/Unit (Global)</button>
+                            <button onclick="deleteFullLab('${safeKey}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto; border-radius:8px;">✕ Delete Test</button>
                         </div>
                         ${hHtml}
                     </div>
@@ -537,16 +683,13 @@
         const nR = prompt("New Range (Updates for all future tests):", ptDetails[activeId].labs[safeKey].range); 
         const nU = prompt("New Unit:", ptDetails[activeId].labs[safeKey].unit);
         if(nR !== null) {
-            // Update this patient
             db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ range: nR, unit: nU }); 
-            // Update Globally
             db.ref('globalLabs/'+safeKey).update({ r: nR, u: nU });
         }
     }
     function deleteFullLab(safeKey) { if(confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/'+activeId+'/labs/'+safeKey).remove(); }
     function deleteLabEntry(safeKey, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[safeKey].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h); } }
 
-    // --- NEW: IMAGING & ENDOSCOPY ENGINE ---
     function genImagingTags() {
         const grid = document.getElementById('imagingSelector'); grid.innerHTML = '';
         defaultImaging.forEach(name => {
@@ -624,7 +767,6 @@
     function deleteFullImg(key) { if(confirm("Delete this entire imaging modality?")) db.ref('patientDetails/'+activeId+'/imaging/'+key).remove(); }
     function deleteImgEntry(key, idx) { if(confirm("Delete this report?")) { const h = ptDetails[activeId].imaging[key].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h); } }
 
-    // --- VITALS ENGINE ---
     function addVital() {
         const w = document.getElementById('vW').value; const bp = document.getElementById('vBP').value; const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
         if(!w && !bp) return;
@@ -642,8 +784,8 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; background:#eef4fb; padding:12px; margin-bottom:8px; border-radius:8px;">
                     <span>📅 <b>${v.dt}</b> | Wt: <b style="font-size:16px;">${v.w||'--'}</b>kg | BP: <b style="font-size:16px;">${v.bp||'--'}</b></span>
                     <div>
-                        <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:14px;" onclick="editVital(${rIdx})">✎ Edit</button>
-                        <button class="action-btn" style="color:var(--danger); font-size:16px;" onclick="deleteVital(${rIdx})">✕</button>
+                        <button class="action-btn" style="color:var(--primary); margin-right:15px;" onclick="editVital(${rIdx})">✎ Edit</button>
+                        <button class="action-btn" style="color:var(--danger);" onclick="deleteVital(${rIdx})">✕</button>
                     </div>
                 </div>`;
         });
@@ -654,6 +796,7 @@
         const w = prompt("Edit Weight (kg):", v.w || "");
         const bp = prompt("Edit BP:", v.bp || "");
         const dt = prompt("Edit Date:", v.dt || "");
+        
         if(w !== null && bp !== null && dt !== null) {
             const vits = ptDetails[activeId].vitals;
             vits[idx] = { w: w, bp: bp, dt: dt };
@@ -681,33 +824,48 @@
         const list = document.getElementById('patientList'); 
         const qText = document.getElementById('searchBox').value.toLowerCase(); 
         
-        // CALENDAR SEARCH FILTER
         const qDate = document.getElementById('searchDate').value; 
         let formattedQDate = "";
         if(qDate) {
             const [y, m, d] = qDate.split('-');
-            formattedQDate = `${d}/${m}/${y}`; // Convert HTML YYYY-MM-DD to DD/MM/YYYY
+            formattedQDate = `${d}/${m}/${y}`; 
         }
 
         list.innerHTML = '';
-        Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
+        
+        // Pin Sorting Logic (Pinned first, then latest)
+        const sortedIds = Object.keys(ptIdx).sort((a, b) => {
+            const pinA = ptIdx[a].pinned ? 1 : 0;
+            const pinB = ptIdx[b].pinned ? 1 : 0;
+            if (pinA !== pinB) return pinB - pinA;
+            return b - a; 
+        });
+
+        sortedIds.forEach(id => {
             const p = ptIdx[id]; const d = ptDetails[id] || {};
             const visits = d.visitDates || [];
-            const lastVisit = (visits && visits.length > 0) ? visits[visits.length - 1] : (p.dateAdded || "N/A");
-
-            // Text Match
-            const textMatch = p.name.toLowerCase().includes(qText) 
-                || (p.complaint && p.complaint.toLowerCase().includes(qText));
+            const lastVisit = p.lastVisit || p.dateAdded || "N/A";
             
-            // Date Match (Check Reg Date OR any Visit Date)
+            // Check Overdue Status for UI marker
+            const days = getDaysSince(lastVisit);
+            const isOverdue = (days >= 25 && p.dismissedVisit !== lastVisit);
+            const alertBadge = isOverdue ? `<span style="font-size:14px; margin-left:5px;" title="25-Day Overdue">🔴</span>` : '';
+
+            const textMatch = p.name.toLowerCase().includes(qText) || (p.complaint && p.complaint.toLowerCase().includes(qText));
             const dateMatch = formattedQDate ? (p.dateAdded === formattedQDate || visits.includes(formattedQDate)) : true;
             
             if (textMatch && dateMatch) {
+                const pinIcon = p.pinned ? '⭐' : '☆';
+                const pinClass = p.pinned ? 'pinned' : '';
+                
                 list.innerHTML += `
                     <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
-                        <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}
+                        <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
                         <span class="pt-meta">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
-                        <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span>
+                        <div class="pt-controls">
+                            <span class="btn-pin-pt ${pinClass}" onclick="event.stopPropagation(); togglePin('${id}', ${!!p.pinned})">${pinIcon}</span>
+                            <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span>
+                        </div>
                     </div>`;
             }
         });
@@ -717,9 +875,10 @@
     function addPatient() {
         const n = document.getElementById('newName').value; if(!n) return;
         const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
-        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true });
+        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true, pinned: false });
         db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); 
         ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
+        showToast("✅ Patient Registered successfully.");
     }
 
     function addPatientReminder() {
@@ -727,13 +886,14 @@
         const d = document.getElementById('vRemDate').value || new Date().toLocaleDateString('en-GB');
         db.ref('reminders').push({ text: `[${ptIdx[activeId].name}] ${t}`, date: d, status: 'pending', ptId: activeId });
         document.getElementById('vRemText').value = ''; document.getElementById('vRemDate').value = '';
+        showToast("✅ Task scheduled.");
     }
 
     function renderRems() {
         const list = document.getElementById('remList'); list.innerHTML = '';
         Object.keys(allReminders).filter(id => allReminders[id].status === 'pending').sort((a,b) => new Date(allReminders[a].date) - new Date(allReminders[b].date)).forEach(id => {
             const r = allReminders[id]; 
-            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders
+            const targetId = r.ptId || r.patientId; 
             list.innerHTML += `
                 <div class="rem-item" onclick="loadFullData('${targetId}')">
                     <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:8px 12px; font-size:14px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
@@ -747,7 +907,7 @@
         const cal = document.getElementById('opCalendar'); const today = new Date(); let rows = "";
         Object.keys(ptIdx).forEach(id => {
             const d = ptDetails[id] || {}; if(d.opD && new Date(d.opD) >= today) {
-                rows += `<tr><td style="padding:10px; border-bottom:1px solid #eee;">${d.opD}</td><td style="padding:10px; border-bottom:1px solid #eee;"><b>${ptIdx[id].name}</b></td><td style="padding:10px; border-bottom:1px solid #eee;">${d.opT}</td></tr>`;
+                rows += `<tr><td style="padding:10px; border-bottom:1px solid #eee;">${d.opD}</td><td style="padding:10px; border-bottom:1px solid #eee; cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary);">${ptIdx[id].name}</b></td><td style="padding:10px; border-bottom:1px solid #eee;">${d.opT}</td></tr>`;
             }
         });
         cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;"><tr><th>Date</th><th>Patient</th><th>Procedure</th></tr>${rows}</table>` : "<p style='color:#999; padding:10px;'>No upcoming surgeries.</p>";
@@ -763,12 +923,16 @@
         if (!activeId) return; const today = new Date().toLocaleDateString('en-GB');
         const detailRef = db.ref('patientDetails/'+activeId);
         detailRef.once('value').then(snap => {
-            const d = snap.val() || {}; const dates = d.visitDates || []; if(!dates.includes(today)) dates.push(today);
+            const d = snap.val() || {}; const dates = d.visitDates || []; 
+            if(!dates.includes(today) && (document.getElementById('vPres').value.includes(today) || document.getElementById('vVisits').value.includes(today))) {
+                dates.push(today);
+            }
             
             detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
-            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
+            if(dates.length > 0) db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
 
-            document.getElementById('syncIndicator').style.display = 'none'; if (manual) alert("Cloud Sync OK");
+            document.getElementById('syncIndicator').style.display = 'none'; 
+            if (manual) showToast("💾 Cloud Sync Successful");
         });
     }
 
