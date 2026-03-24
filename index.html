@@ -7,14 +7,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; }
+        :root { --primary: #004a99; --secondary: #eef4fb; --success: #28a745; --danger: #dc3545; --warning: #ff9800; --call: #673ab7; --waiting: #007bff; --lab: #17a2b8; --img: #9c27b0; }
         body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; color: #333; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         header { background: var(--primary); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
         .logo-img { height: 40px; width: 40px; background: white; border-radius: 50%; padding: 2px; object-fit: cover; }
         .logo-large { width: 90px; height: 90px; border-radius: 50%; background: white; margin-bottom: 15px; border: 3px solid var(--secondary); object-fit: cover; }
 
-        .container { max-width: 1500px; margin: auto; padding: 15px; display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 1024px) { .container { grid-template-columns: 300px 1fr; } } 
+        .container { max-width: 1500px; margin: auto; padding: 15px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 1024px) { .container { grid-template-columns: 320px 1fr; } } 
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } } 
         
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; border: 1px solid #eaeaea; }
@@ -45,6 +45,10 @@
         .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 10px; max-height: 250px; overflow-y: auto; }
         .lab-btn { background: white; border: 1px solid var(--lab); color: var(--lab); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .lab-btn:hover { background: var(--secondary); border-color: var(--primary); color: var(--primary); }
+        
+        .img-btn { background: white; border: 1px solid var(--img); color: var(--img); padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .img-btn:hover { background: #fdf4ff; border-color: var(--img); color: var(--img); }
+
         .lab-accordion { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .lab-header { background: #f8f9fa; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; font-size: 15px; }
         .lab-header:hover { background: #eef4fb; }
@@ -58,9 +62,7 @@
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
         
-        @media (max-width: 768px) {
-            .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; }
-        }
+        @media (max-width: 768px) { .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; } }
     </style>
 </head>
 <body>
@@ -101,8 +103,13 @@
 
         <div class="card">
             <h3>History <span id="waitCounter" style="background:var(--waiting); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span></h3>
-            <input type="text" id="searchBox" placeholder="🔍 Search Name, Date, or Complaint..." oninput="renderList()">
-            <div id="patientList" style="max-height:500px; overflow-y:auto; margin-top:10px;"></div>
+            
+            <div style="display:grid; grid-template-columns: 1fr auto; gap:8px;">
+                <input type="text" id="searchBox" placeholder="🔍 Search Name/Complaint..." oninput="renderList()" style="margin:0;">
+                <input type="date" id="searchDate" onchange="renderList()" title="Search by Exact Date" style="margin:0; width:45px; padding:10px 5px; cursor:pointer;">
+            </div>
+            
+            <div id="patientList" style="max-height:500px; overflow-y:auto; margin-top:15px;"></div>
         </div>
     </div>
 
@@ -181,10 +188,16 @@
             </div>
 
             <div class="section" style="border-left:5px solid var(--lab); padding:20px; border-radius:12px; margin-bottom:20px; background:#f8f9fa;">
-                <span style="font-weight:bold; font-size:12px; color:var(--lab); display:block; margin-bottom:10px;">🧪 ADVANCED PATHOLOGY (CLICK TO EXPAND)</span>
+                <span style="font-weight:bold; font-size:12px; color:var(--lab); display:block; margin-bottom:10px;">🧪 ADVANCED PATHOLOGY (GLOBAL NETWORK)</span>
                 <div class="lab-tag-box" id="labSelector"></div>
-                <button onclick="addNewCustomLab()" style="background:#607d8b; margin-top:15px; padding:10px; font-size:13px; width:auto;">+ Create Custom Test</button>
+                <button onclick="addNewCustomLab()" style="background:#607d8b; margin-top:15px; padding:10px; font-size:13px; width:auto;">+ Create Custom Test (Updates for all patients)</button>
                 <div id="labResultsList" style="margin-top:20px;"></div>
+            </div>
+
+            <div class="section" style="border-left:5px solid var(--img); padding:20px; border-radius:12px; margin-bottom:20px; background:#fdf4ff;">
+                <span style="font-weight:bold; font-size:12px; color:var(--img); display:block; margin-bottom:10px;">📸 IMAGING & ENDOSCOPY SUITE</span>
+                <div class="lab-tag-box" id="imagingSelector"></div>
+                <div id="imagingResultsList" style="margin-top:20px;"></div>
             </div>
 
             <div class="section" style="border-left:5px solid #607d8b; padding:20px; border-radius:12px; margin-bottom:20px; background:#f8f9fa;">
@@ -220,78 +233,91 @@
     let ptIdx = {}; 
     let ptDetails = {}; 
     let allReminders = {}; 
+    let globalLabs = {}; // NEW: Global Lab System
     let activeId = null; 
     let syncTimeout = null; 
     let activeListener = null;
 
-    // COMPREHENSIVE BAGHDAD/INTERNATIONAL LAB DICTIONARY
-    const labRef = {
-        "CBC (Male)": {u: "g/dL", r: "Hb: 13.5-17.5 | PCV: 41-50% | WBC: 4-11k | PLT: 150-450k"},
-        "CBC (Female)": {u: "g/dL", r: "Hb: 12.0-15.5 | PCV: 36-44% | WBC: 4-11k | PLT: 150-450k"},
-        "ESR": {u: "mm/hr", r: "M: 0-15 | F: 0-20"},
-        "CRP TITER": {u: "mg/L", r: "< 6"},
-        "ASO TITER": {u: "IU/mL", r: "< 200"},
-        "LATEX (RF)": {u: "IU/mL", r: "< 14"},
-        "ROSE BENGAL": {u: "", r: "Negative"},
-        "S.IRON": {u: "µg/dL", r: "M: 65-175 | F: 50-170"},
-        "S.FERRITIN": {u: "ng/mL", r: "M: 30-400 | F: 15-150"},
-        "PT": {u: "sec", r: "11-13.5"},
-        "PTT": {u: "sec", r: "25-35"},
-        "INR": {u: "", r: "0.8-1.2"},
-        "BT": {u: "min", r: "2-7"},
-        "D-DIMER": {u: "µg/mL (FEU)", r: "< 0.5"},
-        "S.CHOLESTEROL": {u: "mg/dL", r: "< 200"},
-        "S.TRIGLYCERIDE": {u: "mg/dL", r: "< 150"},
-        "TOTAL LIPID PROFILE": {u: "mg/dL", r: "400-800"},
-        "FBS": {u: "mg/dL", r: "70-100"},
-        "HbA1C": {u: "%", r: "4.0-5.6"},
-        "S.URIC ACID": {u: "mg/dL", r: "M: 3.5-7.2 | F: 2.6-6.0"},
-        "B.UREA": {u: "mg/dL", r: "15-45"},
-        "S.CREATININE": {u: "mg/dL", r: "M: 0.7-1.3 | F: 0.6-1.1"},
-        "S.CALCIUM": {u: "mg/dL", r: "8.5-10.5"},
-        "S.AMYLASE": {u: "U/L", r: "30-110"},
-        "S.LIPASE": {u: "U/L", r: "0-160"},
-        "LDH": {u: "U/L", r: "140-280"},
-        "SGOT (AST)": {u: "U/L", r: "5-40"},
-        "SGPT (ALT)": {u: "U/L", r: "7-56"},
-        "ALP": {u: "U/L", r: "44-147"},
-        "TSB": {u: "mg/dL", r: "0.2-1.2"},
-        "DIRECT BILIRUBIN": {u: "mg/dL", r: "< 0.3"},
-        "INDIRECT BILIRUBIN": {u: "mg/dL", r: "0.2-0.8"},
-        "TSH": {u: "mIU/L", r: "0.4-4.5"},
-        "FREE T3": {u: "pg/mL", r: "2.3-4.2"},
-        "FREE T4": {u: "ng/dL", r: "0.8-1.8"},
-        "S.PROLACTIN": {u: "ng/mL", r: "F: <25 | M: <15"},
-        "LH": {u: "mIU/mL", r: "M: 1.7-8.6 | F: 2.4-95"},
-        "FSH": {u: "mIU/mL", r: "M: 1.5-12.4 | F: 3.5-21.5"},
-        "S.TESTOSTERONE": {u: "ng/dL", r: "M: 300-1000 | F: 15-70"},
-        "PSA": {u: "ng/mL", r: "< 4.0"},
-        "B-HCG": {u: "mIU/mL", r: "< 5"},
-        "S.VIT D": {u: "ng/mL", r: "30-100"},
-        "S.VIT B12": {u: "pg/mL", r: "200-900"},
-        "GUE": {u: "", r: "Clear, pH 5-7, Sp.Gr 1.005-1.030, Pus 0-5, RBC 0-2"},
-        "URINE C+S": {u: "", r: "No growth"},
-        "GSE": {u: "", r: "No parasites/occult blood"},
-        "STOOL H.PYLORI (Ag)": {u: "", r: "Negative"},
-        "STOOL CALPROTECTIN": {u: "µg/g", r: "< 50"},
-        "S.H.PYLORI (Ab)": {u: "", r: "Negative"},
-        "SALMONELLA": {u: "", r: "Negative"},
-        "VIRAL MARKER": {u: "", r: "Non-reactive"},
-        "ANA": {u: "", r: "Negative"},
-        "BL.GP & RH": {u: "", r: "Patient Specific"}
+    // SAFE FIREBASE KEYS FOR STANDARD LABS
+    const initialLabs = {
+        "CBC_Male": { n: "CBC (Male)", u: "g/dL", r: "Hb: 13.5-17.5 | PCV: 41-50% | WBC: 4-11k | PLT: 150-450k" },
+        "CBC_Female": { n: "CBC (Female)", u: "g/dL", r: "Hb: 12.0-15.5 | PCV: 36-44% | WBC: 4-11k | PLT: 150-450k" },
+        "ESR": { n: "ESR", u: "mm/hr", r: "M: 0-15 | F: 0-20" },
+        "CRP_TITER": { n: "CRP TITER", u: "mg/L", r: "< 6" },
+        "ASO_TITER": { n: "ASO TITER", u: "IU/mL", r: "< 200" },
+        "LATEX_RF": { n: "LATEX (RF)", u: "IU/mL", r: "< 14" },
+        "ROSE_BENGAL": { n: "ROSE BENGAL", u: "", r: "Negative" },
+        "S_IRON": { n: "S.IRON", u: "µg/dL", r: "M: 65-175 | F: 50-170" },
+        "S_FERRITIN": { n: "S.FERRITIN", u: "ng/mL", r: "M: 30-400 | F: 15-150" },
+        "PT": { n: "PT", u: "sec", r: "11-13.5" },
+        "PTT": { n: "PTT", u: "sec", r: "25-35" },
+        "INR": { n: "INR", u: "", r: "0.8-1.2" },
+        "BT": { n: "BT", u: "min", r: "2-7" },
+        "D_DIMER": { n: "D-DIMER", u: "µg/mL (FEU)", r: "< 0.5" },
+        "S_CHOLESTEROL": { n: "S.CHOLESTEROL", u: "mg/dL", r: "< 200" },
+        "S_TRIGLYCERIDE": { n: "S.TRIGLYCERIDE", u: "mg/dL", r: "< 150" },
+        "TOTAL_LIPID": { n: "TOTAL LIPID PROFILE", u: "mg/dL", r: "400-800" },
+        "FBS": { n: "FBS", u: "mg/dL", r: "70-100" },
+        "HbA1C": { n: "HbA1C", u: "%", r: "4.0-5.6" },
+        "S_URIC_ACID": { n: "S.URIC ACID", u: "mg/dL", r: "M: 3.5-7.2 | F: 2.6-6.0" },
+        "B_UREA": { n: "B.UREA", u: "mg/dL", r: "15-45" },
+        "S_CREATININE": { n: "S.CREATININE", u: "mg/dL", r: "M: 0.7-1.3 | F: 0.6-1.1" },
+        "S_CALCIUM": { n: "S.CALCIUM", u: "mg/dL", r: "8.5-10.5" },
+        "S_AMYLASE": { n: "S.AMYLASE", u: "U/L", r: "30-110" },
+        "S_LIPASE": { n: "S.LIPASE", u: "U/L", r: "0-160" },
+        "LDH": { n: "LDH", u: "U/L", r: "140-280" },
+        "SGOT": { n: "SGOT (AST)", u: "U/L", r: "5-40" },
+        "SGPT": { n: "SGPT (ALT)", u: "U/L", r: "7-56" },
+        "ALP": { n: "ALP", u: "U/L", r: "44-147" },
+        "TSB": { n: "TSB", u: "mg/dL", r: "0.2-1.2" },
+        "DIRECT_BIL": { n: "DIRECT BILIRUBIN", u: "mg/dL", r: "< 0.3" },
+        "INDIRECT_BIL": { n: "INDIRECT BILIRUBIN", u: "mg/dL", r: "0.2-0.8" },
+        "TSH": { n: "TSH", u: "mIU/L", r: "0.4-4.5" },
+        "FREE_T3": { n: "FREE T3", u: "pg/mL", r: "2.3-4.2" },
+        "FREE_T4": { n: "FREE T4", u: "ng/dL", r: "0.8-1.8" },
+        "S_PROLACTIN": { n: "S.PROLACTIN", u: "ng/mL", r: "F: <25 | M: <15" },
+        "LH": { n: "LH", u: "mIU/mL", r: "M: 1.7-8.6 | F: 2.4-95" },
+        "FSH": { n: "FSH", u: "mIU/mL", r: "M: 1.5-12.4 | F: 3.5-21.5" },
+        "S_TESTOSTERONE": { n: "S.TESTOSTERONE", u: "ng/dL", r: "M: 300-1000 | F: 15-70" },
+        "PSA": { n: "PSA", u: "ng/mL", r: "< 4.0" },
+        "B_HCG": { n: "B-HCG", u: "mIU/mL", r: "< 5" },
+        "S_VIT_D": { n: "S.VIT D", u: "ng/mL", r: "30-100" },
+        "S_VIT_B12": { n: "S.VIT B12", u: "pg/mL", r: "200-900" },
+        "GUE": { n: "GUE", u: "", r: "Clear, pH 5-7, Sp.Gr 1.005-1.030, Pus 0-5, RBC 0-2" },
+        "URINE_C_S": { n: "URINE C+S", u: "", r: "No growth" },
+        "GSE": { n: "GSE", u: "", r: "No parasites/occult blood" },
+        "STOOL_H_PYLORI": { n: "STOOL H.PYLORI (Ag)", u: "", r: "Negative" },
+        "STOOL_CALPROTECTIN": { n: "STOOL CALPROTECTIN", u: "µg/g", r: "< 50" },
+        "S_H_PYLORI": { n: "S.H.PYLORI (Ab)", u: "", r: "Negative" },
+        "SALMONELLA": { n: "SALMONELLA", u: "", r: "Negative" },
+        "VIRAL_MARKER": { n: "VIRAL MARKER", u: "", r: "Non-reactive" },
+        "ANA": { n: "ANA", u: "", r: "Negative" },
+        "BL_GP_RH": { n: "BL.GP & RH", u: "", r: "Patient Specific" }
     };
-    const defaultLabs = Object.keys(labRef);
 
-    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genLabTags(); } else { alert("Access Denied"); } }
+    const defaultImaging = ["Ultrasound", "X-Ray", "CT Scan", "MRI", "MRCP", "OGD", "Colonoscopy"];
+
+    function checkPass() { if(document.getElementById('passCode').value === 'saad2026') { document.getElementById('loginScreen').style.display='none'; document.getElementById('mainContent').style.display='grid'; initSync(); genImagingTags(); } else { alert("Access Denied"); } }
 
     function initSync() {
+        // GLOBAL LABS SYNC ENGINE
+        db.ref('globalLabs').on('value', snap => {
+            if(snap.exists()) {
+                globalLabs = snap.val();
+            } else {
+                globalLabs = initialLabs;
+                db.ref('globalLabs').set(initialLabs); // Seed database
+            }
+            genLabTags(); // Render tags with safe keys
+            if(activeId && ptDetails[activeId]) renderLabs(ptDetails[activeId].labs || {});
+        });
+
         db.ref('patientIndex').on('value', snap => { ptIdx = snap.val() || {}; renderList(); renderCalendar(); });
         db.ref('reminders').on('value', snap => { allReminders = snap.val() || {}; renderRems(); checkActiveReminderBanner(); });
     }
 
-    // AUTO EXPANDING TEXT AREAS
     function autoExpand(field) {
-        field.style.height = 'auto'; // Reset
+        field.style.height = 'auto'; 
         field.style.height = (field.scrollHeight) + 'px';
     }
 
@@ -333,23 +359,18 @@
             
             renderVisitLog(d.visitDates || []);
             renderLabs(d.labs || {});
+            renderImaging(d.imaging || {}); // NEW IMAGING SUITE
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
         });
     }
 
-    // CHECK FOR ACTIVE TASKS FOR THIS PATIENT
     function checkActiveReminderBanner() {
         if(!activeId) return;
         const banner = document.getElementById('activeReminderBanner');
         const activeRem = Object.values(allReminders).find(r => (r.ptId === activeId || r.patientId === activeId) && r.status === 'pending');
-        
-        if(activeRem) {
-            banner.innerHTML = `⚠️ CLINICAL ALERT / TASK: ${activeRem.text} <span style="float:right;">${activeRem.date}</span>`;
-            banner.style.display = 'block';
-        } else {
-            banner.style.display = 'none';
-        }
+        if(activeRem) { banner.innerHTML = `⚠️ CLINICAL ALERT / TASK: ${activeRem.text} <span style="float:right;">${activeRem.date}</span>`; banner.style.display = 'block'; } 
+        else { banner.style.display = 'none'; }
     }
 
     function editRegDate() {
@@ -396,7 +417,7 @@
         if(n) { 
             dates[idx] = n; 
             db.ref('patientDetails/'+activeId+'/visitDates').set(dates); 
-            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] }); // Force Update Index
+            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] }); 
         }
     }
     
@@ -406,7 +427,7 @@
             d.splice(idx,1); 
             db.ref('patientDetails/'+activeId+'/visitDates').set(d); 
             const lastV = d.length > 0 ? d[d.length - 1] : ptIdx[activeId].dateAdded;
-            db.ref('patientIndex/'+activeId).update({ lastVisit: lastV }); // Update Index Last Visit
+            db.ref('patientIndex/'+activeId).update({ lastVisit: lastV }); 
         } 
     }
 
@@ -421,44 +442,54 @@
         document.getElementById('referralResult').style.display = 'block';
     }
 
+    // --- GLOBAL PATHOLOGY ENGINE ---
     function genLabTags() {
         const grid = document.getElementById('labSelector'); grid.innerHTML = '';
-        defaultLabs.forEach(name => {
-            const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = name;
-            btn.onclick = () => orderLab(name, labRef[name] ? labRef[name].r : "N/A", labRef[name] ? labRef[name].u : "");
+        Object.keys(globalLabs).forEach(safeKey => {
+            const data = globalLabs[safeKey];
+            const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = data.n;
+            btn.onclick = () => orderLab(safeKey, data.n, data.r, data.u);
             grid.appendChild(btn);
         });
     }
 
-    function orderLab(name, range="N/A", unit="") {
+    function orderLab(safeKey, dispName, range, unit) {
         if(!activeId) return;
         const labs = ptDetails[activeId].labs || {};
-        if(!labs[name]) labs[name] = { history: [], range: range, unit: unit };
-        labs[name].pending = true;
-        db.ref('patientDetails/'+activeId+'/labs/'+name).set(labs[name]);
+        if(!labs[safeKey]) labs[safeKey] = { name: dispName, history: [], range: range, unit: unit };
+        labs[safeKey].pending = true;
+        db.ref('patientDetails/'+activeId+'/labs/'+safeKey).set(labs[safeKey]);
         db.ref('patientIndex/'+activeId).update({ hasPendingLab:true });
     }
 
     function addNewCustomLab() {
-        const name = prompt("Enter New Test Name (e.g., Amylase):");
+        const name = prompt("Enter New Test Name (e.g., Cortisol):");
         if(name) {
-            const range = prompt("Enter Normal Range (e.g., 0-100):") || "N/A";
-            orderLab(name, range);
+            const range = prompt("Enter Normal Range (e.g., 5-25):") || "N/A";
+            const unit = prompt("Enter Unit (e.g., mcg/dL):") || "";
+            const safeKey = name.replace(/[\.\#\$\[\]]/g, '_'); // Safe Firebase Key
+            
+            // Save globally for all future patients
+            db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit });
+            // Order for current patient
+            orderLab(safeKey, name, range, unit);
         }
     }
 
     function renderLabs(labs) {
         const list = document.getElementById('labResultsList'); list.innerHTML = '';
-        Object.keys(labs).forEach(name => {
-            const data = labs[name];
+        Object.keys(labs).forEach(safeKey => {
+            const data = labs[safeKey];
+            const dispName = data.name || safeKey; // Fallback for old records
+            
             let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
                 const rIdx = (data.history.length-1)-idx;
                 hHtml += `
                     <div class="lab-row">
                         <span>${h.dt}: <b style="font-size:16px;">${h.val} <span style="font-size:12px; font-weight:normal;">${data.unit||''}</span></b></span> 
                         <div>
-                            <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:13px;" onclick="editLabEntry('${name}', ${rIdx})">✎ Edit</button>
-                            <button class="action-btn" style="color:var(--danger); font-size:13px;" onclick="deleteLabEntry('${name}', ${rIdx})">✕</button>
+                            <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:13px;" onclick="editLabEntry('${safeKey}', ${rIdx})">✎ Edit</button>
+                            <button class="action-btn" style="color:var(--danger); font-size:13px;" onclick="deleteLabEntry('${safeKey}', ${rIdx})">✕</button>
                         </div>
                     </div>`;
             });
@@ -466,14 +497,14 @@
             list.innerHTML += `
                 <div class="lab-accordion">
                     <div class="lab-header" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='block'?'none':'block')">
-                        <span style="font-size:15px;">${name} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
+                        <span style="font-size:15px;">${dispName} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
                         <span style="font-size:11px; color:#666; font-weight:normal;">Ref Range: ${data.range || 'N/A'} ▼</span>
                     </div>
                     <div class="lab-body">
                         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                            <button onclick="addLabVal('${name}')" style="background:var(--lab); padding:10px 15px; font-size:13px; width:auto;">+ Add Result</button>
-                            <button onclick="editLabMeta('${name}')" style="background:#607d8b; padding:10px 15px; font-size:13px; width:auto;">✎ Edit Range/Unit</button>
-                            <button onclick="deleteFullLab('${name}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto;">✕ Delete Test</button>
+                            <button onclick="addLabVal('${safeKey}')" style="background:var(--lab); padding:10px 15px; font-size:13px; width:auto;">+ Add Result</button>
+                            <button onclick="editLabMeta('${safeKey}')" style="background:#607d8b; padding:10px 15px; font-size:13px; width:auto;">✎ Edit Range/Unit (Global)</button>
+                            <button onclick="deleteFullLab('${safeKey}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto;">✕ Delete Test</button>
                         </div>
                         ${hHtml}
                     </div>
@@ -481,35 +512,119 @@
         });
     }
 
-    function addLabVal(name) {
-        const v = prompt(`Enter value for ${name}:`); 
+    function addLabVal(safeKey) {
+        const v = prompt(`Enter value:`); 
         if(v) {
             const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
-            const h = ptDetails[activeId].labs[name].history || [];
+            const h = ptDetails[activeId].labs[safeKey].history || [];
             h.push({ val: v, dt: dt });
-            db.ref('patientDetails/'+activeId+'/labs/'+name).update({ pending: false, history: h });
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ pending: false, history: h });
         }
     }
 
-    function editLabEntry(name, idx) {
-        const entry = ptDetails[activeId].labs[name].history[idx];
+    function editLabEntry(safeKey, idx) {
+        const entry = ptDetails[activeId].labs[safeKey].history[idx];
         const newVal = prompt("Edit Value:", entry.val);
         const newDt = prompt("Edit Date:", entry.dt);
         if(newVal && newDt) {
-            const h = ptDetails[activeId].labs[name].history;
+            const h = ptDetails[activeId].labs[safeKey].history;
             h[idx] = { val: newVal, dt: newDt };
-            db.ref('patientDetails/'+activeId+'/labs/'+name+'/history').set(h);
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h);
         }
     }
 
-    function editLabMeta(name) { 
-        const nR = prompt("New Range:", ptDetails[activeId].labs[name].range); 
-        const nU = prompt("New Unit:", ptDetails[activeId].labs[name].unit);
-        if(nR !== null) db.ref('patientDetails/'+activeId+'/labs/'+name).update({ range: nR, unit: nU }); 
+    function editLabMeta(safeKey) { 
+        const nR = prompt("New Range (Updates for all future tests):", ptDetails[activeId].labs[safeKey].range); 
+        const nU = prompt("New Unit:", ptDetails[activeId].labs[safeKey].unit);
+        if(nR !== null) {
+            // Update this patient
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ range: nR, unit: nU }); 
+            // Update Globally
+            db.ref('globalLabs/'+safeKey).update({ r: nR, u: nU });
+        }
     }
-    function deleteFullLab(name) { if(confirm(`Permanently delete all ${name} records for this patient?`)) db.ref('patientDetails/'+activeId+'/labs/'+name).remove(); }
-    function deleteLabEntry(name, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[name].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+name+'/history').set(h); } }
+    function deleteFullLab(safeKey) { if(confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/'+activeId+'/labs/'+safeKey).remove(); }
+    function deleteLabEntry(safeKey, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[safeKey].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h); } }
 
+    // --- NEW: IMAGING & ENDOSCOPY ENGINE ---
+    function genImagingTags() {
+        const grid = document.getElementById('imagingSelector'); grid.innerHTML = '';
+        defaultImaging.forEach(name => {
+            const btn = document.createElement('div'); btn.className = 'img-btn'; btn.innerText = name;
+            btn.onclick = () => orderImaging(name);
+            grid.appendChild(btn);
+        });
+    }
+
+    function orderImaging(name) {
+        if(!activeId) return;
+        const key = name.replace(/[\.\#\$\[\]]/g, '_');
+        const imgNode = ptDetails[activeId].imaging || {};
+        if(!imgNode[key]) imgNode[key] = { name: name, history: [] };
+        imgNode[key].pending = true;
+        db.ref('patientDetails/'+activeId+'/imaging/'+key).set(imgNode[key]);
+    }
+
+    function renderImaging(images) {
+        const list = document.getElementById('imagingResultsList'); list.innerHTML = '';
+        Object.keys(images).forEach(key => {
+            const data = images[key];
+            let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
+                const rIdx = (data.history.length-1)-idx;
+                hHtml += `
+                    <div style="background:#fff; border:1px solid #f0f0f0; padding:12px; margin-bottom:8px; border-radius:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                            <b style="font-size:14px;">📅 ${h.dt}</b>
+                            <div>
+                                <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:13px;" onclick="editImgEntry('${key}', ${rIdx})">✎ Edit</button>
+                                <button class="action-btn" style="color:var(--danger); font-size:13px;" onclick="deleteImgEntry('${key}', ${rIdx})">✕</button>
+                            </div>
+                        </div>
+                        <div style="font-size:15px; color:#333; line-height:1.4;">Dx/Report: <b>${h.val}</b></div>
+                    </div>`;
+            });
+            
+            list.innerHTML += `
+                <div class="lab-accordion" style="border-color:#e1bee7;">
+                    <div class="lab-header" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='block'?'none':'block')" style="background:#fdf4ff; color:var(--img);">
+                        <span style="font-size:15px;">${data.name} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
+                        <span style="font-size:11px; color:#666; font-weight:normal;">Click to Expand ▼</span>
+                    </div>
+                    <div class="lab-body">
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <button onclick="addImgVal('${key}')" style="background:var(--img); padding:10px 15px; font-size:13px; width:auto; border:none; color:white; border-radius:8px; font-weight:bold;">+ Add Report / Dx</button>
+                            <button onclick="deleteFullImg('${key}')" style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto; border-radius:8px; font-weight:bold;">✕ Delete Modality</button>
+                        </div>
+                        ${hHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function addImgVal(key) {
+        const v = prompt(`Enter Report/Dx for ${ptDetails[activeId].imaging[key].name}:`);
+        if(v) {
+            const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
+            const h = ptDetails[activeId].imaging[key].history || [];
+            h.push({ val: v, dt: dt });
+            db.ref('patientDetails/'+activeId+'/imaging/'+key).update({ pending: false, history: h });
+        }
+    }
+
+    function editImgEntry(key, idx) {
+        const entry = ptDetails[activeId].imaging[key].history[idx];
+        const newVal = prompt("Edit Report/Dx:", entry.val);
+        const newDt = prompt("Edit Date:", entry.dt);
+        if(newVal && newDt) {
+            const h = ptDetails[activeId].imaging[key].history;
+            h[idx] = { val: newVal, dt: newDt };
+            db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h);
+        }
+    }
+    function deleteFullImg(key) { if(confirm("Delete this entire imaging modality?")) db.ref('patientDetails/'+activeId+'/imaging/'+key).remove(); }
+    function deleteImgEntry(key, idx) { if(confirm("Delete this report?")) { const h = ptDetails[activeId].imaging[key].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h); } }
+
+    // --- VITALS ENGINE ---
     function addVital() {
         const w = document.getElementById('vW').value; const bp = document.getElementById('vBP').value; const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
         if(!w && !bp) return;
@@ -534,13 +649,11 @@
         });
     }
 
-    // NEW: Fully Editable Vitals
     function editVital(idx) {
         const v = ptDetails[activeId].vitals[idx];
         const w = prompt("Edit Weight (kg):", v.w || "");
         const bp = prompt("Edit BP:", v.bp || "");
         const dt = prompt("Edit Date:", v.dt || "");
-        
         if(w !== null && bp !== null && dt !== null) {
             const vits = ptDetails[activeId].vitals;
             vits[idx] = { w: w, bp: bp, dt: dt };
@@ -565,20 +678,31 @@
     }
 
     function renderList() {
-        const list = document.getElementById('patientList'); const q = document.getElementById('searchBox').value.toLowerCase(); list.innerHTML = '';
-        Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
-            const p = ptIdx[id];
-            
-            // ACCURATE LAST VISIT LOGIC: Prioritizes the saved lastVisit variable updated by the Sync Engine
-            const lastVisit = p.lastVisit || p.dateAdded || "N/A";
+        const list = document.getElementById('patientList'); 
+        const qText = document.getElementById('searchBox').value.toLowerCase(); 
+        
+        // CALENDAR SEARCH FILTER
+        const qDate = document.getElementById('searchDate').value; 
+        let formattedQDate = "";
+        if(qDate) {
+            const [y, m, d] = qDate.split('-');
+            formattedQDate = `${d}/${m}/${y}`; // Convert HTML YYYY-MM-DD to DD/MM/YYYY
+        }
 
-            // Search by Name, Reg Date, Complaint, or Last Visit Date
-            const match = p.name.toLowerCase().includes(q) 
-                || (p.dateAdded && p.dateAdded.includes(q)) 
-                || (p.complaint && p.complaint.toLowerCase().includes(q))
-                || lastVisit.includes(q);
+        list.innerHTML = '';
+        Object.keys(ptIdx).sort((a,b) => b-a).forEach(id => {
+            const p = ptIdx[id]; const d = ptDetails[id] || {};
+            const visits = d.visitDates || [];
+            const lastVisit = (visits && visits.length > 0) ? visits[visits.length - 1] : (p.dateAdded || "N/A");
+
+            // Text Match
+            const textMatch = p.name.toLowerCase().includes(qText) 
+                || (p.complaint && p.complaint.toLowerCase().includes(qText));
             
-            if (match) {
+            // Date Match (Check Reg Date OR any Visit Date)
+            const dateMatch = formattedQDate ? (p.dateAdded === formattedQDate || visits.includes(formattedQDate)) : true;
+            
+            if (textMatch && dateMatch) {
                 list.innerHTML += `
                     <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
                         <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}
@@ -593,7 +717,6 @@
     function addPatient() {
         const n = document.getElementById('newName').value; if(!n) return;
         const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
-        // Save initial patient index with lastVisit identical to Registration Date
         db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true });
         db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); 
         ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
@@ -610,7 +733,7 @@
         const list = document.getElementById('remList'); list.innerHTML = '';
         Object.keys(allReminders).filter(id => allReminders[id].status === 'pending').sort((a,b) => new Date(allReminders[a].date) - new Date(allReminders[b].date)).forEach(id => {
             const r = allReminders[id]; 
-            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders for proper routing
+            const targetId = r.ptId || r.patientId; // Catch both legacy and new reminders
             list.innerHTML += `
                 <div class="rem-item" onclick="loadFullData('${targetId}')">
                     <button style="float:right; background:var(--success); color:white; border:none; border-radius:6px; padding:8px 12px; font-size:14px;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
@@ -642,10 +765,7 @@
         detailRef.once('value').then(snap => {
             const d = snap.val() || {}; const dates = d.visitDates || []; if(!dates.includes(today)) dates.push(today);
             
-            // Sync Medical Text Data
             detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
-            
-            // Sync Last Visit to Index for proper Sidebar Rendering
             db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
 
             document.getElementById('syncIndicator').style.display = 'none'; if (manual) alert("Cloud Sync OK");
