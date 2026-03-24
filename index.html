@@ -38,7 +38,6 @@
         .pt-item.active { border-left-color: var(--primary); background: var(--secondary) !important; font-weight: bold; box-shadow: inset 0 0 0 1px rgba(0,74,153,0.1); }
         .pt-meta { font-size: 11.5px; color: #888; display: block; margin-top: 6px; }
         
-        /* ⭐ Pin & Delete Controls */
         .pt-controls { position: absolute; right: 10px; top: 15px; display: flex; gap: 10px; }
         .btn-pin-pt { color: #ccc; font-size: 16px; cursor: pointer; transition: 0.2s; }
         .btn-pin-pt.pinned { color: var(--warning); text-shadow: 0 0 5px rgba(255, 152, 0, 0.4); }
@@ -65,8 +64,8 @@
         .val-normal { color: var(--success); font-weight: bold; }
         .val-abnormal { color: var(--danger); font-weight: bold; text-shadow: 0 0 5px rgba(220, 53, 69, 0.1); }
         
-        .sparkline-container { display: flex; align-items: flex-end; gap: 4px; height: 30px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee; justify-content: flex-start; }
-        .spark-bar { width: 12px; background: var(--primary); border-radius: 2px 2px 0 0; min-height: 2px; opacity: 0.8; transition: 0.3s; }
+        .sparkline-container { display: flex; align-items: flex-end; gap: 4px; height: 35px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee; justify-content: flex-start; }
+        .spark-bar { width: 14px; background: var(--primary); border-radius: 3px 3px 0 0; min-height: 4px; opacity: 0.8; transition: 0.3s; }
         .spark-bar:hover { opacity: 1; transform: scaleY(1.1); }
         .spark-bar.red { background: var(--danger); }
 
@@ -82,10 +81,6 @@
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
 
-        .date-search-wrapper { position: relative; display: inline-block; width: 50px; }
-        .date-search-btn { background: var(--secondary); border: 1px solid #d1d9e6; font-size: 20px; border-radius: 10px; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
-        .date-search-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        
         .login-box { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #004a99, #001a3d); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease, visibility 0.5s; }
         .login-box.fade-out { opacity: 0; visibility: hidden; }
         .login-glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
@@ -142,11 +137,11 @@
         <div class="card">
             <h3>History <span id="waitCounter" style="background:var(--waiting); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight: bold;">0</span></h3>
             
-            <div style="display:grid; grid-template-columns: 1fr auto; gap:8px;">
+            <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;">
                 <input type="text" id="searchBox" placeholder="🔍 Search Name or C/O..." oninput="renderList()" style="margin:0; border-radius: 10px;">
-                <div class="date-search-wrapper">
-                    <div class="date-search-btn">📅</div>
-                    <input type="date" id="searchDate" class="date-search-input" onchange="renderList()" title="Search by Exact Date">
+                <div style="position:relative; width:48px; height:48px; background:var(--secondary); border:1px solid #d1d9e6; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink: 0;">
+                    <span style="font-size:22px; pointer-events:none;">📅</span>
+                    <input type="date" id="searchDate" onchange="renderList()" title="Search by Exact Date" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0; padding:0;">
                 </div>
             </div>
             
@@ -452,20 +447,21 @@
         });
     }
 
-    function parseDateSafe(dateStr) {
-        if (!dateStr || dateStr === "N/A") return null;
+    // ⭐ MATHEMATICAL DATE PARSER FOR RADAR & SORTING (BUG 1 & 3 FIX)
+    function parseIraqiDate(dateStr) {
+        if (!dateStr || dateStr === "N/A") return 0;
         if (dateStr.includes('/')) {
             const parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
         }
-        const parsed = new Date(dateStr);
-        return isNaN(parsed.getTime()) ? null : parsed;
+        const parsed = new Date(dateStr).getTime();
+        return isNaN(parsed) ? 0 : parsed;
     }
 
     function getDaysSince(dateStr) {
-        const past = parseDateSafe(dateStr);
-        if(!past) return 0;
-        const diff = new Date() - past;
+        const time = parseIraqiDate(dateStr);
+        if(time === 0) return 0;
+        const diff = Date.now() - time;
         return Math.floor(diff / (1000 * 60 * 60 * 24));
     }
 
@@ -501,6 +497,7 @@
                     db.ref('patientIndex/'+id).update({ dismissedVisit: lastV });
                 }
             });
+            showToast("✅ All alerts cleared.");
         }
     }
 
@@ -511,7 +508,6 @@
         showToast("✅ Alert Dismissed for this cycle.");
     }
 
-    // ⭐ PIN LOGIC
     function togglePin(id, currentStatus) {
         db.ref('patientIndex/'+id).update({ pinned: !currentStatus });
     }
@@ -527,7 +523,12 @@
     function editRegDate() {
         const current = ptIdx[activeId].dateAdded;
         const n = prompt("Edit Registration Date (DD/MM/YYYY):", current);
-        if (n && n !== current) db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+        if (n && n !== current) {
+            db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+            if(!ptDetails[activeId].visitDates || ptDetails[activeId].visitDates.length === 0) {
+                db.ref('patientIndex/'+activeId).update({ lastVisit: n });
+            }
+        }
     }
 
     function updateComplaint(el) {
@@ -633,35 +634,7 @@
         }
     }
 
-    function checkLabStatus(valStr, rangeStr) {
-        if (!valStr || !rangeStr || rangeStr === "N/A" || rangeStr.includes("Specific") || rangeStr.includes("Negative") || rangeStr.includes("Normal") || rangeStr.includes("Clear") || rangeStr.includes("No growth")) return "";
-        
-        const matchVal = valStr.match(/[0-9]*\.?[0-9]+/);
-        if(!matchVal) return "";
-        const val = parseFloat(matchVal[0]);
-
-        let min = -Infinity; let max = Infinity;
-
-        if (rangeStr.includes("<")) {
-            const matchMax = rangeStr.match(/[0-9]*\.?[0-9]+/);
-            if(matchMax) max = parseFloat(matchMax[0]);
-        } else if (rangeStr.includes(">")) {
-            const matchMin = rangeStr.match(/[0-9]*\.?[0-9]+/);
-            if(matchMin) min = parseFloat(matchMin[0]);
-        } else {
-            const parts = rangeStr.match(/[0-9]*\.?[0-9]+/g);
-            if (parts && parts.length === 2 && !rangeStr.includes("M:") && !rangeStr.includes("F:")) {
-                min = parseFloat(parts[0]);
-                max = parseFloat(parts[1]);
-            }
-        }
-
-        if (min !== -Infinity && max !== Infinity) { return (val < min || val > max) ? "val-abnormal" : "val-normal"; } 
-        else if (max !== Infinity) { return (val > max) ? "val-abnormal" : "val-normal"; } 
-        else if (min !== -Infinity) { return (val < min) ? "val-abnormal" : "val-normal"; }
-        return "";
-    }
-
+    // ⭐ SMART LAB OVERRIDE & ICONS (BUG 2 FIX)
     function renderLabs(labs) {
         const list = document.getElementById('labResultsList'); list.innerHTML = '';
         Object.keys(labs).forEach(safeKey => {
@@ -670,13 +643,18 @@
             
             let sparkHtml = '';
             if(data.history && data.history.length > 1) {
-                const values = data.history.map(h => parseFloat(h.val.match(/[0-9]*\.?[0-9]+/) || [0]));
-                const maxV = Math.max(...values);
+                const histCopy = [...data.history]; 
+                const values = histCopy.slice(-5).map(h => {
+                    const num = parseFloat((h.val || "0").match(/[0-9]*\.?[0-9]+/) || [0]);
+                    return { num, stat: h.stat };
+                });
+                const maxV = Math.max(...values.map(v => v.num));
+                
                 if(maxV > 0) {
-                    const bars = values.slice(-5).map(v => {
-                        const hPct = Math.max((v / maxV) * 100, 10);
-                        const colorClass = checkLabStatus(v.toString(), data.range) === "val-abnormal" ? "red" : "";
-                        return `<div class="spark-bar ${colorClass}" style="height:${hPct}%;" title="Value: ${v}"></div>`;
+                    const bars = values.map(v => {
+                        const hPct = Math.max((v.num / maxV) * 100, 10);
+                        const colorClass = (v.stat === "High" || v.stat === "Low") ? "red" : "";
+                        return `<div class="spark-bar ${colorClass}" style="height:${hPct}%;" title="Value: ${v.num}"></div>`;
                     }).join('');
                     sparkHtml = `<div class="sparkline-container">${bars}</div>`;
                 }
@@ -684,11 +662,15 @@
 
             let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
                 const rIdx = (data.history.length-1)-idx;
-                const statusClass = checkLabStatus(h.val, data.range);
+                
+                // Set Physical Icons and Colors based on manual flag
+                let icon = "🟢"; let colorClass = "val-normal";
+                if(h.stat === "High") { icon = "🔴 ⬆️"; colorClass = "val-abnormal"; }
+                else if(h.stat === "Low") { icon = "🔴 ⬇️"; colorClass = "val-abnormal"; }
                 
                 hHtml += `
                     <div class="lab-row">
-                        <span>${h.dt}: <span class="${statusClass}" style="font-size:16px;">${h.val} <span style="font-size:12px; font-weight:normal; color:#666;">${data.unit||''}</span></span></span> 
+                        <span>${h.dt}: <span class="${colorClass}" style="font-size:16px;">${h.val} <span style="font-size:12px; font-weight:normal; color:#666;">${data.unit||''}</span> ${icon}</span></span> 
                         <div>
                             <button class="action-btn" style="color:var(--primary); margin-right:15px; font-size:13px;" onclick="editLabEntry('${safeKey}', ${rIdx})">✎ Edit</button>
                             <button class="action-btn" style="color:var(--danger); font-size:13px;" onclick="deleteLabEntry('${safeKey}', ${rIdx})">✕</button>
@@ -716,22 +698,36 @@
     }
 
     function addLabVal(safeKey) {
-        const v = prompt(`Enter value:`); 
-        if(v) {
-            const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
-            const h = ptDetails[activeId].labs[safeKey].history || [];
-            h.push({ val: v, dt: dt });
-            db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ pending: false, history: h });
+        const v = prompt(`Enter numerical value:`); 
+        if(!v) return;
+        
+        let status = "Normal";
+        const flag = prompt(`Flag this result:\nLeave blank = Normal 🟢\nType "H" = High 🔴⬆️\nType "L" = Low 🔴⬇️`);
+        if(flag) {
+            if(flag.toLowerCase() === 'h') status = "High";
+            if(flag.toLowerCase() === 'l') status = "Low";
         }
+        
+        const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
+        const h = ptDetails[activeId].labs[safeKey].history || [];
+        h.push({ val: v, dt: dt, stat: status });
+        db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ pending: false, history: h });
     }
 
     function editLabEntry(safeKey, idx) {
         const entry = ptDetails[activeId].labs[safeKey].history[idx];
         const newVal = prompt("Edit Value:", entry.val);
+        const newFlag = prompt(`Flag this result (Currently ${entry.stat || 'Normal'}):\nLeave blank = Normal 🟢\nType "H" = High 🔴⬆️\nType "L" = Low 🔴⬇️`, entry.stat === "High" ? "H" : (entry.stat === "Low" ? "L" : ""));
         const newDt = prompt("Edit Date:", entry.dt);
-        if(newVal && newDt) {
+        
+        if(newVal && newDt !== null) {
+            let status = "Normal";
+            if(newFlag) {
+                if(newFlag.toLowerCase() === 'h') status = "High";
+                if(newFlag.toLowerCase() === 'l') status = "Low";
+            }
             const h = ptDetails[activeId].labs[safeKey].history;
-            h[idx] = { val: newVal, dt: newDt };
+            h[idx] = { val: newVal, dt: newDt, stat: status };
             db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h);
         }
     }
@@ -894,12 +890,11 @@
         hist.slice().reverse().forEach(h => list.innerHTML += `<div style="background:#fff; border-left:4px solid #ffcdd2; padding:12px; margin-bottom:8px; border-radius:6px; font-weight:bold; font-size:14px;">📅 ${h.d} - ${h.t}</div>`);
     }
 
-    // ⭐ SORTING LOGIC: Pinned first, then chronological
     function renderList() {
         const list = document.getElementById('patientList'); 
         const qText = document.getElementById('searchBox').value.toLowerCase(); 
-        const qDate = document.getElementById('searchDate').value; 
         
+        const qDate = document.getElementById('searchDate').value; 
         let formattedQDate = "";
         if(qDate) {
             const [y, m, d] = qDate.split('-');
@@ -908,15 +903,24 @@
 
         list.innerHTML = '';
         
+        // ⭐ THE TRUE CHRONOLOGICAL SORTING ALGORITHM (BUG 1 FIX)
         const sortedIds = Object.keys(ptIdx).sort((a, b) => {
-            const pinA = ptIdx[a].pinned ? 1 : 0;
-            const pinB = ptIdx[b].pinned ? 1 : 0;
-            if (pinA !== pinB) return pinB - pinA;
-            return b - a; 
+            const pA = ptIdx[a]; const pB = ptIdx[b];
+            
+            const pinA = pA.pinned ? 1 : 0;
+            const pinB = pB.pinned ? 1 : 0;
+            if (pinA !== pinB) return pinB - pinA; // Pinned patients first
+
+            // Convert Iraqi String dates to mathematical time for perfect sorting
+            const timeA = parseIraqiDate(pA.lastVisit || pA.dateAdded);
+            const timeB = parseIraqiDate(pB.lastVisit || pB.dateAdded);
+            
+            return timeB - timeA; // Newest visits bubble to the top
         });
 
         sortedIds.forEach(id => {
             const p = ptIdx[id];
+            
             const lastVisit = p.lastVisit || p.dateAdded || "N/A";
             const days = getDaysSince(lastVisit);
             const isOverdue = (days >= 25 && p.dismissedVisit !== lastVisit);
