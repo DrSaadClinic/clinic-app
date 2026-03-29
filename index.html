@@ -44,6 +44,11 @@
         .btn-del-pt { color: var(--danger); font-size: 16px; opacity: 0.4; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
 
+        /* Web Request Inbox Styles */
+        .web-req-item { background: white; border: 1px solid rgba(0,0,0,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .web-req-actions button { padding: 8px; font-size: 13px; border-radius: 8px; }
+
         [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: #fff; border-radius: 6px; box-shadow: 0 0 0 3px rgba(0,74,153,0.1); padding: 2px 5px; }
@@ -106,7 +111,7 @@
     </div>
 </div>
 
-<div id="liveToast" class="toast">🔔 New Patient Registered</div>
+<div id="liveToast" class="toast">🔔 Notification</div>
 
 <header>
     <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
@@ -115,6 +120,12 @@
 
 <div id="mainContent" class="container" style="display:none;">
     <div class="sidebar">
+        
+        <div class="card" id="webInboxCard" style="display:none; background: #fffdf5; border: 1px solid #ffe082;">
+            <h3 style="color: #d84315; margin-bottom: 10px;">🌐 Web Requests <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span></h3>
+            <div id="webReqList" style="max-height: 280px; overflow-y: auto; padding-right: 5px;"></div>
+        </div>
+
         <div class="card">
             <h3>New Registration</h3>
             <input type="text" id="newName" placeholder="Full Name">
@@ -290,6 +301,7 @@
     let ptDetails = {}; 
     let allReminders = {}; 
     let globalLabs = {}; 
+    let pendingBookings = {}; // ⭐ NEW: Tracks web requests
     let activeId = null; 
     let syncTimeout = null; 
     let activeListener = null;
@@ -374,14 +386,9 @@
         setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // ⭐ WHATSAPP AUTO-DRAFT ENGINE (IRAQI FORMATTER)
     function sendWhatsApp(num, name) {
         const template = `تحية طيبة وبعد ${name}،\nيرجى التفضل بالعلم أن موعد المراجعة الطبية الخاص بكم مع الدكتور سعد صبري الزبيدي محدد يوم [اليوم] بتاريخ [التاريخ] عند الساعة [الوقت].\nنحن حريصون على متابعة حالتكم الصحية لضمان أفضل النتائج. يرجى تأكيد الموعد لطفاً.\nعيادة الدكتور سعد صبري الزبيدي - الجراحة العامة. 📋🩺`;
-        
-        // Attempt clipboard copy as backup
         try { navigator.clipboard.writeText(template); } catch(err) {}
-        
-        // Send directly to WhatsApp App pre-filled
         const encoded = encodeURIComponent(template);
         window.open(`https://wa.me/${num}?text=${encoded}`, '_blank');
         showToast("✅ WhatsApp opened & template drafted!");
@@ -395,11 +402,17 @@
             if(activeId && ptDetails[activeId]) renderLabs(ptDetails[activeId].labs || {});
         });
 
+        // ⭐ NEW: Listener for Incoming Web Bookings
+        db.ref('pendingBookings').on('value', snap => {
+            pendingBookings = snap.val() || {};
+            renderWebRequests();
+        });
+
         db.ref('patientIndex').on('value', snap => { 
             const data = snap.val() || {};
             if(!isInitialLoad) {
                 const newKeys = Object.keys(data).filter(k => !ptIdx[k]);
-                newKeys.forEach(k => showToast("🔔 New Patient Registered: " + data[k].name));
+                // Removed the generic notification because Web Accept has its own
             }
             ptIdx = data; 
             isInitialLoad = false;
@@ -411,6 +424,81 @@
         });
         
         db.ref('reminders').on('value', snap => { allReminders = snap.val() || {}; renderRems(); checkActiveReminderBanner(); });
+    }
+
+    // ⭐ NEW: Web Requests Render & Logic
+    function renderWebRequests() {
+        const list = document.getElementById('webReqList');
+        const card = document.getElementById('webInboxCard');
+        const countBadge = document.getElementById('webReqCount');
+        const keys = Object.keys(pendingBookings);
+        
+        if(keys.length > 0) {
+            card.style.display = 'block';
+            countBadge.innerText = keys.length;
+            list.innerHTML = '';
+            
+            keys.forEach(k => {
+                const req = pendingBookings[k];
+                list.innerHTML += `
+                    <div class="web-req-item">
+                        <div style="display:flex; justify-content:space-between;">
+                            <b style="font-size:15px; color:var(--primary);">${req.name}</b>
+                            <span style="font-size:12px; color:#888;">Age: ${req.age || '--'}</span>
+                        </div>
+                        <div style="font-size:13px; color:#555; margin-top:5px;">📞 ${req.phone}</div>
+                        <div style="font-size:13px; font-style:italic; background:#f9f9f9; padding:8px; border-radius:6px; margin-top:8px;">
+                            "${req.symptom}" <br><span style="color:var(--danger); font-size:11px;">(${req.duration})</span>
+                        </div>
+                        <div class="web-req-actions">
+                            <button style="background:var(--success); color:white; border:none; cursor:pointer;" onclick="acceptWebBooking('${k}')">✅ Accept</button>
+                            <button style="background:#fff4f4; color:var(--danger); border:1px solid var(--danger); cursor:pointer;" onclick="rejectWebBooking('${k}')">🗑️ Reject</button>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            card.style.display = 'none';
+        }
+    }
+
+    function acceptWebBooking(reqId) {
+        const req = pendingBookings[reqId];
+        if(!req) return;
+        
+        const id = Date.now(); 
+        const d = new Date().toLocaleDateString('en-GB');
+        const combinedComplaint = `[WEB] ${req.symptom} (${req.duration})`;
+        
+        // 1. Add to Main Registry
+        db.ref('patientIndex/'+id).set({ 
+            name: req.name, 
+            age: req.age || '', 
+            phone: req.phone || '', 
+            complaint: combinedComplaint, 
+            dateAdded: d, 
+            lastVisit: d, 
+            isWaiting: true, 
+            pinned: false 
+        });
+        
+        // 2. Add to Details File
+        db.ref('patientDetails/'+id).set({ 
+            name: req.name, 
+            presentation: `--- Online Booking Request ---\nSymptoms: ${req.symptom}\nDuration: ${req.duration}\n\n`, 
+            visits: '', 
+            visitDates: [] 
+        });
+        
+        // 3. Delete from Inbox
+        db.ref('pendingBookings/'+reqId).remove();
+        showToast(`✅ ${req.name} added to clinic registry!`);
+    }
+
+    function rejectWebBooking(reqId) {
+        if(confirm("Are you sure you want to permanently delete this web request?")) {
+            db.ref('pendingBookings/'+reqId).remove();
+        }
     }
 
     function autoExpand(field) {
@@ -450,7 +538,6 @@
             document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} | Mobile: ${b.phone || '--'}`;
             document.getElementById('viewRegDate').innerText = `${b.dateAdded || '--'}`;
             
-            // ⭐ IRAQI WHATSAPP NUMBER FORMATTER
             let waNum = b.phone ? b.phone.replace(/\D/g,'') : '';
             if (waNum) {
                 if (waNum.startsWith('00964')) waNum = waNum.substring(2);
