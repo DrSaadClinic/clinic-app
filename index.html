@@ -114,7 +114,7 @@
         
         .container.fluid-active { grid-template-columns: 0px 1fr; gap: 0; }
         .container.fluid-active .sidebar { opacity: 0; pointer-events: none; transform: translateX(-50px); overflow: hidden; }
-        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; }
+        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; display: flex; flex-direction: column; gap: 25px;}
 
         #backBtn { 
             display: none; 
@@ -134,15 +134,27 @@
         .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* MOBILE FIX: Perfect Stacking UI */
+        /* =========================================================
+           MOBILE FIX: PERFECT SECRETARY FLOW
+           ========================================================= */
         @media (max-width: 1024px) { 
-            .container { grid-template-columns: 1fr; padding: 15px; } 
-            .sidebar { width: 100%; display: block; }
-            .content { display: none; }
+            .container { display: flex; flex-direction: column; padding: 15px; gap: 20px;} 
+            
+            /* Order of items on Mobile Sidebar */
+            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 20px; }
+            #webInboxCard { order: 1; margin-bottom: 0; }
+            #addPtCard { order: 2; margin-bottom: 0; }
+            #registryCard { order: 3; margin-bottom: 0; }
+            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 20px;} /* Reminders/Alerts pushed to bottom */
+            #bmiCard { order: 5; margin-bottom: 0; }
+
+            .content { display: none; width: 100%; }
             
             .fluid-active .sidebar { display: none; }
             .fluid-active .content { display: block; animation: slideInRight 0.3s ease; }
             #backBtn { display: inline-block; }
+            
+            .card { margin-bottom: 0; } /* Let the flex gap handle spacing on mobile */
         } 
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -156,7 +168,6 @@
             padding: 25px; 
             border-radius: var(--radius); 
             box-shadow: var(--shadow); 
-            margin-bottom: 25px; 
             border: 1px solid var(--border); 
             transition: var(--transition); 
         }
@@ -165,6 +176,7 @@
         
         h3 { color: var(--text); margin: 0 0 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
         
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 25px; align-items: start; }
         .scroll-card { max-height: 280px; overflow-y: auto; padding-right: 10px; }
         .scroll-card::-webkit-scrollbar { width: 6px; }
         .scroll-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -203,6 +215,18 @@
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
         button:active { transform: scale(0.96); }
+
+        /* iOS INLINE SEARCH BAR */
+        .ios-search-container { position: relative; margin-bottom: 15px; display: flex; gap: 8px; align-items: center; }
+        .ios-search-icon { position: absolute; left: 14px; top: 16px; font-size: 16px; opacity: 0.5; color: var(--text); }
+        .ios-search-input { margin: 0; padding-left: 40px; background: var(--secondary); border-radius: 14px; font-weight: 500; }
+        .ios-search-input:focus { background: var(--card-bg); }
+        
+        /* Fixed Calendar Button */
+        .ios-date-btn-wrapper { position: relative; width: 48px; height: 48px; flex-shrink: 0; border-radius: 14px; background: var(--secondary); border: 1px solid var(--border); overflow: hidden; transition: 0.2s;}
+        .ios-date-btn-wrapper:hover { background: var(--card-bg); }
+        .ios-date-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; pointer-events: none; color: var(--text); }
+        .ios-date-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; margin: 0; }
 
         /* =========================================================
            iOS CONTEXT MENUS (Replacing Edit/Delete text)
@@ -297,9 +321,6 @@
             margin: 0; box-shadow: none; color: var(--text); 
         }
         .spotlight-input:focus { box-shadow: none; border-bottom: 1px solid var(--primary); }
-        
-        .ios-date-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--secondary); border: 1px solid var(--border); border-radius: 14px; color: var(--text); box-shadow: none; margin: 0; flex-shrink: 0; cursor: pointer; transition:0.2s;}
-        .ios-date-btn:hover { background: var(--card-bg); }
 
         /* =========================================================
            SKELETON LOADING
@@ -375,11 +396,6 @@
         
         .toast { position: fixed; top: -100px; right: 20px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); padding: 18px 25px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 15px; border: 1px solid var(--border); }
         .toast.show { top: 25px; }
-
-        @media (max-width: 768px) {
-            .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; }
-            .toast { left: 10px; right: 10px; text-align: center; }
-        }
     </style>
 </head>
 <body>
@@ -412,7 +428,7 @@
         </div>
     </div>
     <div class="header-actions">
-        <button class="spotlight-btn" onclick="openSpotlight()">🔍 <span>Search (Cmd+K)</span></button>
+        <button class="spotlight-btn" onclick="openSpotlight()">🔍 <span class="desktop-only">Search (Cmd+K)</span></button>
         <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
     </div>
 </header>
@@ -426,7 +442,7 @@
             <div id="webReqList" style="max-height: 280px; overflow-y: auto; padding-right: 5px;"></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="addPtCard">
             <h3>New Registration</h3>
             <input type="text" id="newName" placeholder="Full Name">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -437,6 +453,24 @@
             <button onclick="addPatient()">Add to Registry</button>
         </div>
         
+        <div class="card" id="registryCard" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+            <h3 style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
+                <span>Registry <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:12px; font-weight: bold;">0</span></span>
+            </h3>
+            
+            <div class="ios-search-container">
+                <span class="ios-search-icon">🔍</span>
+                <input type="text" id="searchBox" class="ios-search-input" placeholder="Search Name or C/O..." oninput="renderList()">
+                
+                <div class="ios-date-btn-wrapper">
+                    <span class="ios-date-icon">📅</span>
+                    <input type="date" id="searchDate" class="ios-date-input" onchange="renderList()">
+                </div>
+            </div>
+            
+            <div id="patientList" style="max-height:55vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
+        </div>
+
         <div id="sidebarDashItems">
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
             
@@ -463,7 +497,7 @@
             </div>
         </div>
 
-        <div class="card" style="background:var(--secondary); border: 1px solid var(--border);">
+        <div class="card" id="bmiCard" style="background:var(--secondary); border: 1px solid var(--border);">
             <h3>BMI Calculator</h3>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <input type="number" id="bmiW" placeholder="Wt (kg)" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="Ht (cm)" oninput="calcBMI()">
@@ -471,15 +505,6 @@
             <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.8em; color:var(--primary);">--</div>
         </div>
 
-        <div class="card" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h3 style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
-                <span>Registry <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:12px; font-weight: bold;">0</span></span>
-                <button class="ios-date-btn" style="width:36px; height:36px; font-size:16px;" onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()">📅</button>
-                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute; top:-9999px; left:-9999px; width:0; height:0; opacity:0;">
-            </h3>
-            
-            <div id="patientList" style="max-height:55vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
-        </div>
     </div>
 
     <div class="content">
@@ -609,8 +634,9 @@
     // =====================================================================
     function updateClock() {
         const now = new Date();
-        const hr = now.getHours();
+        
         let greeting = "Good Evening";
+        const hr = now.getHours();
         if(hr < 12) greeting = "Good Morning";
         else if(hr < 17) greeting = "Good Afternoon";
         
@@ -627,7 +653,6 @@
 
     function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
-    // Bind Cmd+K to spotlight
     document.addEventListener('keydown', e => {
         if((e.metaKey || e.ctrlKey) && e.key === 'k') { 
             e.preventDefault(); 
@@ -653,7 +678,6 @@
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active')); 
         document.getElementById('fileView').style.display='none'; 
         document.getElementById('emptyState').style.display='block'; 
-        // We removed topDashGrid hiding logic because it's now beautifully stacked in the sidebar on mobile!
     }
 
     // =====================================================================
