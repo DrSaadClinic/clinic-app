@@ -8,28 +8,28 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         /* =========================================================
-           APPLE OS DESIGN SYSTEM (Compact Variables)
+           APPLE OS DESIGN SYSTEM (Variables)
            ========================================================= */
         :root { 
-            --bg: #f2f2f7; /* iOS standard gray background */
-            --card-bg: rgba(255, 255, 255, 0.95); 
+            --bg: #f2f4f8; 
+            --card-bg: rgba(255, 255, 255, 0.85); 
             --text: #1d1d1f; 
             --text-light: #86868b;
             --primary: #007aff; 
-            --primary-glow: rgba(0, 122, 255, 0.15);
-            --secondary: rgba(242, 242, 247, 0.8); 
+            --primary-glow: rgba(0, 122, 255, 0.2);
+            --secondary: rgba(255, 255, 255, 0.5); 
             --success: #34c759; 
             --danger: #ff3b30; 
             --warning: #ff9500;
             --lab: #5ac8fa; 
             --img: #af52de; 
             --waiting: #007bff;
-            --border: rgba(0,0,0,0.08); 
-            --glass: rgba(255, 255, 255, 0.8);
-            --shadow: 0 4px 12px rgba(0,0,0,0.03); 
-            --shadow-hover: 0 8px 20px rgba(0,0,0,0.06);
-            --radius: 16px; /* Tighter Apple radius */
-            --transition: all 0.3s cubic-bezier(0.25, 1, 0.2, 1);
+            --border: rgba(0,0,0,0.05); 
+            --glass: rgba(255, 255, 255, 0.65);
+            --shadow: 0 10px 30px rgba(0,0,0,0.04); 
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.08);
+            --radius: 24px; 
+            --transition: all 0.4s cubic-bezier(0.25, 1, 0.2, 1);
         }
 
         /* =========================================================
@@ -37,13 +37,13 @@
            ========================================================= */
         body.dark-mode {
             --bg: #000000; 
-            --card-bg: rgba(28, 28, 30, 0.95); 
+            --card-bg: rgba(28, 28, 30, 0.85); 
             --text: #f5f5f7; 
             --text-light: #98989d;
-            --border: rgba(255,255,255,0.1); 
-            --secondary: rgba(44, 44, 46, 0.6); 
-            --glass: rgba(28, 28, 30, 0.8);
-            --shadow: 0 4px 12px rgba(0,0,0,0.5); 
+            --border: rgba(255,255,255,0.08); 
+            --secondary: rgba(44, 44, 46, 0.5); 
+            --glass: rgba(28, 28, 30, 0.7);
+            --shadow: 0 10px 30px rgba(0,0,0,0.5); 
             --primary: #0a84ff;
         }
 
@@ -68,12 +68,12 @@
             100% { background-position: 0% 50%; } 
         }
 
-        /* COMPACT HEADER */
+        /* FLOATING ACRYLIC HEADER */
         header { 
             background: var(--glass); 
-            backdrop-filter: blur(30px) saturate(200%); 
-            -webkit-backdrop-filter: blur(30px) saturate(200%); 
-            padding: 10px 20px; 
+            backdrop-filter: blur(40px) saturate(200%); 
+            -webkit-backdrop-filter: blur(40px) saturate(200%); 
+            padding: 15px 30px; 
             position: sticky; 
             top: 0; 
             z-index: 100; 
@@ -81,22 +81,22 @@
             align-items: center; 
             justify-content: space-between; 
             border-bottom: 1px solid var(--border); 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
         
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 38px; width: 38px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background: white; padding: 2px; }
-        .os-greeting h2 { margin: 0; font-size: 1em; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
-        .os-greeting p { margin: 2px 0 0 0; font-size: 0.75em; color: var(--text-light); font-weight: 500; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 44px; width: 44px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; padding: 2px; }
+        .os-greeting h2 { margin: 0; font-size: 1.1em; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+        .os-greeting p { margin: 2px 0 0 0; font-size: 0.8em; color: var(--text-light); font-weight: 500; }
         
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .spotlight-btn { background: var(--secondary); color: var(--text-light); border: 1px solid var(--border); padding: 8px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; box-shadow: none; width: auto; margin: 0; }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .spotlight-btn { background: var(--secondary); color: var(--text-light); border: 1px solid var(--border); padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: none; width: auto; margin: 0; }
         .spotlight-btn:hover { background: var(--card-bg); color: var(--text); border-color: var(--primary); }
         
-        .dark-btn { background: var(--secondary); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0; padding: 0; box-shadow: none; color: var(--text); }
+        .dark-btn { background: var(--secondary); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0; padding: 0; box-shadow: none; color: var(--text); }
         .dark-btn:hover { transform: scale(1.05); background: var(--card-bg); }
 
-        .logo-large { width: 90px; height: 90px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid rgba(255,255,255,0.2); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .logo-large { width: 100px; height: 100px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid rgba(255,255,255,0.2); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         /* =========================================================
            FLUID SPLIT-VIEW ARCHITECTURE
@@ -104,10 +104,10 @@
         .container { 
             max-width: 1600px; 
             margin: auto; 
-            padding: 15px; 
+            padding: 25px; 
             display: grid; 
-            grid-template-columns: 350px 1fr; 
-            gap: 20px; 
+            grid-template-columns: 380px 1fr; 
+            gap: 30px; 
             align-items: start; 
             transition: var(--transition); 
             min-width: 0;
@@ -116,51 +116,49 @@
         
         .container.fluid-active { grid-template-columns: 0px 1fr; gap: 0; }
         .container.fluid-active .sidebar { opacity: 0; pointer-events: none; transform: translateX(-50px); overflow: hidden; }
-        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 350px; display: flex; flex-direction: column; gap: 15px; min-width: 0;}
+        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; display: flex; flex-direction: column; gap: 25px; min-width: 0;}
 
         #backBtn { 
             display: none; 
             background: var(--secondary); 
             color: var(--text); 
-            padding: 8px 16px; 
+            padding: 10px 18px; 
             width: auto; 
-            margin-bottom: 15px; 
-            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border-radius: 14px; 
             box-shadow: none; 
-            font-size: 13px; 
+            font-size: 14px; 
             font-weight: 600;
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
         }
         
-        .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.4s ease; }
+        .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* =========================================================
-           MOBILE FIX: PERFECT COMPACT SECRETARY FLOW
+           MOBILE FIX: PERFECT SECRETARY FLOW
            ========================================================= */
         @media (max-width: 1024px) { 
-            .container, .container.fluid-active { display: flex !important; flex-direction: column !important; padding: 10px; gap: 12px; width: 100%; box-sizing: border-box; min-width: 0;} 
+            .container, .container.fluid-active { display: flex !important; flex-direction: column !important; padding: 15px; gap: 20px; width: 100%; box-sizing: border-box; min-width: 0;} 
             
-            /* Sidebar Stacking Order */
-            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 12px; min-width: 0;}
+            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
             #webInboxCard { order: 1; margin-bottom: 0; }
             #addPtCard { order: 2; margin-bottom: 0; }
             #registryCard { order: 3; margin-bottom: 0; }
-            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 12px; min-width: 0;}
+            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
             #bmiCard { order: 5; margin-bottom: 0; }
 
             .content { display: none; width: 100% !important; min-width: 0; box-sizing: border-box;}
             
             .fluid-active .sidebar { display: none !important; }
-            .fluid-active .content { display: block; animation: slideInRight 0.25s ease; }
+            .fluid-active .content { display: block; animation: slideInRight 0.3s ease; }
             #backBtn { display: inline-block; }
             
-            .card { margin-bottom: 0; padding: 16px !important; border-radius: 16px !important; } /* Tighter mobile cards */
+            .card { margin-bottom: 0; } 
             
-            /* Prevent text squishing */
             .pt-item, .health-widget, .web-req-item, p, span, div, h2, h3 { word-break: break-word; white-space: pre-wrap; }
-            .mobile-stack { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .mobile-stack { grid-template-columns: 1fr !important; gap: 15px !important; }
             input, textarea, button { max-width: 100%; }
         } 
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -170,24 +168,25 @@
            ========================================================= */
         .card { 
             background: var(--card-bg); 
-            backdrop-filter: blur(30px) saturate(200%); 
-            -webkit-backdrop-filter: blur(30px) saturate(200%); 
-            padding: 20px; 
+            backdrop-filter: blur(40px) saturate(200%); 
+            -webkit-backdrop-filter: blur(40px) saturate(200%); 
+            padding: 25px; 
             border-radius: var(--radius); 
             box-shadow: var(--shadow); 
             border: 1px solid var(--border); 
             transition: var(--transition); 
             min-width: 0;
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
         .card:hover { box-shadow: var(--shadow-hover); }
+        @media (max-width: 768px) { .card { padding: 18px; border-radius: 18px; } }
         
-        h3 { color: var(--text); margin: 0 0 15px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.05em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
+        h3 { color: var(--text); margin: 0 0 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
         
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; margin-bottom: 15px; align-items: start; }
-        .scroll-card { max-height: 250px; overflow-y: auto; padding-right: 8px; }
-        .scroll-card::-webkit-scrollbar { width: 5px; }
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 25px; align-items: start; }
+        .scroll-card { max-height: 280px; overflow-y: auto; padding-right: 10px; }
+        .scroll-card::-webkit-scrollbar { width: 6px; }
         .scroll-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         /* =========================================================
@@ -195,69 +194,67 @@
            ========================================================= */
         input, textarea { 
             width: 100%; 
-            padding: 12px 14px; 
-            margin: 6px 0; 
+            padding: 16px; 
+            margin: 8px 0; 
             border: 1px solid var(--border); 
-            border-radius: 12px; 
+            border-radius: 14px; 
             box-sizing: border-box; 
-            font-size: 14px; 
+            font-size: 15px; 
             background: var(--secondary); 
             color: var(--text); 
             transition: var(--transition); 
             font-family: inherit; 
             max-width: 100%;
         }
-        input:focus, textarea:focus { border-color: var(--primary); background: transparent; outline: none; box-shadow: 0 0 0 3px var(--primary-glow); }
-        
-        /* Tighter Textareas to reduce scrolling fatigue */
-        textarea { resize: none; overflow-y: hidden; min-height: 45px; line-height: 1.5; } 
+        input:focus, textarea:focus { border-color: var(--primary); background: transparent; outline: none; box-shadow: 0 0 0 4px var(--primary-glow); }
+        textarea { resize: none; overflow-y: hidden; min-height: 100px; line-height: 1.6; } 
         
         button { 
             width: 100%; 
-            padding: 12px 14px; 
+            padding: 16px; 
             background: var(--primary); 
             color: white; 
             border: none; 
-            border-radius: 12px; 
-            font-size: 14px; 
+            border-radius: 14px; 
+            font-size: 15px; 
             font-weight: bold; 
             cursor: pointer; 
             transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s; 
-            box-shadow: 0 3px 10px var(--primary-glow); 
+            box-shadow: 0 4px 15px var(--primary-glow); 
             max-width: 100%;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 5px 15px var(--primary-glow); }
-        button:active { transform: scale(0.97); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
+        button:active { transform: scale(0.96); }
 
         /* iOS INLINE SEARCH BAR */
-        .ios-search-container { position: relative; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
-        .ios-search-icon { position: absolute; left: 12px; top: 13px; font-size: 14px; opacity: 0.5; color: var(--text); }
-        .ios-search-input { margin: 0; padding-left: 36px; background: var(--secondary); border-radius: 12px; font-weight: 500; height: 42px; }
+        .ios-search-container { position: relative; margin-bottom: 15px; display: flex; gap: 8px; align-items: center; }
+        .ios-search-icon { position: absolute; left: 14px; top: 16px; font-size: 16px; opacity: 0.5; color: var(--text); }
+        .ios-search-input { margin: 0; padding-left: 40px; background: var(--secondary); border-radius: 14px; font-weight: 500; }
         .ios-search-input:focus { background: var(--card-bg); }
         
         /* Fixed Calendar Button */
-        .ios-date-btn-wrapper { position: relative; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--secondary); border: 1px solid var(--border); overflow: hidden; transition: 0.2s;}
+        .ios-date-btn-wrapper { position: relative; width: 48px; height: 48px; flex-shrink: 0; border-radius: 14px; background: var(--secondary); border: 1px solid var(--border); overflow: hidden; transition: 0.2s;}
         .ios-date-btn-wrapper:hover { background: var(--card-bg); }
-        .ios-date-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 18px; pointer-events: none; color: var(--text); }
+        .ios-date-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; pointer-events: none; color: var(--text); }
         .ios-date-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; margin: 0; z-index: 10; }
 
         /* =========================================================
-           iOS CONTEXT MENUS
+           iOS CONTEXT MENUS (Replacing Edit/Delete text)
            ========================================================= */
         .context-menu { position: relative; display: inline-block; }
         .context-dots { 
-            font-size: 20px; 
+            font-size: 24px; 
             color: var(--text-light); 
             cursor: pointer; 
-            padding: 0 8px; 
-            border-radius: 10px; 
+            padding: 0 10px; 
+            border-radius: 12px; 
             transition: 0.2s; 
             user-select: none; 
             line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 26px;
+            height: 30px;
         }
         .context-dots:hover { background: var(--border); color: var(--text); }
         
@@ -267,20 +264,30 @@
             right: 0; 
             top: 100%; 
             background: var(--card-bg); 
-            backdrop-filter: blur(25px) saturate(200%); 
+            backdrop-filter: blur(30px) saturate(200%); 
             border: 1px solid var(--border); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            border-radius: 12px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
+            border-radius: 14px; 
             z-index: 50; 
             overflow: hidden; 
-            min-width: 120px; 
+            min-width: 140px; 
             flex-direction: column; 
         }
-        .context-menu:hover .context-dropdown { display: flex; animation: popMenu 0.15s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        @keyframes popMenu { from { opacity: 0; transform: scale(0.95) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .context-menu:hover .context-dropdown { display: flex; animation: popMenu 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes popMenu { from { opacity: 0; transform: scale(0.9) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
         .context-dropdown button { 
-            background: transparent; color: var(--text); border-radius: 0; padding: 10px 14px; box-shadow: none; font-size: 13px; font-weight: 600; text-align: left; width: 100%; border-bottom: 1px solid var(--border); margin: 0; 
+            background: transparent; 
+            color: var(--text); 
+            border-radius: 0; 
+            padding: 12px 18px; 
+            box-shadow: none; 
+            font-size: 14px; 
+            font-weight: 600; 
+            text-align: left; 
+            width: 100%; 
+            border-bottom: 1px solid var(--border); 
+            margin: 0; 
         }
         .context-dropdown button:hover { background: var(--primary); color: white; }
         .context-dropdown button.danger-btn { color: var(--danger); border-bottom: none; }
@@ -290,29 +297,39 @@
            APPLE HEALTH WIDGETS
            ========================================================= */
         .health-widget { 
-            background: var(--secondary); padding: 12px 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid var(--border); transition: 0.2s; min-width: 0; box-sizing: border-box; 
+            background: var(--secondary); 
+            padding: 16px 20px; 
+            border-radius: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            border: 1px solid var(--border); 
+            transition: 0.2s; 
+            min-width: 0;
+            box-sizing: border-box;
         }
-        .health-widget:hover { background: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.02); transform: translateY(-1px); }
-        .health-val { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; word-break: break-word; white-space: pre-wrap;}
-        .health-label { font-size: 11px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; display: block; }
+        .health-widget:hover { background: var(--card-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transform: translateY(-1px); }
+        .health-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; word-break: break-word; white-space: pre-wrap;}
+        .health-label { font-size: 12px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
 
         /* =========================================================
            SPOTLIGHT SEARCH OVERLAY
            ========================================================= */
         #spotlightOverlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
             z-index: 2000; display: none; justify-content: center; align-items: flex-start; 
-            padding-top: 15vh; opacity: 0; transition: opacity 0.2s; 
+            padding-top: 15vh; opacity: 0; transition: opacity 0.3s; 
         }
         .spotlight-box { 
-            background: var(--card-bg); width: 600px; max-width: 90%; 
-            border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
-            overflow: hidden; transform: scale(0.95); transition: 0.2s; border: 1px solid var(--border); 
+            background: var(--card-bg); width: 650px; max-width: 90%; 
+            border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
+            overflow: hidden; transform: scale(0.95); transition: 0.3s; border: 1px solid var(--border); 
         }
         .spotlight-input { 
             width: 100%; border: none; border-bottom: 1px solid var(--border); 
-            padding: 20px; font-size: 20px; border-radius: 0; background: transparent; 
+            padding: 25px; font-size: 24px; border-radius: 0; background: transparent; 
             margin: 0; box-shadow: none; color: var(--text); 
         }
         .spotlight-input:focus { box-shadow: none; border-bottom: 1px solid var(--primary); }
@@ -321,73 +338,87 @@
            SKELETON LOADING
            ========================================================= */
         .skeleton-wrapper { display: none; }
-        .skeleton { background: linear-gradient(90deg, var(--secondary) 25%, var(--border) 50%, var(--secondary) 75%); background-size: 200% 100%; animation: skeletonLoading 1.5s infinite; border-radius: 8px; margin-bottom: 10px; }
+        .skeleton { 
+            background: linear-gradient(90deg, var(--secondary) 25%, var(--border) 50%, var(--secondary) 75%); 
+            background-size: 200% 100%; 
+            animation: skeletonLoading 1.5s infinite; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+        }
         @keyframes skeletonLoading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
         /* =========================================================
            REGISTRY LIST ITEMS
            ========================================================= */
-        .pt-item { padding: 14px; border-bottom: 1px solid transparent; cursor: pointer; background: transparent; border-radius: 16px; margin-bottom: 6px; transition: all 0.2s ease; position: relative; border: 1px solid var(--border); min-width: 0; box-sizing: border-box; }
-        .pt-item:hover { background: var(--secondary); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .pt-item.active { background: var(--primary); color: white; box-shadow: 0 6px 15px var(--primary-glow); border-color: var(--primary); transform: translateY(-1px); }
-        .pt-meta { font-size: 11px; color: var(--text-light); display: block; margin-top: 4px; font-weight: 500; word-break: break-word;}
+        .pt-item { padding: 18px; border-bottom: 1px solid transparent; cursor: pointer; background: transparent; border-radius: 20px; margin-bottom: 8px; transition: all 0.2s ease; position: relative; border: 1px solid var(--border); min-width: 0; box-sizing: border-box; }
+        .pt-item:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .pt-item.active { background: var(--primary); color: white; box-shadow: 0 10px 25px var(--primary-glow); border-color: var(--primary); transform: translateY(-2px); }
+        .pt-meta { font-size: 12px; color: var(--text-light); display: block; margin-top: 6px; font-weight: 500; word-break: break-word;}
         .pt-item.active .pt-meta { color: rgba(255,255,255,0.8); }
-        .pt-controls { position: absolute; right: 10px; top: 14px; display: flex; gap: 4px; align-items: center; }
+        .pt-controls { position: absolute; right: 12px; top: 18px; display: flex; gap: 5px; align-items: center; }
 
         /* =========================================================
-           MISC UI TWEAKS & COMPACTING
+           MISC UI TWEAKS
            ========================================================= */
-        .section-title { font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
+        .section-title { font-size: 12px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
         
         [contenteditable="true"] { 
-            transition: 0.2s; border-bottom: 1px dashed transparent; display: block; width: 100%; min-width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap; 
+            transition: 0.2s; 
+            border-bottom: 1px dashed transparent; 
+            display: block; 
+            width: 100%; 
+            min-width: 100%; 
+            box-sizing: border-box;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: var(--secondary); border-radius: 8px; box-shadow: 0 0 0 3px var(--primary-glow); padding: 4px 8px; }
 
-        /* Web Request Inbox Styles - Made much slimmer! */
-        .web-req-item { background: var(--card-bg); border: 1px solid var(--border); padding: 12px; border-radius: 16px; margin-bottom: 10px; box-shadow: var(--shadow); min-width: 0;}
-        .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .web-req-actions button { padding: 8px; font-size: 13px; border-radius: 10px; box-shadow: none;}
+        /* Web Request Inbox Styles */
+        .web-req-item { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 20px; margin-bottom: 12px; box-shadow: var(--shadow); min-width: 0;}
+        .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .web-req-actions button { padding: 12px; font-size: 14px; border-radius: 12px; }
 
-        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; background: var(--secondary); padding: 12px; border-radius: 14px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border); }
-        .lab-btn { background: var(--card-bg); border: 1px solid var(--lab); color: var(--lab); padding: 10px 4px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin:0; }
-        .lab-btn:hover { background: var(--lab); color: white; transform: scale(1.02); }
+        .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; background: var(--secondary); padding: 15px; border-radius: 16px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); }
+        .lab-btn { background: var(--card-bg); border: 1px solid var(--lab); color: var(--lab); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin:0; }
+        .lab-btn:hover { background: var(--lab); color: white; transform: scale(1.03); }
         
-        .img-btn { background: var(--card-bg); border: 1px solid var(--img); color: var(--img); padding: 10px 4px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin:0;}
-        .img-btn:hover { background: var(--img); color: white; transform: scale(1.02); }
+        .img-btn { background: var(--card-bg); border: 1px solid var(--img); color: var(--img); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin:0;}
+        .img-btn:hover { background: var(--img); color: white; transform: scale(1.03); }
 
-        .lab-accordion { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-        .lab-header { background: var(--secondary); padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s; color: var(--text); }
+        .lab-accordion { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .lab-header { background: var(--secondary); padding: 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; font-size: 15px; transition: 0.2s; color: var(--text); }
         .lab-header:hover { background: var(--border); }
-        .lab-body { display: none; padding: 14px; border-top: 1px solid var(--border); background: var(--card-bg); }
-        .lab-row { display: flex; justify-content: space-between; font-size: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; color: var(--text); }
+        .lab-body { display: none; padding: 18px; border-top: 1px solid var(--border); background: var(--card-bg); }
+        .lab-row { display: flex; justify-content: space-between; font-size: 15px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: center; color: var(--text); }
 
         .val-normal { color: var(--success); font-weight: bold; }
         .val-abnormal { color: var(--danger); font-weight: bold; text-shadow: 0 0 5px rgba(220, 53, 69, 0.2); }
         
-        .sparkline-container { display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); justify-content: flex-start; }
-        .spark-bar { width: 12px; background: var(--primary); border-radius: 3px 3px 0 0; min-height: 4px; opacity: 0.8; transition: 0.3s; }
-        .spark-bar:hover { opacity: 1; transform: scaleY(1.1); }
+        .sparkline-container { display: flex; align-items: flex-end; gap: 4px; height: 40px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--border); justify-content: flex-start; }
+        .spark-bar { width: 14px; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 4px; opacity: 0.8; transition: 0.3s; }
+        .spark-bar:hover { opacity: 1; transform: scaleY(1.15); }
         .spark-bar.red { background: var(--danger); }
 
-        .apple-notification { background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 16px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
-        .apple-notification:hover { transform: scale(1.01); background: var(--card-bg); }
-        .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; background: var(--secondary); }
+        .apple-notification { background: var(--glass); border: 1px solid var(--border); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; gap: 15px; align-items: flex-start; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+        .apple-notification:hover { transform: scale(1.02); background: var(--card-bg); }
+        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: var(--secondary); }
         
-        .overdue-item { background: rgba(255, 59, 48, 0.05); border-left: 5px solid var(--danger); padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; color: var(--text); border: 1px solid var(--border); }
+        .overdue-item { background: rgba(255, 59, 48, 0.05); border-left: 6px solid var(--danger); padding: 16px; border-radius: 14px; margin-bottom: 10px; cursor: pointer; font-size: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; color: var(--text); border: 1px solid var(--border); }
         .overdue-item:hover { background: rgba(255, 59, 48, 0.1); transform: translateX(2px); }
 
-        .ai-box { background: var(--secondary); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-top: 12px; white-space: pre-wrap; font-family: 'Times New Roman', serif; color: var(--text); line-height: 1.5; font-size: 14px;}
+        .ai-box { background: var(--secondary); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-top: 15px; white-space: pre-wrap; font-family: 'Times New Roman', serif; color: var(--text); line-height: 1.6; }
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; color: var(--text); }
 
         .login-box { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #000000, #1c1c1e); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease, visibility 0.5s; }
         .login-box.fade-out { opacity: 0; visibility: hidden; }
-        .login-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 40px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 50px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        .toast { position: fixed; top: -100px; right: 20px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); padding: 15px 20px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 14px; border: 1px solid var(--border); }
-        .toast.show { top: 20px; }
+        .toast { position: fixed; top: -100px; right: 20px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); padding: 18px 25px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 15px; border: 1px solid var(--border); }
+        .toast.show { top: 25px; }
+        
     </style>
 </head>
 <body>
@@ -395,17 +426,17 @@
 <div id="loginScreen" class="login-box">
     <div class="login-glass">
         <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-        <h2 style="margin-bottom:5px; font-size: 1.6em; text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-family: 'SF Pro Display';">Surgical OS</h2>
-        <h3 style="margin-top:0; margin-bottom:20px; color:#98989d; font-weight: normal; letter-spacing: 1px; font-size: 1em;">Dr. Saad Sabry Alzubaidy</h3>
-        <input type="password" id="passCode" placeholder="Enter Passcode..." oninput="checkAutoLogin()" style="width:260px; text-align:center; border:1px solid rgba(255,255,255,0.2); border-radius:14px; padding: 16px; font-size: 16px; letter-spacing: 2px; background: rgba(0,0,0,0.5); color: white;">
-        <div style="font-size: 11px; opacity: 0.6; margin-top: 15px; color: #98989d;">Secured by 256-bit Cloud Encryption</div>
+        <h2 style="margin-bottom:5px; font-size: 1.8em; text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-family: 'SF Pro Display';">Surgical OS</h2>
+        <h3 style="margin-top:0; margin-bottom:25px; color:#98989d; font-weight: normal; letter-spacing: 1px;">Dr. Saad Sabry Alzubaidy</h3>
+        <input type="password" id="passCode" placeholder="Enter Passcode..." oninput="checkAutoLogin()" style="width:280px; text-align:center; border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding: 18px; font-size: 18px; letter-spacing: 2px; background: rgba(0,0,0,0.5); color: white;">
+        <div style="font-size: 12px; opacity: 0.6; margin-top: 20px; color: #98989d;">Secured by 256-bit Cloud Encryption</div>
     </div>
 </div>
 
 <div id="spotlightOverlay" onclick="if(event.target===this) closeSpotlight()">
     <div class="spotlight-box">
         <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Search patients, complaints, dates..." oninput="renderList(true)">
-        <div id="spotlightResults" style="max-height: 350px; overflow-y: auto; padding: 10px;"></div>
+        <div id="spotlightResults" style="max-height: 400px; overflow-y: auto; padding: 10px;"></div>
     </div>
 </div>
 
@@ -430,8 +461,8 @@
     <div class="sidebar">
         
         <div class="card" id="webInboxCard" style="display:none; background: rgba(255, 149, 0, 0.05); border: 1px solid var(--warning);">
-            <h3 style="color: var(--warning); margin-bottom: 10px;">🌐 الحجوزات الإلكترونية <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 8px; border-radius:10px; font-size:11px;">0</span></h3>
-            <div id="webReqList" style="max-height: 200px; overflow-y: auto; padding-right: 5px;"></div>
+            <h3 style="color: var(--warning); margin-bottom: 10px;">🌐 الحجوزات الإلكترونية <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span></h3>
+            <div id="webReqList" style="max-height: 280px; overflow-y: auto; padding-right: 5px;"></div>
         </div>
 
         <div class="card" id="addPtCard">
@@ -446,8 +477,8 @@
         </div>
         
         <div class="card" id="registryCard" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-            <h3 style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px; margin-bottom: 10px;">
-                <span>Registry <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 8px; border-radius:10px; font-size:11px; font-weight: bold;">0</span></span>
+            <h3 style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
+                <span>Registry <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:12px; font-weight: bold;">0</span></span>
             </h3>
             
             <div class="ios-search-container">
@@ -494,7 +525,7 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <input type="number" id="bmiW" placeholder="Wt (kg)" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="Ht (cm)" oninput="calcBMI()">
             </div>
-            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.5em; color:var(--primary);">--</div>
+            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.8em; color:var(--primary);">--</div>
         </div>
 
     </div>
@@ -502,119 +533,119 @@
     <div class="content">
         <button id="backBtn" onclick="closeFluidView()">🔙 Back to Registry</button>
 
-        <div id="emptyState" class="card" style="text-align:center; padding:100px 20px; color:var(--text-light); border: 2px dashed var(--border); background: transparent; box-shadow: none;">
-            <div style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;">📁</div>
-            <p style="font-size: 1.2em; font-weight: bold; margin:0;">No Patient Selected</p>
-            <p style="font-size: 0.9em; margin-top: 10px;">Select a patient from the registry or use Cmd+K to search.</p>
+        <div id="emptyState" class="card" style="text-align:center; padding:120px 20px; color:var(--text-light); border: 2px dashed var(--border); background: transparent; box-shadow: none;">
+            <div style="font-size: 50px; margin-bottom: 20px; opacity: 0.5;">📁</div>
+            <p style="font-size: 1.3em; font-weight: bold; margin:0;">No Patient Selected</p>
+            <p style="font-size: 1em; margin-top: 10px;">Select a patient from the registry or use Cmd+K to search.</p>
         </div>
 
         <div id="fileView" style="display:none; border: none;">
             
             <div id="skeletonLoader" class="skeleton-wrapper card">
-                <div class="skeleton" style="height: 30px; width: 60%;"></div>
-                <div class="skeleton" style="height: 15px; width: 40%;"></div>
-                <div style="margin-top: 30px;">
-                    <div class="skeleton" style="height: 80px; width: 100%;"></div>
-                    <div class="skeleton" style="height: 80px; width: 100%;"></div>
+                <div class="skeleton" style="height: 40px; width: 60%;"></div>
+                <div class="skeleton" style="height: 20px; width: 40%;"></div>
+                <div style="margin-top: 40px;">
+                    <div class="skeleton" style="height: 120px; width: 100%;"></div>
+                    <div class="skeleton" style="height: 120px; width: 100%;"></div>
                 </div>
             </div>
 
             <div id="actualData">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 15px; width: 100%;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; width: 100%;">
                     <div style="width: 100%; min-width: 0;">
-                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; padding:5px 8px; border-radius:10px; display: block; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></h2>
-                        <div id="waArea" style="margin-top:6px; padding-left: 8px;"></div>
+                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 32px; font-weight: 800; letter-spacing: -1px; padding:5px 10px; border-radius:12px; display: block; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></h2>
+                        <div id="waArea" style="margin-top:8px; padding-left: 10px;"></div>
                     </div>
-                    <div id="syncIndicator" style="font-size:11px; color:var(--success); font-weight:bold; display:none; padding:6px 12px; white-space: nowrap; background: rgba(52, 199, 89, 0.1); border-radius: 16px; height: 18px; align-items: center;">● SAVING</div>
+                    <div id="syncIndicator" style="font-size:12px; color:var(--success); font-weight:bold; display:none; padding:8px 16px; white-space: nowrap; background: rgba(52, 199, 89, 0.1); border-radius: 20px; height: 20px; align-items: center;">● SAVING</div>
                 </div>
 
-                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:14px; border-radius:14px; margin-bottom:20px; color:var(--warning); font-weight:bold; font-size:13px; box-shadow: 0 2px 10px rgba(255, 149, 0, 0.1); word-break: break-word;"></div>
+                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:18px; border-radius:16px; margin-bottom:25px; color:var(--warning); font-weight:bold; font-size:15px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1); word-break: break-word;"></div>
 
-                <div class="card" style="background:var(--secondary); padding:20px; border-radius:16px; margin-bottom:15px; border: 1px solid var(--border);">
+                <div class="card" style="background:var(--secondary); padding:25px; border-radius:20px; margin-bottom:25px; border: 1px solid var(--border);">
                     <span class="section-title" style="color:var(--warning);">Chief Complaint (Click to edit)</span>
-                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:16px; display:block; padding: 12px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); color: var(--text); width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></span>
+                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:20px; display:block; padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); color: var(--text); width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></span>
                 </div>
 
-                <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr; gap:15px; margin-bottom:15px;">
-                    <div class="card" style="margin:0; padding:16px;">
+                <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr; gap:25px; margin-bottom:25px;">
+                    <div class="card" style="margin:0;">
                         <span class="section-title">Patient Bio</span>
-                        <p id="viewContact" style="font-weight:600; margin:8px 0 0 0; font-size: 14px; color: var(--text); word-break: break-word; white-space: pre-wrap;"></p>
-                        <span style="font-size:13px; color:var(--primary); display:block; margin-top:12px; font-weight:bold; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> ✎</span>
+                        <p id="viewContact" style="font-weight:600; margin:10px 0 0 0; font-size: 16px; color: var(--text); word-break: break-word; white-space: pre-wrap;"></p>
+                        <span style="font-size:14px; color:var(--primary); display:block; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> ✎</span>
                     </div>
-                    <div class="card" style="margin:0; padding: 16px;">
+                    <div class="card" style="margin:0; padding: 25px;">
                         <span class="section-title">Visit Audit</span>
-                        <div id="visitHistoryLog" style="max-height:120px; overflow-y:auto; padding-right:8px;"></div>
+                        <div id="visitHistoryLog" style="max-height:140px; overflow-y:auto; padding-right:10px;"></div>
                     </div>
                 </div>
 
-                <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:rgba(255, 59, 48, 0.1); color:var(--danger); border:1px solid var(--danger); margin-bottom:20px; display:none; padding:10px 16px; border-radius:12px; width:auto; box-shadow:none; font-weight: 700; font-size: 13px;">✕ Dismiss 25-Day Alert</button>
+                <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:rgba(255, 59, 48, 0.1); color:var(--danger); border:1px solid var(--danger); margin-bottom:25px; display:none; padding:12px 20px; border-radius:14px; width:auto; box-shadow:none; font-weight: 700;">✕ Dismiss 25-Day Alert</button>
 
-                <div class="card" style="background:rgba(255, 149, 0, 0.05); border:1px solid var(--warning); margin-bottom:15px; padding:20px;">
+                <div class="card" style="background:rgba(255, 149, 0, 0.05); border:1px solid var(--warning); margin-bottom:25px; padding:25px;">
                     <span class="section-title" style="color:var(--warning);">SCHEDULE PATIENT TASK</span>
-                    <div class="mobile-stack" style="display:grid; grid-template-columns: 1fr auto auto; gap:10px;">
-                        <input type="text" id="vRemText" placeholder="e.g. Follow-up" style="margin:0; background: var(--card-bg);">
+                    <div class="mobile-stack" style="display:grid; grid-template-columns: 1fr auto auto; gap:15px;">
+                        <input type="text" id="vRemText" placeholder="e.g. Follow-up visit" style="margin:0; background: var(--card-bg);">
                         <input type="date" id="vRemDate" style="margin:0; background: var(--card-bg);">
-                        <button onclick="addPatientReminder()" style="background:var(--warning); margin:0; border-radius: 12px; box-shadow: none;">Set Task</button>
+                        <button onclick="addPatientReminder()" style="background:var(--warning); margin:0; border-radius: 14px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.2);">Set Task</button>
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; margin-bottom: -10px;">
-                    <button onclick="insertClinicalSheet()" style="width: auto; background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 8px 16px; font-size: 12px; border-radius: 16px; box-shadow: none; position: relative; z-index: 10;">📄 Insert Clinical Sheet</button>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: -15px;">
+                    <button onclick="insertClinicalSheet()" style="width: auto; background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 10px 20px; font-size: 14px; border-radius: 20px; box-shadow: none; position: relative; z-index: 10;">📄 Insert Clinical Sheet</button>
                 </div>
 
-                <div class="card" style="padding:20px;">
+                <div class="card">
                     <span class="section-title">CLINICAL HISTORY</span>
-                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 10px 0; font-size: 15px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap; min-height: 45px;"></textarea>
+                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap;"></textarea>
                 </div>
                 
-                <div class="card" style="padding:20px;">
+                <div class="card">
                     <span class="section-title">MANAGEMENT (Mx)</span>
-                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 10px 0; font-size: 15px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap; min-height: 45px;"></textarea>
+                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap;"></textarea>
                 </div>
 
-                <div class="card" style="background:var(--secondary); padding:20px;">
+                <div class="card" style="background:var(--secondary);">
                     <span class="section-title" style="color:var(--primary);">📋 AI SURGICAL REFERRAL ENGINE</span>
-                    <button onclick="generateReferral()" style="background:var(--primary); margin:0; box-shadow:none;">Generate Professional Letter</button>
-                    <div id="referralResult" class="ai-box" style="display:none; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap; font-size:13px;" contenteditable="true"></div>
+                    <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
+                    <div id="referralResult" class="ai-box" style="display:none; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;" contenteditable="true"></div>
                 </div>
 
-                <div class="card" style="border-left:5px solid var(--danger); padding:20px;">
+                <div class="card" style="border-left:6px solid var(--danger);">
                     <span class="section-title" style="color:var(--danger);">PLANNED & HISTORICAL PROCEDURES</span>
-                    <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr auto; gap:10px;">
+                    <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr auto; gap:15px;">
                         <input type="date" id="vOpDate" onchange="autoSyncTrigger()" style="margin:0;">
                         <input type="text" id="vOpDetail" placeholder="Procedure" oninput="autoSyncTrigger()" style="margin:0;">
-                        <button onclick="archiveSurgery()" style="background:var(--danger); margin:0; padding:0 20px; box-shadow: none;">Archive</button>
+                        <button onclick="archiveSurgery()" style="background:var(--danger); margin:0; padding:0 25px; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);">Archive</button>
                     </div>
                     <div class="table-responsive">
-                        <div id="opHistoryList" style="margin-top:15px;"></div>
+                        <div id="opHistoryList" style="margin-top:20px;"></div>
                     </div>
                 </div>
 
-                <div class="card" style="border-left:5px solid var(--lab); padding:20px;">
+                <div class="card" style="border-left:6px solid var(--lab);">
                     <span class="section-title" style="color:var(--lab);">🧪 ADVANCED PATHOLOGY</span>
                     <div class="lab-tag-box" id="labSelector"></div>
-                    <button onclick="addNewCustomLab()" style="background:var(--secondary); color: var(--text); border: 1px solid var(--border); margin-top:15px; padding:12px; font-size:13px; width:auto; border-radius: 12px; box-shadow:none;">+ Create Custom Test</button>
-                    <div id="labResultsList" style="margin-top:20px;"></div>
+                    <button onclick="addNewCustomLab()" style="background:var(--secondary); color: var(--text); border: 1px solid var(--border); margin-top:20px; padding:14px; font-size:14px; width:auto; border-radius: 14px; box-shadow:none;">+ Create Custom Test</button>
+                    <div id="labResultsList" style="margin-top:25px;"></div>
                 </div>
 
-                <div class="card" style="border-left:5px solid var(--img); padding:20px;">
+                <div class="card" style="border-left:6px solid var(--img);">
                     <span class="section-title" style="color:var(--img);">📸 IMAGING & ENDOSCOPY SUITE</span>
                     <div class="lab-tag-box" id="imagingSelector"></div>
-                    <div id="imagingResultsList" style="margin-top:20px;"></div>
+                    <div id="imagingResultsList" style="margin-top:25px;"></div>
                 </div>
 
-                <div class="card" style="border-left:5px solid #607d8b; padding:20px;">
+                <div class="card" style="border-left:6px solid #607d8b;">
                     <span class="section-title" style="color:#607d8b;">⚖️ WEIGHT & BP TRENDS</span>
-                    <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px;">
+                    <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:15px;">
                         <input type="text" id="vW" placeholder="Wt(kg)" style="margin:0;">
                         <input type="text" id="vBP" placeholder="BP" style="margin:0;">
                         <input type="date" id="vVDt" style="margin:0;">
-                        <button onclick="addVital()" style="padding:0 20px; background:#607d8b; margin:0; border-radius: 12px; box-shadow: none;">Log</button>
+                        <button onclick="addVital()" style="padding:0 25px; background:#607d8b; margin:0; border-radius: 14px; box-shadow: 0 4px 15px rgba(96, 125, 139, 0.2);">Log</button>
                     </div>
-                    <div id="vitalList" style="margin-top:15px;"></div>
+                    <div id="vitalList" style="margin-top:20px;"></div>
                 </div>
 
-                <button onclick="manualSync()" style="background:var(--success); height:55px; font-size:16px; margin-top:10px; box-shadow: 0 5px 15px rgba(52, 199, 89, 0.2); border-radius: 16px;">💾 FORCE CLOUD DATABASE SYNC</button>
+                <button onclick="manualSync()" style="background:var(--success); height:65px; font-size:18px; margin-top:15px; box-shadow: 0 10px 30px rgba(52, 199, 89, 0.3); border-radius: 20px;">💾 FORCE CLOUD DATABASE SYNC</button>
             </div>
         </div>
     </div>
@@ -634,7 +665,7 @@
         
         document.getElementById('timeGreeting').innerText = `${greeting}, Dr. Saad`;
         
-        const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+        const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
         const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
         const dateStr = now.toLocaleDateString('en-US', dateOptions);
         const timeStr = now.toLocaleTimeString('en-US', timeOptions);
@@ -833,16 +864,785 @@
                 list.innerHTML += `
                     <div class="web-req-item">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; gap: 8px;">
-                                <div class="notif-icon" style="background:rgba(255,149,0,0.1); color:var(--warning); width:30px; height:30px; font-size:14px;">🌐</div>
-                                <b style="font-size:14px; color:var(--text); word-break: break-word;">${req.name}</b>
+                            <div style="display:flex; align-items:center; gap: 10px;">
+                                <div class="notif-icon" style="background:rgba(255,149,0,0.1); color:var(--warning);">🌐</div>
+                                <b style="font-size:16px; color:var(--text); word-break: break-word;">${req.name}</b>
                             </div>
-                            <span style="font-size:11px; color:var(--text-light); font-weight:600;">Age: ${req.age || '--'}</span>
+                            <span style="font-size:12px; color:var(--text-light); font-weight:600;">Age: ${req.age || '--'}</span>
                         </div>
-                        <div style="font-size:13px; color:var(--text); margin-top:8px; font-weight: 500;">📞 ${req.phone}</div>
-                        <div style="font-size:13px; font-style:italic; background:var(--secondary); padding:10px; border-radius:10px; margin-top:8px; color:var(--text); border: 1px solid var(--border); word-break: break-word; white-space: pre-wrap;">
-                            "${req.symptom}" <br><span style="color:var(--danger); font-size:11px; font-style:normal; font-weight:600; display:block; margin-top:4px;">(${req.duration})</span>
+                        <div style="font-size:14px; color:var(--text); margin-top:10px; font-weight: 500;">📞 ${req.phone}</div>
+                        <div style="font-size:14px; font-style:italic; background:var(--secondary); padding:12px; border-radius:12px; margin-top:10px; color:var(--text); border: 1px solid var(--border); word-break: break-word; white-space: pre-wrap;">
+                            "${req.symptom}" <br><span style="color:var(--danger); font-size:12px; font-style:normal; font-weight:600; display:block; margin-top:4px;">(${req.duration})</span>
                         </div>
                         <div class="web-req-actions">
-                            <button style="background:var(--success); color:white; border:none; box-shadow:none; padding:8px; font-size:12px;" onclick="acceptWebBooking('${k}')">✅ Accept Patient</button>
-                            <button style
+                            <button style="background:var(--success); color:white; border:none; box-shadow:none;" onclick="acceptWebBooking('${k}')">✅ Accept Patient</button>
+                            <button style="background:rgba(255,59,48,0.1); color:var(--danger); border:1px solid var(--danger); box-shadow:none;" onclick="rejectWebBooking('${k}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            card.style.display = 'none';
+        }
+    }
+
+    function acceptWebBooking(reqId) {
+        const req = pendingBookings[reqId];
+        if(!req) return;
+        
+        const id = Date.now(); 
+        const d = new Date().toLocaleDateString('en-GB');
+        const combinedComplaint = `[WEB] ${req.symptom} (${req.duration})`;
+        
+        db.ref('patientIndex/'+id).set({ 
+            name: req.name, 
+            age: req.age || '', 
+            phone: req.phone || '', 
+            complaint: combinedComplaint, 
+            dateAdded: d, 
+            lastVisit: d, 
+            isWaiting: true, 
+            pinned: false 
+        });
+        
+        db.ref('patientDetails/'+id).set({ 
+            name: req.name, 
+            presentation: `--- Online Booking Request ---\nSymptoms: ${req.symptom}\nDuration: ${req.duration}\n\n`, 
+            visits: '', 
+            visitDates: [] 
+        });
+        
+        db.ref('pendingBookings/'+reqId).remove();
+        showToast(`✅ ${req.name} added to clinic registry!`);
+    }
+
+    function rejectWebBooking(reqId) {
+        if(confirm("Are you sure you want to permanently delete this web request?")) {
+            db.ref('pendingBookings/'+reqId).remove();
+        }
+    }
+
+    function autoExpand(field) {
+        field.style.height = 'auto'; 
+        field.style.height = (field.scrollHeight) + 'px';
+    }
+
+    function loadFullData(id) {
+        if(activeListener) activeListener.off(); 
+        activeId = id; 
+        db.ref('patientIndex/'+id).update({ isWaiting:false, hasPendingLab:false });
+        
+        document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
+        if(document.getElementById('pt-'+id)) document.getElementById('pt-'+id).classList.add('active');
+        if(document.getElementById('sp-'+id)) document.getElementById('sp-'+id).classList.add('active');
+
+        checkActiveReminderBanner();
+        openFluidView();
+        closeSpotlight();
+
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('fileView').style.display = 'block';
+        document.getElementById('referralResult').style.display = 'none';
+
+        // START SKELETON UI
+        document.getElementById('actualData').style.display = 'none';
+        document.getElementById('skeletonLoader').style.display = 'block';
+
+        activeListener = db.ref('patientDetails/'+id);
+        activeListener.on('value', snap => {
+            const d = snap.val() || {}; const b = ptIdx[id] || {};
+            ptDetails[id] = d;
+            
+            // Artificial delay for premium OS feel
+            setTimeout(() => {
+                document.getElementById('skeletonLoader').style.display = 'none';
+                document.getElementById('actualData').style.display = 'block';
+
+                const days = getDaysSince(b.lastVisit || b.dateAdded);
+                const alertBtn = document.getElementById('dismissOverdueBtn');
+                if (days >= 25 && b.dismissedVisit !== (b.lastVisit || b.dateAdded)) {
+                    alertBtn.style.display = 'block';
+                } else {
+                    alertBtn.style.display = 'none';
+                }
+
+                document.getElementById('viewName').innerText = b.name || "Unknown";
+                document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
+                document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} &nbsp;•&nbsp; Mobile: ${b.phone || '--'}`;
+                document.getElementById('viewRegDate').innerText = `${b.dateAdded || '--'}`;
+                
+                let waNum = b.phone ? b.phone.replace(/\D/g,'') : '';
+                if (waNum) {
+                    if (waNum.startsWith('00964')) waNum = waNum.substring(2);
+                    else if (waNum.startsWith('07')) waNum = '964' + waNum.substring(1);
+                    else if (waNum.startsWith('7')) waNum = '964' + waNum;
+                    else if (!waNum.startsWith('964')) waNum = '964' + waNum;
+                }
+
+                document.getElementById('waArea').innerHTML = waNum ? `<button onclick="sendWhatsApp('${waNum}', '${b.name.replace(/'/g, "\\'")}')" style="background:rgba(52, 199, 89, 0.15); color:var(--success); border:1px solid rgba(52, 199, 89, 0.3); padding:8px 15px; border-radius:18px; cursor:pointer; font-size:13px; font-weight:800; box-shadow:none; width:auto; margin-top:5px;">💬 Open WhatsApp</button>` : '';
+                
+                const presBox = document.getElementById('vPres'); presBox.value = d.presentation || ''; 
+                setTimeout(() => autoExpand(presBox), 50);
+
+                const visitsBox = document.getElementById('vVisits'); visitsBox.value = d.visits || ''; 
+                setTimeout(() => autoExpand(visitsBox), 50);
+                
+                document.getElementById('vOpDate').value = d.opD || '';
+                document.getElementById('vOpDetail').value = d.opT || '';
+                
+                renderVisitLog(d.visitDates || []);
+                renderLabs(d.labs || {});
+                renderImaging(d.imaging || {}); 
+                renderVitals(d.vitals || []);
+                renderOpHistory(d.surgicalHistory || []);
+            }, 400); 
+        });
+    }
+
+    function parseIraqiDate(dateStr) {
+        if (!dateStr || dateStr === "N/A") return 0;
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+        }
+        const parsed = new Date(dateStr).getTime();
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function getDaysSince(dateStr) {
+        const time = parseIraqiDate(dateStr);
+        if(time === 0) return 0;
+        const diff = Date.now() - time;
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function renderOverdueRadar() {
+        const list = document.getElementById('overdueList'); 
+        if(!list) return;
+        list.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-light); font-size: 13px; font-weight:600;">Analyzing OS Database...</div>';
+        
+        setTimeout(() => {
+            let overdueHtml = '';
+            let count = 0;
+            
+            const overduePatients = Object.keys(ptIdx).map(id => {
+                const p = ptIdx[id];
+                const lastV = p.lastVisit || p.dateAdded || "N/A";
+                const days = getDaysSince(lastV);
+                return { id, p, lastV, days };
+            }).filter(data => data.days >= 25 && data.p.dismissedVisit !== data.lastV)
+              .sort((a, b) => b.days - a.days);
+
+            overduePatients.forEach(data => {
+                overdueHtml += `
+                    <div class="overdue-item" onclick="loadFullData('${data.id}')">
+                        <div>
+                            <b style="color:var(--text); font-size: 16px; word-break: break-word;">${data.p.name}</b><br>
+                            <span style="font-size:12px; color:var(--text-light);">${data.days} days since last visit (${data.lastV})</span>
+                        </div>
+                        <span style="font-size:18px;">🔴</span>
+                    </div>`;
+                count++;
+            });
+            
+            if(count === 0) {
+                list.innerHTML = "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px; font-weight:600;'>All patients are up to date.</p>";
+            } else {
+                list.innerHTML = overdueHtml;
+            }
+        }, 100);
+    }
+
+    function dismissAllOverdue() {
+        if(confirm("Dismiss all current overdue alerts?")) {
+            Object.keys(ptIdx).forEach(id => {
+                const p = ptIdx[id];
+                const lastV = p.lastVisit || p.dateAdded;
+                if(getDaysSince(lastV) >= 25) {
+                    db.ref('patientIndex/'+id).update({ dismissedVisit: lastV });
+                }
+            });
+            document.getElementById('overdueList').innerHTML = "<p style='color:var(--text-light); padding:10px; text-align:center; font-size: 14px; font-weight:600;'>All alerts cleared.</p>";
+            showToast("✅ All alerts cleared.");
+        }
+    }
+
+    function dismissPatientOverdue() {
+        const lastV = ptIdx[activeId].lastVisit || ptIdx[activeId].dateAdded;
+        db.ref('patientIndex/'+activeId).update({ dismissedVisit: lastV });
+        document.getElementById('dismissOverdueBtn').style.display = 'none';
+        
+        if(document.getElementById('overdueList').innerHTML.includes('overdue-item')) {
+            renderOverdueRadar();
+        }
+        showToast("✅ Alert Dismissed for this cycle.");
+    }
+
+    function togglePin(id, currentStatus) {
+        db.ref('patientIndex/'+id).update({ pinned: !currentStatus });
+    }
+
+    function checkActiveReminderBanner() {
+        if(!activeId) return;
+        const banner = document.getElementById('activeReminderBanner');
+        const activeRem = Object.values(allReminders).find(r => (r.ptId === activeId || r.patientId === activeId) && r.status === 'pending');
+        if(activeRem) { banner.innerHTML = `⚠️ CLINICAL ALERT / TASK: ${activeRem.text} <span style="float:right;">${activeRem.date}</span>`; banner.style.display = 'block'; } 
+        else { banner.style.display = 'none'; }
+    }
+
+    function editRegDate() {
+        const current = ptIdx[activeId].dateAdded;
+        const n = prompt("Edit Registration Date (DD/MM/YYYY):", current);
+        if (n && n !== current) {
+            db.ref('patientIndex/'+activeId).update({ dateAdded: n });
+            if(!ptDetails[activeId].visitDates || ptDetails[activeId].visitDates.length === 0) {
+                db.ref('patientIndex/'+activeId).update({ lastVisit: n });
+            }
+        }
+    }
+
+    function updateComplaint(el) {
+        if(activeId) {
+            const txt = el.innerText.trim();
+            db.ref('patientIndex/'+activeId).update({ complaint: txt });
+        }
+    }
+
+    function insertClinicalSheet() {
+        if(!activeId) return;
+        const template = `🛑 C/O (Chief Complaint):\n\n🩺 HPI (History of Present Illness):\n\n💊 PMHx (Past Medical):\n[ ] DM | [ ] HTN | [ ] Cardiac | [ ] Asthma\n\n🔪 PSHx (Past Surgical):\n\n⚠️ Allergies:\nNKDA\n\n🫀 Systemic Review:\nUnremarkable\n\n🔬 Local Examination:\n\n📝 Additional Notes / Plan:\n`;
+        const box = document.getElementById('vPres');
+        box.value = box.value + (box.value ? '\n\n' : '') + template;
+        autoExpand(box);
+        autoSyncTrigger();
+        showToast("📄 Sheet Template Inserted.");
+    }
+
+    function smartStamp(t) {
+        const today = new Date().toLocaleDateString('en-GB');
+        const stamp = `--- Visit: ${today} ---`;
+        if (!t.value.includes(stamp)) {
+            t.value = t.value + (t.value ? "\n\n" : "") + `${stamp}\n`;
+            autoExpand(t);
+            autoSyncTrigger();
+        }
+    }
+
+    function renderVisitLog(dates) {
+        const log = document.getElementById('visitHistoryLog'); log.innerHTML = '';
+        dates.slice().reverse().forEach((dt, i) => {
+            const rIdx = (dates.length-1)-i;
+            log.innerHTML += `
+                <div class="health-widget" style="padding:12px 18px;">
+                    <span style="font-size:15px; font-weight:700; color:var(--text);">📅 ${dt}</span>
+                    <div class="context-menu">
+                        <span class="context-dots">⋯</span>
+                        <div class="context-dropdown">
+                            <button onclick="editVisit(${rIdx})">Edit Date</button>
+                            <button class="danger-btn" onclick="deleteVisit(${rIdx})">Delete</button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function editVisit(idx) {
+        const dates = ptDetails[activeId].visitDates;
+        const n = prompt("Edit Date (DD/MM/YYYY):", dates[idx]);
+        if(n) { 
+            dates[idx] = n; 
+            db.ref('patientDetails/'+activeId+'/visitDates').set(dates); 
+            db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] }); 
+        }
+    }
+    
+    function deleteVisit(idx) { 
+        if(confirm("Remove this visit date?")) { 
+            const d = ptDetails[activeId].visitDates; 
+            d.splice(idx,1); 
+            db.ref('patientDetails/'+activeId+'/visitDates').set(d); 
+            const lastV = d.length > 0 ? d[d.length - 1] : ptIdx[activeId].dateAdded;
+            db.ref('patientIndex/'+activeId).update({ lastVisit: lastV }); 
+        } 
+    }
+
+    function generateReferral() {
+        const b = ptIdx[activeId] || {}; const d = ptDetails[activeId] || {};
+        const date = new Date().toLocaleDateString('en-GB');
+        const ageStr = b.age ? `${b.age} years old` : "Unknown age";
+        
+        const text = `DATE: ${date}\nTO: Specialist Colleague\nFROM: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nSUBJECT: Comprehensive Surgical Referral for ${b.name} (${ageStr})\n\n------------------------------------------------------------\n\nCHIEF COMPLAINT / REASON FOR REFERRAL:\n${b.complaint || "Referred for specialist surgical evaluation."}\n\nHISTORY OF PRESENT ILLNESS & OBJECTIVE FINDINGS:\n${d.presentation || "[No specific history recorded in system. Please consult directly with patient.]"}\n\nPROPOSED MANAGEMENT & INVESTIGATIONS TO DATE:\n${d.visits || "[No management recorded in system.]"}\n\nCLINICAL REQUEST:\nDear Colleague, \nI am referring this patient to your esteemed clinic for specialist evaluation and potential co-management. Please review the clinical summary detailed above. I would greatly appreciate your expert opinion and feedback regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon`;
+        
+        document.getElementById('referralResult').innerText = text;
+        document.getElementById('referralResult').style.display = 'block';
+    }
+
+    function genLabTags() {
+        const grid = document.getElementById('labSelector'); grid.innerHTML = '';
+        Object.keys(globalLabs).forEach(safeKey => {
+            const data = globalLabs[safeKey];
+            const btn = document.createElement('div'); btn.className = 'lab-btn'; btn.innerText = data.n;
+            btn.onclick = () => orderLab(safeKey, data.n, data.r, data.u);
+            grid.appendChild(btn);
+        });
+    }
+
+    function orderLab(safeKey, dispName, range, unit) {
+        if(!activeId) return;
+        const labs = ptDetails[activeId].labs || {};
+        if(!labs[safeKey]) labs[safeKey] = { name: dispName, history: [], range: range, unit: unit };
+        labs[safeKey].pending = true;
+        db.ref('patientDetails/'+activeId+'/labs/'+safeKey).set(labs[safeKey]);
+        db.ref('patientIndex/'+activeId).update({ hasPendingLab:true });
+    }
+
+    function addNewCustomLab() {
+        const name = prompt("Enter New Test Name (e.g., Cortisol):");
+        if(name) {
+            const range = prompt("Enter Normal Range (e.g., 5-25):") || "N/A";
+            const unit = prompt("Enter Unit (e.g., mcg/dL):") || "";
+            const safeKey = name.replace(/[\.\#\$\[\]]/g, '_'); 
+            db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit });
+            orderLab(safeKey, name, range, unit);
+        }
+    }
+
+    function checkLabStatus(valStr, rangeStr) {
+        if (!valStr || !rangeStr || rangeStr === "N/A" || rangeStr.includes("Specific") || rangeStr.includes("Negative") || rangeStr.includes("Normal") || rangeStr.includes("Clear") || rangeStr.includes("No growth")) return "";
+        
+        const matchVal = valStr.match(/[0-9]*\.?[0-9]+/);
+        if(!matchVal) return "";
+        const val = parseFloat(matchVal[0]);
+
+        let min = -Infinity; let max = Infinity;
+
+        if (rangeStr.includes("<")) {
+            const matchMax = rangeStr.match(/[0-9]*\.?[0-9]+/);
+            if(matchMax) max = parseFloat(matchMax[0]);
+        } else if (rangeStr.includes(">")) {
+            const matchMin = rangeStr.match(/[0-9]*\.?[0-9]+/);
+            if(matchMin) min = parseFloat(matchMin[0]);
+        } else {
+            const parts = rangeStr.match(/[0-9]*\.?[0-9]+/g);
+            if (parts && parts.length === 2 && !rangeStr.includes("M:") && !rangeStr.includes("F:")) {
+                min = parseFloat(parts[0]);
+                max = parseFloat(parts[1]);
+            }
+        }
+
+        if (min !== -Infinity && max !== Infinity) { return (val < min || val > max) ? "val-abnormal" : "val-normal"; } 
+        else if (max !== Infinity) { return (val > max) ? "val-abnormal" : "val-normal"; } 
+        else if (min !== -Infinity) { return (val < min) ? "val-abnormal" : "val-normal"; }
+        return "";
+    }
+
+    function renderLabs(labs) {
+        const list = document.getElementById('labResultsList'); list.innerHTML = '';
+        Object.keys(labs).forEach(safeKey => {
+            const data = labs[safeKey];
+            const dispName = data.name || safeKey; 
+            
+            let sparkHtml = '';
+            if(data.history && data.history.length > 1) {
+                const histCopy = [...data.history]; 
+                const values = histCopy.slice(-5).map(h => {
+                    const num = parseFloat((h.val || "0").match(/[0-9]*\.?[0-9]+/) || [0]);
+                    return { num, stat: h.stat };
+                });
+                const maxV = Math.max(...values.map(v => v.num));
+                
+                if(maxV > 0) {
+                    const bars = values.map(v => {
+                        const hPct = Math.max((v.num / maxV) * 100, 10);
+                        const colorClass = (v.stat === "High" || v.stat === "Low") ? "red" : "";
+                        return `<div class="spark-bar ${colorClass}" style="height:${hPct}%;" title="Value: ${v.num}"></div>`;
+                    }).join('');
+                    sparkHtml = `<div class="sparkline-container">${bars}</div>`;
+                }
+            }
+
+            let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
+                const rIdx = (data.history.length-1)-idx;
+                
+                let icon = "🟢"; let colorClass = "val-normal";
+                if(h.stat === "High") { icon = "🔴 ⬆️"; colorClass = "val-abnormal"; }
+                else if(h.stat === "Low") { icon = "🔴 ⬇️"; colorClass = "val-abnormal"; }
+                
+                hHtml += `
+                    <div class="lab-row">
+                        <span>${h.dt}: <span class="${colorClass}" style="font-size:16px;">${h.val} <span style="font-size:12px; font-weight:normal; color:var(--text-light);">${data.unit||''}</span> ${icon}</span></span> 
+                        <div class="context-menu">
+                            <span class="context-dots">⋯</span>
+                            <div class="context-dropdown">
+                                <button onclick="editLabEntry('${safeKey}', ${rIdx})">Edit Value</button>
+                                <button class="danger-btn" onclick="deleteLabEntry('${safeKey}', ${rIdx})">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            list.innerHTML += `
+                <div class="lab-accordion">
+                    <div class="lab-header" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='block'?'none':'block')">
+                        <span style="font-size:15px;">${dispName} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
+                        <span style="font-size:11px; color:var(--text-light); font-weight:normal;">Ref Range: ${data.range || 'N/A'} ▼</span>
+                    </div>
+                    <div class="lab-body">
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <button onclick="addLabVal('${safeKey}')" style="background:var(--lab); padding:10px 15px; font-size:13px; width:auto; border-radius:12px; box-shadow:none;">+ Add Result</button>
+                            <button onclick="editLabMeta('${safeKey}')" style="background:var(--secondary); color:var(--text); border:1px solid var(--border); padding:10px 15px; font-size:13px; width:auto; border-radius:12px; box-shadow:none;">✎ Edit Global Range</button>
+                            <button onclick="deleteFullLab('${safeKey}')" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto; border-radius:12px; box-shadow:none;">✕ Delete Test</button>
+                        </div>
+                        ${hHtml}
+                        ${sparkHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function addLabVal(safeKey) {
+        const v = prompt(`Enter numerical value:`); 
+        if(!v) return;
+        
+        let status = "Normal";
+        const flag = prompt(`Flag this result:\nLeave blank = Normal 🟢\nType "H" = High 🔴⬆️\nType "L" = Low 🔴⬇️`);
+        if(flag) {
+            if(flag.toLowerCase() === 'h') status = "High";
+            if(flag.toLowerCase() === 'l') status = "Low";
+        }
+        
+        const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
+        const h = ptDetails[activeId].labs[safeKey].history || [];
+        h.push({ val: v, dt: dt, stat: status });
+        db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ pending: false, history: h });
+    }
+
+    function editLabEntry(safeKey, idx) {
+        const entry = ptDetails[activeId].labs[safeKey].history[idx];
+        const newVal = prompt("Edit Value:", entry.val);
+        const newFlag = prompt(`Flag this result (Currently ${entry.stat || 'Normal'}):\nLeave blank = Normal 🟢\nType "H" = High 🔴⬆️\nType "L" = Low 🔴⬇️`, entry.stat === "High" ? "H" : (entry.stat === "Low" ? "L" : ""));
+        const newDt = prompt("Edit Date:", entry.dt);
+        
+        if(newVal && newDt !== null) {
+            let status = "Normal";
+            if(newFlag) {
+                if(newFlag.toLowerCase() === 'h') status = "High";
+                if(newFlag.toLowerCase() === 'l') status = "Low";
+            }
+            const h = ptDetails[activeId].labs[safeKey].history;
+            h[idx] = { val: newVal, dt: newDt, stat: status };
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h);
+        }
+    }
+
+    function editLabMeta(safeKey) { 
+        const nR = prompt("New Range (Updates for all future tests):", ptDetails[activeId].labs[safeKey].range); 
+        const nU = prompt("New Unit:", ptDetails[activeId].labs[safeKey].unit);
+        if(nR !== null) {
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey).update({ range: nR, unit: nU }); 
+            db.ref('globalLabs/'+safeKey).update({ r: nR, u: nU });
+        }
+    }
+    function deleteFullLab(safeKey) { if(confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/'+activeId+'/labs/'+safeKey).remove(); }
+    function deleteLabEntry(safeKey, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[safeKey].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h); } }
+
+    function genImagingTags() {
+        const grid = document.getElementById('imagingSelector'); grid.innerHTML = '';
+        defaultImaging.forEach(name => {
+            const btn = document.createElement('div'); btn.className = 'img-btn'; btn.innerText = name;
+            btn.onclick = () => orderImaging(name);
+            grid.appendChild(btn);
+        });
+    }
+
+    function orderImaging(name) {
+        if(!activeId) return;
+        const key = name.replace(/[\.\#\$\[\]]/g, '_');
+        const imgNode = ptDetails[activeId].imaging || {};
+        if(!imgNode[key]) imgNode[key] = { name: name, history: [] };
+        imgNode[key].pending = true;
+        db.ref('patientDetails/'+activeId+'/imaging/'+key).set(imgNode[key]);
+    }
+
+    function renderImaging(images) {
+        const list = document.getElementById('imagingResultsList'); list.innerHTML = '';
+        Object.keys(images).forEach(key => {
+            const data = images[key];
+            let hHtml = ''; (data.history || []).slice().reverse().forEach((h, idx) => {
+                const rIdx = (data.history.length-1)-idx;
+                hHtml += `
+                    <div class="health-widget" style="display:block; padding:18px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                            <b style="font-size:15px; color:var(--text);">📅 ${h.dt}</b>
+                            <div class="context-menu">
+                                <span class="context-dots">⋯</span>
+                                <div class="context-dropdown">
+                                    <button onclick="editImgEntry('${key}', ${rIdx})">Edit Report</button>
+                                    <button class="danger-btn" onclick="deleteImgEntry('${key}', ${rIdx})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size:16px; color:var(--text); line-height:1.5; word-break: break-word;">Dx/Report: <b style="color:var(--img);">${h.val}</b></div>
+                    </div>`;
+            });
+            
+            list.innerHTML += `
+                <div class="lab-accordion" style="border-color:rgba(175, 82, 222, 0.3);">
+                    <div class="lab-header" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='block'?'none':'block')" style="background:rgba(175, 82, 222, 0.05); color:var(--img);">
+                        <span style="font-size:15px;">${data.name} ${data.pending ? '<span style="color:var(--danger); font-size:12px; margin-left:10px;">(PENDING)</span>':''}</span>
+                        <span style="font-size:11px; opacity:0.7; font-weight:normal;">Click to Expand ▼</span>
+                    </div>
+                    <div class="lab-body">
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                            <button onclick="addImgVal('${key}')" style="background:var(--img); padding:10px 15px; font-size:13px; width:auto; border:none; color:white; border-radius:12px; font-weight:bold; box-shadow:none;">+ Add Report / Dx</button>
+                            <button onclick="deleteFullImg('${key}')" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:10px 15px; font-size:13px; width:auto; border-radius:12px; font-weight:bold; box-shadow:none;">✕ Delete Modality</button>
+                        </div>
+                        ${hHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function addImgVal(key) {
+        const v = prompt(`Enter Report/Dx for ${ptDetails[activeId].imaging[key].name}:`);
+        if(v) {
+            const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
+            const h = ptDetails[activeId].imaging[key].history || [];
+            h.push({ val: v, dt: dt });
+            db.ref('patientDetails/'+activeId+'/imaging/'+key).update({ pending: false, history: h });
+        }
+    }
+
+    function editImgEntry(key, idx) {
+        const entry = ptDetails[activeId].imaging[key].history[idx];
+        const newVal = prompt("Edit Report/Dx:", entry.val);
+        const newDt = prompt("Edit Date:", entry.dt);
+        if(newVal && newDt) {
+            const h = ptDetails[activeId].imaging[key].history;
+            h[idx] = { val: newVal, dt: newDt };
+            db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h);
+        }
+    }
+    function deleteFullImg(key) { if(confirm("Delete this entire imaging modality?")) db.ref('patientDetails/'+activeId+'/imaging/'+key).remove(); }
+    function deleteImgEntry(key, idx) { if(confirm("Delete this report?")) { const h = ptDetails[activeId].imaging[key].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h); } }
+
+    function addVital() {
+        const w = document.getElementById('vW').value; const bp = document.getElementById('vBP').value; const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
+        if(!w && !bp) return;
+        const vits = ptDetails[activeId].vitals || [];
+        vits.push({ w, bp, dt });
+        db.ref('patientDetails/'+activeId+'/vitals').set(vits);
+        document.getElementById('vW').value=''; document.getElementById('vBP').value='';
+    }
+
+    function renderVitals(vits) {
+        const list = document.getElementById('vitalList'); list.innerHTML = '';
+        
+        let wSparkHtml = '';
+        if(vits && vits.length > 1) {
+            const weights = vits.map(v => parseFloat(v.w || 0)).filter(v => v > 0);
+            if(weights.length > 1) {
+                const minW = Math.min(...weights) - 5;
+                const maxW = Math.max(...weights) + 5;
+                const range = maxW - minW;
+                const bars = weights.slice(-5).map(w => {
+                    const hPct = Math.max(((w - minW) / range) * 100, 10);
+                    return `<div class="spark-bar" style="height:${hPct}%; background:#607d8b;" title="${w}kg"></div>`;
+                }).join('');
+                wSparkHtml = `<div class="sparkline-container" style="justify-content: flex-start; margin: 0 0 10px 0; border:none;">${bars}</div>`;
+            }
+        }
+        
+        if (wSparkHtml) list.innerHTML += wSparkHtml;
+
+        vits.slice().reverse().forEach((v, idx) => {
+            const rIdx = (vits.length-1)-idx;
+            list.innerHTML += `
+                <div class="health-widget">
+                    <div>
+                        <span class="health-label">📅 ${v.dt}</span>
+                        <span class="health-val">Wt: ${v.w||'--'}kg &nbsp;|&nbsp; BP: ${v.bp||'--'}</span>
+                    </div>
+                    <div class="context-menu">
+                        <span class="context-dots">⋯</span>
+                        <div class="context-dropdown">
+                            <button onclick="editVital(${rIdx})">Edit Vitals</button>
+                            <button class="danger-btn" onclick="deleteVital(${rIdx})">Delete</button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function editVital(idx) {
+        const v = ptDetails[activeId].vitals[idx];
+        const w = prompt("Edit Weight (kg):", v.w || "");
+        const bp = prompt("Edit BP:", v.bp || "");
+        const dt = prompt("Edit Date:", v.dt || "");
+        if(w !== null && bp !== null && dt !== null) {
+            const vits = ptDetails[activeId].vitals;
+            vits[idx] = { w: w, bp: bp, dt: dt };
+            db.ref('patientDetails/'+activeId+'/vitals').set(vits);
+        }
+    }
+
+    function deleteVital(idx) { if(confirm("Delete vitals?")) { const v = ptDetails[activeId].vitals; v.splice(idx,1); db.ref('patientDetails/'+activeId+'/vitals').set(v); } }
+
+    function archiveSurgery() {
+        const d = document.getElementById('vOpDate').value; const t = document.getElementById('vOpDetail').value;
+        if(!d || !t) return;
+        const hist = ptDetails[activeId].surgicalHistory || [];
+        hist.push({ d, t });
+        db.ref('patientDetails/'+activeId+'/surgicalHistory').set(hist);
+        document.getElementById('vOpDate').value=''; document.getElementById('vOpDetail').value='';
+    }
+
+    function renderOpHistory(hist) {
+        const list = document.getElementById('opHistoryList'); list.innerHTML = '';
+        if(hist.length === 0) list.innerHTML = '<span style="color:var(--text-light); font-size:14px;">No procedures recorded.</span>';
+        hist.slice().reverse().forEach(h => {
+            list.innerHTML += `
+                <div class="health-widget" style="border-left: 6px solid var(--danger);">
+                    <div>
+                        <span class="health-label">📅 ${h.d}</span>
+                        <span class="health-val" style="word-break: break-word;">${h.t}</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function renderList(fromSpotlight = false) {
+        const list = fromSpotlight ? document.getElementById('spotlightResults') : document.getElementById('patientList'); 
+        const qText = (fromSpotlight ? document.getElementById('spotlightInput') : document.getElementById('searchBox')).value.toLowerCase(); 
+        
+        const qDate = document.getElementById('searchDate').value; 
+        let formattedQDate = "";
+        if(qDate && !fromSpotlight) {
+            const [y, m, d] = qDate.split('-');
+            formattedQDate = `${d}/${m}/${y}`; 
+        }
+
+        list.innerHTML = '';
+        
+        const sortedIds = Object.keys(ptIdx).sort((a, b) => {
+            const pA = ptIdx[a]; const pB = ptIdx[b];
+            
+            const pinA = pA.pinned ? 1 : 0;
+            const pinB = pB.pinned ? 1 : 0;
+            if (pinA !== pinB) return pinB - pinA;
+
+            const timeA = parseIraqiDate(pA.lastVisit || pA.dateAdded);
+            const timeB = parseIraqiDate(pB.lastVisit || pB.dateAdded);
+            
+            return timeB - timeA; 
+        });
+
+        sortedIds.forEach(id => {
+            const p = ptIdx[id];
+            const lastVisit = p.lastVisit || p.dateAdded || "N/A";
+            const days = getDaysSince(lastVisit);
+            const isOverdue = (days >= 25 && p.dismissedVisit !== lastVisit);
+            const alertBadge = isOverdue ? `<span style="font-size:14px; margin-left:5px;" title="25-Day Overdue">🔴</span>` : '';
+
+            const textMatch = p.name.toLowerCase().includes(qText) || (p.complaint && p.complaint.toLowerCase().includes(qText));
+            const dateMatch = formattedQDate ? (p.dateAdded === formattedQDate || (p.lastVisit && p.lastVisit.includes(formattedQDate))) : true;
+            
+            if (textMatch && dateMatch) {
+                const pinIcon = p.pinned ? '⭐' : '☆';
+                const pinClass = p.pinned ? 'pinned' : '';
+                
+                list.innerHTML += `
+                    <div id="${fromSpotlight?'sp':'pt'}-${id}" class="pt-item ${(activeId == id && !fromSpotlight) ? 'active' : ''}" onclick="loadFullData('${id}')">
+                        <strong style="font-size:16px; word-break: break-word;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
+                        <span class="pt-meta" style="word-break: break-word;">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
+                        ${!fromSpotlight ? `
+                        <div class="pt-controls" onclick="event.stopPropagation();">
+                            <span class="btn-pin-pt ${pinClass}" style="font-size:20px;" onclick="togglePin('${id}', ${!!p.pinned})">${pinIcon}</span>
+                            <div class="context-menu">
+                                <span class="context-dots" style="color: ${activeId == id ? 'white' : 'var(--text-light)'}">⋯</span>
+                                <div class="context-dropdown">
+                                    <button class="danger-btn" onclick="deletePt('${id}')">Delete Patient</button>
+                                </div>
+                            </div>
+                        </div>` : ''}
+                    </div>`;
+            }
+        });
+        if(!fromSpotlight) document.getElementById('waitCounter').innerText = Object.values(ptIdx).filter(x => x.isWaiting).length;
+    }
+
+    function addPatient() {
+        const n = document.getElementById('newName').value; if(!n) return;
+        const id = Date.now(); const d = new Date().toLocaleDateString('en-GB');
+        db.ref('patientIndex/'+id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true, pinned: false });
+        db.ref('patientDetails/'+id).set({ name: n, presentation: '', visits: '', visitDates: [] }); 
+        ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
+        showToast("✅ Patient Registered successfully.");
+    }
+
+    function addPatientReminder() {
+        const t = document.getElementById('vRemText').value || "Follow-up visit";
+        const d = document.getElementById('vRemDate').value || new Date().toLocaleDateString('en-GB');
+        db.ref('reminders').push({ text: `[${ptIdx[activeId].name}] ${t}`, date: d, status: 'pending', ptId: activeId });
+        document.getElementById('vRemText').value = ''; document.getElementById('vRemDate').value = '';
+        showToast("✅ Task scheduled.");
+    }
+
+    function renderRems() {
+        const list = document.getElementById('remList'); list.innerHTML = '';
+        Object.keys(allReminders).filter(id => allReminders[id].status === 'pending').sort((a,b) => new Date(allReminders[a].date) - new Date(allReminders[b].date)).forEach(id => {
+            const r = allReminders[id]; 
+            const targetId = r.ptId || r.patientId; 
+            list.innerHTML += `
+                <div class="apple-notification" onclick="loadFullData('${targetId}')">
+                    <div class="notif-icon" style="background:rgba(0,122,255,0.1); color:var(--primary);">📅</div>
+                    <div style="flex-grow:1; min-width:0;">
+                        <b style="font-size:15px; display:block; color:var(--text); word-break: break-word;">${r.date}</b>
+                        <span style="font-size:14px; color:var(--text-light); font-weight:500; word-break: break-word;">${r.text}</span>
+                    </div>
+                    <button style="width:auto; padding:8px 15px; font-size:13px; border-radius:12px; background:var(--success); box-shadow:none;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">Done</button>
+                </div>`;
+        });
+        if(list.innerHTML === '') list.innerHTML = "<p style='color:var(--text-light); padding:10px; font-size:14px; text-align:center;'>No pending tasks.</p>";
+    }
+
+    function renderCalendar() {
+        const cal = document.getElementById('opCalendar'); const today = new Date(); let rows = "";
+        Object.keys(ptIdx).forEach(id => {
+            const d = ptDetails[id] || {}; if(d.opD && new Date(d.opD) >= today) {
+                rows += `<tr><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text-light); font-weight:600;">${d.opD}</td><td style="padding:12px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary); font-size:15px; word-break: break-word;">${ptIdx[id].name}</b></td><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text); font-weight:500; word-break: break-word;">${d.opT}</td></tr>`;
+            }
+        });
+        cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse; table-layout: fixed;"><tr><th style="padding-bottom:10px; color:var(--text); width:30%;">Date</th><th style="padding-bottom:10px; color:var(--text); width:40%;">Patient</th><th style="padding-bottom:10px; color:var(--text); width:30%;">Procedure</th></tr>${rows}</table>` : "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px;'>No upcoming surgeries.</p>";
+    }
+
+    function autoSyncTrigger() { 
+        document.getElementById('syncIndicator').style.display = 'flex';
+        if (syncTimeout) clearTimeout(syncTimeout); 
+        syncTimeout = setTimeout(() => saveAll(false), 2000); 
+    }
+
+    function saveAll(manual = false) {
+        if (!activeId) return; const today = new Date().toLocaleDateString('en-GB');
+        const detailRef = db.ref('patientDetails/'+activeId);
+        detailRef.once('value').then(snap => {
+            const d = snap.val() || {}; const dates = d.visitDates || []; 
+            if(!dates.includes(today) && (document.getElementById('vPres').value.includes(today) || document.getElementById('vVisits').value.includes(today))) {
+                dates.push(today);
+            }
+            
+            detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
+            if(dates.length > 0) db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
+
+            document.getElementById('syncIndicator').style.display = 'none'; 
+            if (manual) showToast("💾 Cloud Sync Successful");
+        });
+    }
+
+    function manualSync() { saveAll(true); }
+    function deletePt(id) { if(confirm("Permanently delete this patient?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); if(activeId===id) { document.getElementById('fileView').style.display='none'; document.getElementById('emptyState').style.display='block'; closeFluidView(); } } }
+    function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
+    function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
+</script>
+</body>
+</html>
