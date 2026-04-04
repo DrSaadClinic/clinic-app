@@ -1173,5 +1173,26 @@
     function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
     function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
 </script>
+    
+    // 1. Instantly bypass login if the browser remembers you
+    window.addEventListener('DOMContentLoaded', function() {
+        if(localStorage.getItem('saadAuth') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none'; 
+            document.getElementById('mainContent').style.display = 'grid'; 
+            if(typeof initSync === 'function') initSync(); 
+            if(typeof genImagingTags === 'function') genImagingTags();
+        }
+    });
+
+    // 2. Silently save the session the first time you type the correct passcode
+    const securePassInput = document.getElementById('passCode');
+    if(securePassInput) {
+        securePassInput.addEventListener('input', function() {
+            if(this.value === 'saad2026') {
+                localStorage.setItem('saadAuth', 'true');
+            }
+        });
+    }
+</script>
 </body>
 </html>
