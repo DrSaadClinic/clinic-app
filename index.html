@@ -110,13 +110,11 @@
             gap: 30px; 
             align-items: start; 
             transition: var(--transition); 
-            min-width: 0;
-            box-sizing: border-box;
         }
         
         .container.fluid-active { grid-template-columns: 0px 1fr; gap: 0; }
         .container.fluid-active .sidebar { opacity: 0; pointer-events: none; transform: translateX(-50px); overflow: hidden; }
-        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; display: flex; flex-direction: column; gap: 25px; min-width: 0;}
+        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; display: flex; flex-direction: column; gap: 25px;}
 
         #backBtn { 
             display: none; 
@@ -140,26 +138,26 @@
            MOBILE FIX: PERFECT SECRETARY FLOW
            ========================================================= */
         @media (max-width: 1024px) { 
-            .container, .container.fluid-active { display: flex !important; flex-direction: column !important; padding: 15px; gap: 20px; width: 100%; box-sizing: border-box; min-width: 0;} 
+            .container { display: flex; flex-direction: column; padding: 15px; gap: 20px;} 
             
-            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
+            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 20px; }
             #webInboxCard { order: 1; margin-bottom: 0; }
             #addPtCard { order: 2; margin-bottom: 0; }
             #registryCard { order: 3; margin-bottom: 0; }
-            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
+            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 20px;}
             #bmiCard { order: 5; margin-bottom: 0; }
 
-            .content { display: none; width: 100% !important; min-width: 0; box-sizing: border-box;}
+            .content { display: none; width: 100%; }
             
-            .fluid-active .sidebar { display: none !important; }
+            .fluid-active .sidebar { display: none; }
             .fluid-active .content { display: block; animation: slideInRight 0.3s ease; }
             #backBtn { display: inline-block; }
             
             .card { margin-bottom: 0; } 
             
-            .pt-item, .health-widget, .web-req-item, p, span, div, h2, h3 { word-break: break-word; white-space: pre-wrap; }
+            /* Prevent text squishing on mobile */
+            .pt-item, .health-widget, .web-req-item { word-break: break-word; }
             .mobile-stack { grid-template-columns: 1fr !important; gap: 15px !important; }
-            input, textarea, button { max-width: 100%; }
         } 
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -175,12 +173,9 @@
             box-shadow: var(--shadow); 
             border: 1px solid var(--border); 
             transition: var(--transition); 
-            min-width: 0;
-            box-sizing: border-box;
-            margin-bottom: 25px;
         }
         .card:hover { box-shadow: var(--shadow-hover); }
-        @media (max-width: 768px) { .card { padding: 18px; border-radius: 18px; } }
+        @media (max-width: 768px) { .card { padding: 20px; border-radius: 20px; } }
         
         h3 { color: var(--text); margin: 0 0 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
         
@@ -204,7 +199,6 @@
             color: var(--text); 
             transition: var(--transition); 
             font-family: inherit; 
-            max-width: 100%;
         }
         input:focus, textarea:focus { border-color: var(--primary); background: transparent; outline: none; box-shadow: 0 0 0 4px var(--primary-glow); }
         textarea { resize: none; overflow-y: hidden; min-height: 100px; line-height: 1.6; } 
@@ -221,7 +215,6 @@
             cursor: pointer; 
             transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s; 
             box-shadow: 0 4px 15px var(--primary-glow); 
-            max-width: 100%;
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
         button:active { transform: scale(0.96); }
@@ -232,14 +225,11 @@
         .ios-search-input { margin: 0; padding-left: 40px; background: var(--secondary); border-radius: 14px; font-weight: 500; }
         .ios-search-input:focus { background: var(--card-bg); }
         
-        /* Fixed Calendar Button */
-        .ios-date-btn-wrapper { position: relative; width: 48px; height: 48px; flex-shrink: 0; border-radius: 14px; background: var(--secondary); border: 1px solid var(--border); overflow: hidden; transition: 0.2s;}
-        .ios-date-btn-wrapper:hover { background: var(--card-bg); }
-        .ios-date-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; pointer-events: none; color: var(--text); }
-        .ios-date-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; margin: 0; z-index: 10; }
+        .ios-date-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--secondary); border: 1px solid var(--border); border-radius: 14px; color: var(--text); box-shadow: none; margin: 0; flex-shrink: 0; cursor: pointer; transition:0.2s;}
+        .ios-date-btn:hover { background: var(--card-bg); }
 
         /* =========================================================
-           iOS CONTEXT MENUS (Replacing Edit/Delete text)
+           iOS CONTEXT MENUS
            ========================================================= */
         .context-menu { position: relative; display: inline-block; }
         .context-dots { 
@@ -306,11 +296,9 @@
             margin-bottom: 12px; 
             border: 1px solid var(--border); 
             transition: 0.2s; 
-            min-width: 0;
-            box-sizing: border-box;
         }
         .health-widget:hover { background: var(--card-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transform: translateY(-1px); }
-        .health-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; word-break: break-word; white-space: pre-wrap;}
+        .health-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
         .health-label { font-size: 12px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
 
         /* =========================================================
@@ -350,10 +338,10 @@
         /* =========================================================
            REGISTRY LIST ITEMS
            ========================================================= */
-        .pt-item { padding: 18px; border-bottom: 1px solid transparent; cursor: pointer; background: transparent; border-radius: 20px; margin-bottom: 8px; transition: all 0.2s ease; position: relative; border: 1px solid var(--border); min-width: 0; box-sizing: border-box; }
+        .pt-item { padding: 18px; border-bottom: 1px solid transparent; cursor: pointer; background: transparent; border-radius: 20px; margin-bottom: 8px; transition: all 0.2s ease; position: relative; border: 1px solid var(--border); }
         .pt-item:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .pt-item.active { background: var(--primary); color: white; box-shadow: 0 10px 25px var(--primary-glow); border-color: var(--primary); transform: translateY(-2px); }
-        .pt-meta { font-size: 12px; color: var(--text-light); display: block; margin-top: 6px; font-weight: 500; word-break: break-word;}
+        .pt-meta { font-size: 12px; color: var(--text-light); display: block; margin-top: 6px; font-weight: 500; }
         .pt-item.active .pt-meta { color: rgba(255,255,255,0.8); }
         .pt-controls { position: absolute; right: 12px; top: 18px; display: flex; gap: 5px; align-items: center; }
 
@@ -361,30 +349,20 @@
            MISC UI TWEAKS
            ========================================================= */
         .section-title { font-size: 12px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
-        
-        [contenteditable="true"] { 
-            transition: 0.2s; 
-            border-bottom: 1px dashed transparent; 
-            display: block; 
-            width: 100%; 
-            min-width: 100%; 
-            box-sizing: border-box;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
+        [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: var(--secondary); border-radius: 8px; box-shadow: 0 0 0 3px var(--primary-glow); padding: 4px 8px; }
 
         /* Web Request Inbox Styles */
-        .web-req-item { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 20px; margin-bottom: 12px; box-shadow: var(--shadow); min-width: 0;}
+        .web-req-item { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 20px; margin-bottom: 12px; box-shadow: var(--shadow); }
         .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .web-req-actions button { padding: 12px; font-size: 14px; border-radius: 12px; }
 
         .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; background: var(--secondary); padding: 15px; border-radius: 16px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); }
-        .lab-btn { background: var(--card-bg); border: 1px solid var(--lab); color: var(--lab); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin:0; }
+        .lab-btn { background: var(--card-bg); border: 1px solid var(--lab); color: var(--lab); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .lab-btn:hover { background: var(--lab); color: white; transform: scale(1.03); }
         
-        .img-btn { background: var(--card-bg); border: 1px solid var(--img); color: var(--img); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin:0;}
+        .img-btn { background: var(--card-bg); border: 1px solid var(--img); color: var(--img); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .img-btn:hover { background: var(--img); color: white; transform: scale(1.03); }
 
         .lab-accordion { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
@@ -485,10 +463,8 @@
                 <span class="ios-search-icon">🔍</span>
                 <input type="text" id="searchBox" class="ios-search-input" placeholder="Search Name or C/O..." oninput="renderList()">
                 
-                <div class="ios-date-btn-wrapper">
-                    <span class="ios-date-icon">📅</span>
-                    <input type="date" id="searchDate" class="ios-date-input" onchange="renderList()">
-                </div>
+                <button class="ios-date-btn" onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()">📅</button>
+                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute; top:-9999px; left:-9999px; width:0; height:0; opacity:0;">
             </div>
             
             <div id="patientList" style="max-height:55vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
@@ -551,25 +527,25 @@
             </div>
 
             <div id="actualData">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; width: 100%;">
-                    <div style="width: 100%; min-width: 0;">
-                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 32px; font-weight: 800; letter-spacing: -1px; padding:5px 10px; border-radius:12px; display: block; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></h2>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px;">
+                    <div style="width: 100%;">
+                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 36px; font-weight: 800; letter-spacing: -1px; padding:5px 10px; border-radius:12px;"></h2>
                         <div id="waArea" style="margin-top:8px; padding-left: 10px;"></div>
                     </div>
                     <div id="syncIndicator" style="font-size:12px; color:var(--success); font-weight:bold; display:none; padding:8px 16px; white-space: nowrap; background: rgba(52, 199, 89, 0.1); border-radius: 20px; height: 20px; align-items: center;">● SAVING</div>
                 </div>
 
-                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:18px; border-radius:16px; margin-bottom:25px; color:var(--warning); font-weight:bold; font-size:15px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1); word-break: break-word;"></div>
+                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:18px; border-radius:16px; margin-bottom:25px; color:var(--warning); font-weight:bold; font-size:15px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1);"></div>
 
                 <div class="card" style="background:var(--secondary); padding:25px; border-radius:20px; margin-bottom:25px; border: 1px solid var(--border);">
                     <span class="section-title" style="color:var(--warning);">Chief Complaint (Click to edit)</span>
-                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:20px; display:block; padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); color: var(--text); width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;"></span>
+                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:20px; display:block; padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); color: var(--text);"></span>
                 </div>
 
                 <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr; gap:25px; margin-bottom:25px;">
                     <div class="card" style="margin:0;">
                         <span class="section-title">Patient Bio</span>
-                        <p id="viewContact" style="font-weight:600; margin:10px 0 0 0; font-size: 16px; color: var(--text); word-break: break-word; white-space: pre-wrap;"></p>
+                        <p id="viewContact" style="font-weight:600; margin:10px 0 0 0; font-size: 16px; color: var(--text);"></p>
                         <span style="font-size:14px; color:var(--primary); display:block; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> ✎</span>
                     </div>
                     <div class="card" style="margin:0; padding: 25px;">
@@ -595,18 +571,18 @@
 
                 <div class="card">
                     <span class="section-title">CLINICAL HISTORY</span>
-                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap;"></textarea>
+                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px;"></textarea>
                 </div>
                 
                 <div class="card">
                     <span class="section-title">MANAGEMENT (Mx)</span>
-                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%; word-break: break-word; white-space: pre-wrap;"></textarea>
+                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px;"></textarea>
                 </div>
 
                 <div class="card" style="background:var(--secondary);">
                     <span class="section-title" style="color:var(--primary);">📋 AI SURGICAL REFERRAL ENGINE</span>
                     <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
-                    <div id="referralResult" class="ai-box" style="display:none; width: 100%; box-sizing: border-box; word-break: break-word; white-space: pre-wrap;" contenteditable="true"></div>
+                    <div id="referralResult" class="ai-box" style="display:none;" contenteditable="true"></div>
                 </div>
 
                 <div class="card" style="border-left:6px solid var(--danger);">
@@ -866,12 +842,12 @@
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; align-items:center; gap: 10px;">
                                 <div class="notif-icon" style="background:rgba(255,149,0,0.1); color:var(--warning);">🌐</div>
-                                <b style="font-size:16px; color:var(--text); word-break: break-word;">${req.name}</b>
+                                <b style="font-size:16px; color:var(--text);">${req.name}</b>
                             </div>
                             <span style="font-size:12px; color:var(--text-light); font-weight:600;">Age: ${req.age || '--'}</span>
                         </div>
                         <div style="font-size:14px; color:var(--text); margin-top:10px; font-weight: 500;">📞 ${req.phone}</div>
-                        <div style="font-size:14px; font-style:italic; background:var(--secondary); padding:12px; border-radius:12px; margin-top:10px; color:var(--text); border: 1px solid var(--border); word-break: break-word; white-space: pre-wrap;">
+                        <div style="font-size:14px; font-style:italic; background:var(--secondary); padding:12px; border-radius:12px; margin-top:10px; color:var(--text); border: 1px solid var(--border);">
                             "${req.symptom}" <br><span style="color:var(--danger); font-size:12px; font-style:normal; font-weight:600; display:block; margin-top:4px;">(${req.duration})</span>
                         </div>
                         <div class="web-req-actions">
@@ -1037,7 +1013,7 @@
                 overdueHtml += `
                     <div class="overdue-item" onclick="loadFullData('${data.id}')">
                         <div>
-                            <b style="color:var(--text); font-size: 16px; word-break: break-word;">${data.p.name}</b><br>
+                            <b style="color:var(--text); font-size: 16px;">${data.p.name}</b><br>
                             <span style="font-size:12px; color:var(--text-light);">${data.days} days since last visit (${data.lastV})</span>
                         </div>
                         <span style="font-size:18px;">🔴</span>
@@ -1382,7 +1358,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="font-size:16px; color:var(--text); line-height:1.5; word-break: break-word;">Dx/Report: <b style="color:var(--img);">${h.val}</b></div>
+                        <div style="font-size:16px; color:var(--text); line-height:1.5;">Dx/Report: <b style="color:var(--img);">${h.val}</b></div>
                     </div>`;
             });
             
@@ -1505,7 +1481,7 @@
                 <div class="health-widget" style="border-left: 6px solid var(--danger);">
                     <div>
                         <span class="health-label">📅 ${h.d}</span>
-                        <span class="health-val" style="word-break: break-word;">${h.t}</span>
+                        <span class="health-val">${h.t}</span>
                     </div>
                 </div>`;
         });
@@ -1553,8 +1529,8 @@
                 
                 list.innerHTML += `
                     <div id="${fromSpotlight?'sp':'pt'}-${id}" class="pt-item ${(activeId == id && !fromSpotlight) ? 'active' : ''}" onclick="loadFullData('${id}')">
-                        <strong style="font-size:16px; word-break: break-word;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
-                        <span class="pt-meta" style="word-break: break-word;">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
+                        <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
+                        <span class="pt-meta">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
                         ${!fromSpotlight ? `
                         <div class="pt-controls" onclick="event.stopPropagation();">
                             <span class="btn-pin-pt ${pinClass}" style="font-size:20px;" onclick="togglePin('${id}', ${!!p.pinned})">${pinIcon}</span>
@@ -1596,9 +1572,9 @@
             list.innerHTML += `
                 <div class="apple-notification" onclick="loadFullData('${targetId}')">
                     <div class="notif-icon" style="background:rgba(0,122,255,0.1); color:var(--primary);">📅</div>
-                    <div style="flex-grow:1; min-width:0;">
-                        <b style="font-size:15px; display:block; color:var(--text); word-break: break-word;">${r.date}</b>
-                        <span style="font-size:14px; color:var(--text-light); font-weight:500; word-break: break-word;">${r.text}</span>
+                    <div style="flex-grow:1;">
+                        <b style="font-size:15px; display:block; color:var(--text);">${r.date}</b>
+                        <span style="font-size:14px; color:var(--text-light); font-weight:500;">${r.text}</span>
                     </div>
                     <button style="width:auto; padding:8px 15px; font-size:13px; border-radius:12px; background:var(--success); box-shadow:none;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">Done</button>
                 </div>`;
@@ -1610,10 +1586,10 @@
         const cal = document.getElementById('opCalendar'); const today = new Date(); let rows = "";
         Object.keys(ptIdx).forEach(id => {
             const d = ptDetails[id] || {}; if(d.opD && new Date(d.opD) >= today) {
-                rows += `<tr><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text-light); font-weight:600;">${d.opD}</td><td style="padding:12px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary); font-size:15px; word-break: break-word;">${ptIdx[id].name}</b></td><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text); font-weight:500; word-break: break-word;">${d.opT}</td></tr>`;
+                rows += `<tr><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text-light); font-weight:600;">${d.opD}</td><td style="padding:12px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary); font-size:15px;">${ptIdx[id].name}</b></td><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text); font-weight:500;">${d.opT}</td></tr>`;
             }
         });
-        cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse; table-layout: fixed;"><tr><th style="padding-bottom:10px; color:var(--text); width:30%;">Date</th><th style="padding-bottom:10px; color:var(--text); width:40%;">Patient</th><th style="padding-bottom:10px; color:var(--text); width:30%;">Procedure</th></tr>${rows}</table>` : "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px;'>No upcoming surgeries.</p>";
+        cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;"><tr><th style="padding-bottom:10px; color:var(--text);">Date</th><th style="padding-bottom:10px; color:var(--text);">Patient</th><th style="padding-bottom:10px; color:var(--text);">Procedure</th></tr>${rows}</table>` : "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px;'>No upcoming surgeries.</p>";
     }
 
     function autoSyncTrigger() { 
