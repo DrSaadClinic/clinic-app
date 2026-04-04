@@ -10,7 +10,7 @@
         :root { --primary: #0A84FF; --secondary: rgba(255,255,255,0.05); --success: #30D158; --danger: #FF453A; --warning: #FF9F0A; --call: #5E5CE6; --waiting: #0A84FF; --lab: #64D2FF; --img: #BF5AF2; --glass-bg: rgba(28, 28, 30, 0.65); --glass-border: rgba(255, 255, 255, 0.1); }
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #000000; margin: 0; color: #F2F2F7; overflow-x: hidden; -webkit-font-smoothing: antialiased; letter-spacing: 0.3px; }
         
-        header { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; border-bottom: 1px solid var(--glass-border); }
+        header { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: white; padding: 12px; text-align: center; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: center; gap: 12px; border-bottom: 1px solid var(--glass-border); }
         .logo-img { height: 40px; width: 40px; background: transparent; border-radius: 50%; padding: 2px; object-fit: cover; }
         .logo-large { width: 100px; height: 100px; border-radius: 50%; background: transparent; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.1); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
@@ -18,7 +18,8 @@
         @media (max-width: 1024px) { .container { grid-template-columns: 320px 1fr; } } 
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } } 
         
-        .card { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 20px; border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-bottom: 20px; border: 1px solid var(--glass-border); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        /* GPU Optimization: Lowered blur from 25px to 12px to prevent browser freezing */
+        .card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 20px; border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-bottom: 20px; border: 1px solid var(--glass-border); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .card:hover { transform: translateY(-2px); }
         @media (max-width: 768px) { .card { padding: 15px; border-radius: 20px; } }
         
@@ -89,11 +90,12 @@
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
 
+        /* GPU Optimization for login screen blur */
         .login-box { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #000000, #1C1C1E); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease, visibility 0.5s; }
         .login-box.fade-out { opacity: 0; visibility: hidden; }
-        .login-glass { background: rgba(28, 28, 30, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 40px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .login-glass { background: rgba(28, 28, 30, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 40px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         
-        .toast { position: fixed; top: -100px; right: 20px; background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: #fff; padding: 15px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 14px; border: 1px solid var(--glass-border); }
+        .toast { position: fixed; top: -100px; right: 20px; background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; padding: 15px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 14px; border: 1px solid var(--glass-border); }
         .toast.show { top: 20px; }
 
         /* Mac OS Invisible Scrollbars */
@@ -377,6 +379,10 @@
 
     function checkAutoLogin() {
         if(document.getElementById('passCode').value === 'saad2026') {
+            
+            // Expert Integration: Securing the session instantly on successful input
+            localStorage.setItem('saadAuth', 'true');
+            
             document.getElementById('loginScreen').classList.add('fade-out');
             setTimeout(() => {
                 document.getElementById('loginScreen').style.display='none'; 
@@ -1026,6 +1032,7 @@
                     <span>📅 <b>${v.dt}</b> | Wt: <b style="font-size:16px;">${v.w||'--'}</b>kg | BP: <b style="font-size:16px;">${v.bp||'--'}</b></span>
                     <div>
                         <button class="action-btn" style="color:var(--primary); margin-right:15px;" onclick="editVital(${rIdx})">✎ Edit</button>
+                        <button class="action-btn
                         <button class="action-btn" style="color:var(--danger); font-size:16px;" onclick="deleteVital(${rIdx})">✕</button>
                     </div>
                 </div>`;
@@ -1171,4 +1178,40 @@
             }
             
             detailRef.update({ presentation: document.getElementById('vPres').value, visits: document.getElementById('vVisits').value, opD: document.getElementById('vOpDate').value, opT: document.getElementById('vOpDetail').value, visitDates: dates });
-            if(dates.length > 0) db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length -
+            if(dates.length > 0) db.ref('patientIndex/'+activeId).update({ lastVisit: dates[dates.length - 1] });
+
+            document.getElementById('syncIndicator').style.display = 'none'; 
+            if (manual) showToast("💾 Cloud Sync Successful");
+        });
+    }
+
+    function manualSync() { saveAll(true); }
+    function deletePt(id) { if(confirm("Permanently delete this patient?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); if(activeId===id) { document.getElementById('fileView').style.display='none'; document.getElementById('emptyState').style.display='block'; } } }
+    function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
+    function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
+    
+    // 1. Instantly bypass login if the browser remembers you
+    window.addEventListener('DOMContentLoaded', function() {
+        if(localStorage.getItem('saadAuth') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none'; 
+            document.getElementById('mainContent').style.display = 'grid'; 
+            if(typeof initSync === 'function') initSync(); 
+            if(typeof genImagingTags === 'function') genImagingTags();
+        }
+    });
+
+    // 2. Silently save the session the first time you type the correct passcode
+    window.addEventListener('load', function() {
+        const securePassInput = document.getElementById('passCode');
+        if(securePassInput) {
+            securePassInput.addEventListener('input', function() {
+                if(this.value === 'saad2026') {
+                    localStorage.setItem('saadAuth', 'true');
+                }
+            });
+        }
+    });
+
+</script>
+</body>
+</html>
