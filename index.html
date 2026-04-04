@@ -1,12 +1,13 @@
-
-this is the code : <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dr. Saad Sabry Alzubaidy - Surgical OS</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    
     <style>
         /* =========================================================
            APPLE OS DESIGN SYSTEM (Variables)
@@ -85,19 +86,100 @@ this is the code : <!DOCTYPE html>
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
         
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 44px; width: 44px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; padding: 2px; }
-        .os-greeting h2 { margin: 0; font-size: 1.1em; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
-        .os-greeting p { margin: 2px 0 0 0; font-size: 0.8em; color: var(--text-light); font-weight: 500; }
-        
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .spotlight-btn { background: var(--secondary); color: var(--text-light); border: 1px solid var(--border); padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: none; width: auto; margin: 0; }
-        .spotlight-btn:hover { background: var(--card-bg); color: var(--text); border-color: var(--primary); }
-        
-        .dark-btn { background: var(--secondary); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0; padding: 0; box-shadow: none; color: var(--text); }
-        .dark-btn:hover { transform: scale(1.05); background: var(--card-bg); }
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
 
-        .logo-large { width: 100px; height: 100px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid rgba(255,255,255,0.2); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .logo-img { 
+            height: 44px; 
+            width: 44px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            background: white; 
+            padding: 2px; 
+        }
+
+        .os-greeting h2 { 
+            margin: 0; 
+            font-size: 1.1em; 
+            font-weight: 700; 
+            letter-spacing: -0.3px; 
+            color: var(--text); 
+        }
+
+        .os-greeting p { 
+            margin: 2px 0 0 0; 
+            font-size: 0.8em; 
+            color: var(--text-light); 
+            font-weight: 500; 
+        }
+        
+        .header-actions { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+        }
+
+        .spotlight-btn { 
+            background: var(--secondary); 
+            color: var(--text-light); 
+            border: 1px solid var(--border); 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: 0.2s; 
+            box-shadow: none; 
+            width: auto; 
+            margin: 0; 
+        }
+
+        .spotlight-btn:hover { 
+            background: var(--card-bg); 
+            color: var(--text); 
+            border-color: var(--primary); 
+        }
+        
+        .dark-btn { 
+            background: var(--secondary); 
+            border: 1px solid var(--border); 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            font-size: 18px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s; 
+            margin: 0; 
+            padding: 0; 
+            box-shadow: none; 
+            color: var(--text); 
+        }
+
+        .dark-btn:hover { 
+            transform: scale(1.05); 
+            background: var(--card-bg); 
+        }
+
+        .logo-large { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            background: white; 
+            margin-bottom: 20px; 
+            border: 4px solid rgba(255,255,255,0.2); 
+            object-fit: cover; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        }
 
         /* =========================================================
            FLUID SPLIT-VIEW ARCHITECTURE
@@ -111,11 +193,30 @@ this is the code : <!DOCTYPE html>
             gap: 30px; 
             align-items: start; 
             transition: var(--transition); 
+            box-sizing: border-box;
         }
         
-        .container.fluid-active { grid-template-columns: 0px 1fr; gap: 0; }
-        .container.fluid-active .sidebar { opacity: 0; pointer-events: none; transform: translateX(-50px); overflow: hidden; }
-        .sidebar { transition: var(--transition); opacity: 1; transform: translateX(0); width: 380px; display: flex; flex-direction: column; gap: 25px;}
+        .container.fluid-active { 
+            grid-template-columns: 0px 1fr; 
+            gap: 0; 
+        }
+
+        .container.fluid-active .sidebar { 
+            opacity: 0; 
+            pointer-events: none; 
+            transform: translateX(-50px); 
+            overflow: hidden; 
+        }
+
+        .sidebar { 
+            transition: var(--transition); 
+            opacity: 1; 
+            transform: translateX(0); 
+            width: 380px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 25px;
+        }
 
         #backBtn { 
             display: none; 
@@ -132,35 +233,74 @@ this is the code : <!DOCTYPE html>
             backdrop-filter: blur(10px);
         }
         
-        .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container.fluid-active #backBtn { 
+            display: inline-block; 
+            animation: fadeIn 0.5s ease; 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
 
         /* =========================================================
-           MOBILE FIX: PERFECT SECRETARY FLOW
+           CRITICAL MOBILE FIX: PERFECT SECRETARY FLOW
            ========================================================= */
         @media (max-width: 1024px) { 
-            .container { display: flex; flex-direction: column; padding: 15px; gap: 20px;} 
+            /* Force Flexbox to prevent iOS Safari Grid Collapse */
+            .container, .container.fluid-active { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                padding: 15px; 
+                gap: 20px;
+                width: 100%;
+                box-sizing: border-box;
+            } 
             
-            .sidebar { width: 100%; display: flex; flex-direction: column; gap: 20px; }
+            /* Stacking Order for Secretary */
+            .sidebar { 
+                width: 100%; 
+                display: flex; 
+                flex-direction: column; 
+                gap: 20px; 
+                min-width: 0;
+            }
             #webInboxCard { order: 1; margin-bottom: 0; }
             #addPtCard { order: 2; margin-bottom: 0; }
             #registryCard { order: 3; margin-bottom: 0; }
-            #sidebarDashItems { order: 4; display: flex; flex-direction: column; gap: 20px;}
+            /* Push everything else to the bottom */
+            #sidebarDashItems { 
+                order: 4; 
+                display: flex; 
+                flex-direction: column; 
+                gap: 20px;
+                min-width: 0;
+            }
             #bmiCard { order: 5; margin-bottom: 0; }
 
-            .content { display: none; width: 100%; }
+            .content { 
+                display: none; 
+                width: 100% !important; 
+                min-width: 0; /* Prevents flex blowout */
+                box-sizing: border-box;
+            }
             
-            .fluid-active .sidebar { display: none; }
-            .fluid-active .content { display: block; animation: slideInRight 0.3s ease; }
+            .fluid-active .sidebar { display: none !important; }
+            .fluid-active .content { 
+                display: block; 
+                animation: slideInRight 0.3s ease; 
+            }
             #backBtn { display: inline-block; }
             
             .card { margin-bottom: 0; } 
             
-            /* Prevent text squishing on mobile */
-            .pt-item, .health-widget, .web-req-item { word-break: break-word; }
             .mobile-stack { grid-template-columns: 1fr !important; gap: 15px !important; }
         } 
-        @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        @keyframes slideInRight { 
+            from { transform: translateX(20px); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
 
         /* =========================================================
            ACRYLIC CARDS & WIDGETS
@@ -174,14 +314,43 @@ this is the code : <!DOCTYPE html>
             box-shadow: var(--shadow); 
             border: 1px solid var(--border); 
             transition: var(--transition); 
+            min-width: 0; /* Prevents internal blowout */
+            box-sizing: border-box;
         }
-        .card:hover { box-shadow: var(--shadow-hover); }
-        @media (max-width: 768px) { .card { padding: 20px; border-radius: 20px; } }
+        .card:hover { 
+            box-shadow: var(--shadow-hover); 
+        }
+        @media (max-width: 768px) { 
+            .card { padding: 18px; border-radius: 18px; } 
+        }
         
-        h3 { color: var(--text); margin: 0 0 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
+        h3 { 
+            color: var(--text); 
+            margin: 0 0 20px 0; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 12px; 
+            font-size: 1.1em; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-weight: 700; 
+            letter-spacing: -0.3px; 
+        }
         
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 25px; align-items: start; }
-        .scroll-card { max-height: 280px; overflow-y: auto; padding-right: 10px; }
+        .dash-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
+            margin-bottom: 25px; 
+            align-items: start; 
+        }
+
+        .scroll-card { 
+            max-height: 280px; 
+            overflow-y: auto; 
+            padding-right: 10px; 
+        }
+
         .scroll-card::-webkit-scrollbar { width: 6px; }
         .scroll-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
@@ -200,9 +369,22 @@ this is the code : <!DOCTYPE html>
             color: var(--text); 
             transition: var(--transition); 
             font-family: inherit; 
+            max-width: 100%;
         }
-        input:focus, textarea:focus { border-color: var(--primary); background: transparent; outline: none; box-shadow: 0 0 0 4px var(--primary-glow); }
-        textarea { resize: none; overflow-y: hidden; min-height: 100px; line-height: 1.6; } 
+
+        input:focus, textarea:focus { 
+            border-color: var(--primary); 
+            background: transparent; 
+            outline: none; 
+            box-shadow: 0 0 0 4px var(--primary-glow); 
+        }
+
+        textarea { 
+            resize: none; 
+            overflow-y: hidden; 
+            min-height: 100px; 
+            line-height: 1.6; 
+        } 
         
         button { 
             width: 100%; 
@@ -216,23 +398,93 @@ this is the code : <!DOCTYPE html>
             cursor: pointer; 
             transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s; 
             box-shadow: 0 4px 15px var(--primary-glow); 
+            max-width: 100%;
         }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
-        button:active { transform: scale(0.96); }
+
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px var(--primary-glow); 
+        }
+
+        button:active { 
+            transform: scale(0.96); 
+        }
 
         /* iOS INLINE SEARCH BAR */
-        .ios-search-container { position: relative; margin-bottom: 15px; display: flex; gap: 8px; align-items: center; }
-        .ios-search-icon { position: absolute; left: 14px; top: 16px; font-size: 16px; opacity: 0.5; color: var(--text); }
-        .ios-search-input { margin: 0; padding-left: 40px; background: var(--secondary); border-radius: 14px; font-weight: 500; }
+        .ios-search-container { 
+            position: relative; 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+        }
+
+        .ios-search-icon { 
+            position: absolute; 
+            left: 14px; 
+            top: 16px; 
+            font-size: 16px; 
+            opacity: 0.5; 
+            color: var(--text); 
+        }
+
+        .ios-search-input { 
+            margin: 0; 
+            padding-left: 40px; 
+            background: var(--secondary); 
+            border-radius: 14px; 
+            font-weight: 500; 
+        }
+
         .ios-search-input:focus { background: var(--card-bg); }
         
-        .ios-date-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--secondary); border: 1px solid var(--border); border-radius: 14px; color: var(--text); box-shadow: none; margin: 0; flex-shrink: 0; cursor: pointer; transition:0.2s;}
-        .ios-date-btn:hover { background: var(--card-bg); }
+        /* Native iOS Date Picker Fix */
+        .ios-date-btn-wrapper { 
+            position: relative; 
+            width: 48px; 
+            height: 48px; 
+            flex-shrink: 0; 
+            border-radius: 14px; 
+            background: var(--secondary); 
+            border: 1px solid var(--border); 
+            overflow: hidden; 
+            transition: 0.2s;
+        }
+
+        .ios-date-btn-wrapper:hover { background: var(--card-bg); }
+
+        .ios-date-icon { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            pointer-events: none; 
+            color: var(--text); 
+        }
+
+        .ios-date-input { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; 
+            cursor: pointer; 
+            padding: 0; 
+            margin: 0; 
+            z-index: 10;
+        }
 
         /* =========================================================
            iOS CONTEXT MENUS
            ========================================================= */
         .context-menu { position: relative; display: inline-block; }
+        
         .context-dots { 
             font-size: 24px; 
             color: var(--text-light); 
@@ -247,7 +499,11 @@ this is the code : <!DOCTYPE html>
             justify-content: center;
             height: 30px;
         }
-        .context-dots:hover { background: var(--border); color: var(--text); }
+
+        .context-dots:hover { 
+            background: var(--border); 
+            color: var(--text); 
+        }
         
         .context-dropdown { 
             display: none; 
@@ -264,8 +520,16 @@ this is the code : <!DOCTYPE html>
             min-width: 140px; 
             flex-direction: column; 
         }
-        .context-menu:hover .context-dropdown { display: flex; animation: popMenu 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        @keyframes popMenu { from { opacity: 0; transform: scale(0.9) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .context-menu:hover .context-dropdown { 
+            display: flex; 
+            animation: popMenu 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
+        }
+
+        @keyframes popMenu { 
+            from { opacity: 0; transform: scale(0.9) translateY(-10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
         
         .context-dropdown button { 
             background: transparent; 
@@ -280,6 +544,7 @@ this is the code : <!DOCTYPE html>
             border-bottom: 1px solid var(--border); 
             margin: 0; 
         }
+
         .context-dropdown button:hover { background: var(--primary); color: white; }
         .context-dropdown button.danger-btn { color: var(--danger); border-bottom: none; }
         .context-dropdown button.danger-btn:hover { background: var(--danger); color: white; }
@@ -297,30 +562,61 @@ this is the code : <!DOCTYPE html>
             margin-bottom: 12px; 
             border: 1px solid var(--border); 
             transition: 0.2s; 
+            min-width: 0;
+            box-sizing: border-box;
         }
-        .health-widget:hover { background: var(--card-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transform: translateY(-1px); }
-        .health-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
-        .health-label { font-size: 12px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+
+        .health-widget:hover { 
+            background: var(--card-bg); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+            transform: translateY(-1px); 
+        }
+
+        .health-val { 
+            font-size: 20px; 
+            font-weight: 800; 
+            color: var(--text); 
+            letter-spacing: -0.5px; 
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .health-label { 
+            font-size: 12px; 
+            color: var(--text-light); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 4px; 
+            display: block; 
+        }
 
         /* =========================================================
            SPOTLIGHT SEARCH OVERLAY
            ========================================================= */
         #spotlightOverlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
             z-index: 2000; display: none; justify-content: center; align-items: flex-start; 
             padding-top: 15vh; opacity: 0; transition: opacity 0.3s; 
         }
+
         .spotlight-box { 
-            background: var(--card-bg); width: 650px; max-width: 90%; 
+            background: var(--card-bg); 
+            width: 650px; max-width: 90%; 
             border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
             overflow: hidden; transform: scale(0.95); transition: 0.3s; border: 1px solid var(--border); 
         }
+
         .spotlight-input { 
             width: 100%; border: none; border-bottom: 1px solid var(--border); 
             padding: 25px; font-size: 24px; border-radius: 0; background: transparent; 
             margin: 0; box-shadow: none; color: var(--text); 
         }
+
         .spotlight-input:focus { box-shadow: none; border-bottom: 1px solid var(--primary); }
 
         /* =========================================================
@@ -339,27 +635,80 @@ this is the code : <!DOCTYPE html>
         /* =========================================================
            REGISTRY LIST ITEMS
            ========================================================= */
-        .pt-item { padding: 18px; border-bottom: 1px solid transparent; cursor: pointer; background: transparent; border-radius: 20px; margin-bottom: 8px; transition: all 0.2s ease; position: relative; border: 1px solid var(--border); }
-        .pt-item:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .pt-item.active { background: var(--primary); color: white; box-shadow: 0 10px 25px var(--primary-glow); border-color: var(--primary); transform: translateY(-2px); }
-        .pt-meta { font-size: 12px; color: var(--text-light); display: block; margin-top: 6px; font-weight: 500; }
+        .pt-item { 
+            padding: 18px; 
+            border-bottom: 1px solid transparent; 
+            cursor: pointer; 
+            background: transparent; 
+            border-radius: 20px; 
+            margin-bottom: 8px; 
+            transition: all 0.2s ease; 
+            position: relative; 
+            border: 1px solid var(--border); 
+            min-width: 0; /* Prevents text blowout */
+            box-sizing: border-box;
+        }
+
+        .pt-item:hover { 
+            background: var(--secondary); 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+        }
+
+        .pt-item.active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 10px 25px var(--primary-glow); 
+            border-color: var(--primary); 
+            transform: translateY(-2px); 
+        }
+
+        .pt-meta { 
+            font-size: 12px; 
+            color: var(--text-light); 
+            display: block; 
+            margin-top: 6px; 
+            font-weight: 500; 
+            word-break: break-word;
+        }
+
         .pt-item.active .pt-meta { color: rgba(255,255,255,0.8); }
         .pt-controls { position: absolute; right: 12px; top: 18px; display: flex; gap: 5px; align-items: center; }
 
         /* =========================================================
-           MISC UI TWEAKS
+           CRITICAL FIX: EDITABLE TEXT FIELDS (Fixes Longitudinal Bug)
            ========================================================= */
         .section-title { font-size: 12px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
-        [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
+        
+        [contenteditable="true"] { 
+            transition: 0.2s; 
+            border-bottom: 1px dashed transparent; 
+            display: block; 
+            width: 100%; 
+            min-width: 100%; /* Force width on iOS */
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: var(--secondary); border-radius: 8px; box-shadow: 0 0 0 3px var(--primary-glow); padding: 4px 8px; }
 
         /* Web Request Inbox Styles */
-        .web-req-item { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 20px; margin-bottom: 12px; box-shadow: var(--shadow); }
+        .web-req-item { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            padding: 18px; 
+            border-radius: 20px; 
+            margin-bottom: 12px; 
+            box-shadow: var(--shadow); 
+            min-width: 0;
+        }
         .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .web-req-actions button { padding: 12px; font-size: 14px; border-radius: 12px; }
 
         .lab-tag-box { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; background: var(--secondary); padding: 15px; border-radius: 16px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); }
+        
         .lab-btn { background: var(--card-bg); border: 1px solid var(--lab); color: var(--lab); padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .lab-btn:hover { background: var(--lab); color: white; transform: scale(1.03); }
         
@@ -391,6 +740,9 @@ this is the code : <!DOCTYPE html>
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; color: var(--text); }
 
+        /* =========================================================
+           LOGIN & TOASTS
+           ========================================================= */
         .login-box { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #000000, #1c1c1e); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s ease, visibility 0.5s; }
         .login-box.fade-out { opacity: 0; visibility: hidden; }
         .login-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 50px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
@@ -464,15 +816,20 @@ this is the code : <!DOCTYPE html>
                 <span class="ios-search-icon">🔍</span>
                 <input type="text" id="searchBox" class="ios-search-input" placeholder="Search Name or C/O..." oninput="renderList()">
                 
-                <button class="ios-date-btn" onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()">📅</button>
-                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute; top:-9999px; left:-9999px; width:0; height:0; opacity:0;">
+                <div class="ios-date-btn-wrapper">
+                    <span class="ios-date-icon">📅</span>
+                    <input type="date" id="searchDate" class="ios-date-input" onchange="renderList()">
+                </div>
             </div>
             
             <div id="patientList" style="max-height:55vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
         </div>
 
         <div id="sidebarDashItems">
-            <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
+            <div class="card">
+                <h3>🔔 Reminders</h3>
+                <div id="remList" class="scroll-card"></div>
+            </div>
             
             <div class="card" style="border-color: rgba(255,59,48,0.2);">
                 <h3 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -490,21 +847,22 @@ this is the code : <!DOCTYPE html>
                 </div>
             </div>
             
-            <div class="card"><h3>📅 Operations</h3>
+            <div class="card">
+                <h3>📅 Operations</h3>
                 <div class="table-responsive">
                     <div id="opCalendar" class="scroll-card" style="color: var(--text);">No surgeries scheduled.</div>
                 </div>
             </div>
-        </div>
 
-        <div class="card" id="bmiCard" style="background:var(--secondary); border: 1px solid var(--border);">
-            <h3>BMI Calculator</h3>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <input type="number" id="bmiW" placeholder="Wt (kg)" oninput="calcBMI()"><input type="number" id="bmiH" placeholder="Ht (cm)" oninput="calcBMI()">
+            <div class="card" id="bmiCard" style="background:var(--secondary); border: 1px solid var(--border);">
+                <h3>BMI Calculator</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <input type="number" id="bmiW" placeholder="Wt (kg)" oninput="calcBMI()">
+                    <input type="number" id="bmiH" placeholder="Ht (cm)" oninput="calcBMI()">
+                </div>
+                <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.8em; color:var(--primary);">--</div>
             </div>
-            <div id="bmiRes" style="font-weight:bold; text-align:center; padding:10px 5px 0 5px; font-size:1.8em; color:var(--primary);">--</div>
         </div>
-
     </div>
 
     <div class="content">
@@ -528,25 +886,25 @@ this is the code : <!DOCTYPE html>
             </div>
 
             <div id="actualData">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px;">
-                    <div style="width: 100%;">
-                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 36px; font-weight: 800; letter-spacing: -1px; padding:5px 10px; border-radius:12px;"></h2>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; width: 100%;">
+                    <div style="width: 100%; min-width: 0;">
+                        <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--text); margin:0; font-size: 32px; font-weight: 800; letter-spacing: -1px; padding:5px 10px; border-radius:12px; display: block; width: 100%; box-sizing: border-box;"></h2>
                         <div id="waArea" style="margin-top:8px; padding-left: 10px;"></div>
                     </div>
                     <div id="syncIndicator" style="font-size:12px; color:var(--success); font-weight:bold; display:none; padding:8px 16px; white-space: nowrap; background: rgba(52, 199, 89, 0.1); border-radius: 20px; height: 20px; align-items: center;">● SAVING</div>
                 </div>
 
-                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:18px; border-radius:16px; margin-bottom:25px; color:var(--warning); font-weight:bold; font-size:15px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1);"></div>
+                <div id="activeReminderBanner" style="display:none; background:rgba(255, 149, 0, 0.1); border: 1px solid var(--warning); padding:18px; border-radius:16px; margin-bottom:25px; color:var(--warning); font-weight:bold; font-size:15px; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1); word-break: break-word;"></div>
 
                 <div class="card" style="background:var(--secondary); padding:25px; border-radius:20px; margin-bottom:25px; border: 1px solid var(--border);">
                     <span class="section-title" style="color:var(--warning);">Chief Complaint (Click to edit)</span>
-                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:20px; display:block; padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); color: var(--text);"></span>
+                    <span id="viewComplaint" contenteditable="true" onblur="updateComplaint(this)" style="font-weight:700; font-size:20px; display:block; padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); color: var(--text); width: 100%; box-sizing: border-box;"></span>
                 </div>
 
                 <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1.5fr; gap:25px; margin-bottom:25px;">
                     <div class="card" style="margin:0;">
                         <span class="section-title">Patient Bio</span>
-                        <p id="viewContact" style="font-weight:600; margin:10px 0 0 0; font-size: 16px; color: var(--text);"></p>
+                        <p id="viewContact" style="font-weight:600; margin:10px 0 0 0; font-size: 16px; color: var(--text); word-break: break-word; white-space: pre-wrap;"></p>
                         <span style="font-size:14px; color:var(--primary); display:block; margin-top:15px; font-weight:bold; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> ✎</span>
                     </div>
                     <div class="card" style="margin:0; padding: 25px;">
@@ -572,18 +930,18 @@ this is the code : <!DOCTYPE html>
 
                 <div class="card">
                     <span class="section-title">CLINICAL HISTORY</span>
-                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px;"></textarea>
+                    <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%;"></textarea>
                 </div>
                 
                 <div class="card">
                     <span class="section-title">MANAGEMENT (Mx)</span>
-                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px;"></textarea>
+                    <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)" style="background: transparent; border: none; border-bottom: 1px dashed var(--border); border-radius: 0; padding: 15px 0; font-size: 16px; width: 100%; box-sizing: border-box; max-width: 100%;"></textarea>
                 </div>
 
                 <div class="card" style="background:var(--secondary);">
                     <span class="section-title" style="color:var(--primary);">📋 AI SURGICAL REFERRAL ENGINE</span>
                     <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
-                    <div id="referralResult" class="ai-box" style="display:none;" contenteditable="true"></div>
+                    <div id="referralResult" class="ai-box" style="display:none;" contenteditable="true" style="width: 100%; box-sizing: border-box;"></div>
                 </div>
 
                 <div class="card" style="border-left:6px solid var(--danger);">
@@ -649,9 +1007,13 @@ this is the code : <!DOCTYPE html>
         
         document.getElementById('dateDisplay').innerText = `${dateStr} • ${timeStr}`;
     }
-    setInterval(updateClock, 10000); updateClock();
+    
+    setInterval(updateClock, 10000); 
+    updateClock();
 
-    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    function toggleDarkMode() { 
+        document.body.classList.toggle('dark-mode'); 
+    }
 
     document.addEventListener('keydown', e => {
         if((e.metaKey || e.ctrlKey) && e.key === 'k') { 
@@ -663,15 +1025,25 @@ this is the code : <!DOCTYPE html>
     function openSpotlight() {
         const ov = document.getElementById('spotlightOverlay');
         ov.style.display = 'flex';
-        setTimeout(() => { ov.style.opacity = '1'; document.getElementById('spotlightInput').focus(); }, 10);
+        setTimeout(() => { 
+            ov.style.opacity = '1'; 
+            document.getElementById('spotlightInput').focus(); 
+        }, 10);
     }
+    
     function closeSpotlight() {
         const ov = document.getElementById('spotlightOverlay');
         ov.style.opacity = '0';
-        setTimeout(() => { ov.style.display = 'none'; document.getElementById('spotlightInput').value = ''; }, 300);
+        setTimeout(() => { 
+            ov.style.display = 'none'; 
+            document.getElementById('spotlightInput').value = ''; 
+        }, 300);
     }
 
-    function openFluidView() { document.getElementById('mainContent').classList.add('fluid-active'); }
+    function openFluidView() { 
+        document.getElementById('mainContent').classList.add('fluid-active'); 
+    }
+    
     function closeFluidView() { 
         document.getElementById('mainContent').classList.remove('fluid-active'); 
         activeId = null; 
@@ -693,6 +1065,7 @@ this is the code : <!DOCTYPE html>
         appId: "1:216860298716:web:6f2e31e3267f8d1487d319",
         measurementId: "G-3DBY6CC5HD"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
@@ -843,12 +1216,12 @@ this is the code : <!DOCTYPE html>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; align-items:center; gap: 10px;">
                                 <div class="notif-icon" style="background:rgba(255,149,0,0.1); color:var(--warning);">🌐</div>
-                                <b style="font-size:16px; color:var(--text);">${req.name}</b>
+                                <b style="font-size:16px; color:var(--text); word-break: break-word;">${req.name}</b>
                             </div>
                             <span style="font-size:12px; color:var(--text-light); font-weight:600;">Age: ${req.age || '--'}</span>
                         </div>
                         <div style="font-size:14px; color:var(--text); margin-top:10px; font-weight: 500;">📞 ${req.phone}</div>
-                        <div style="font-size:14px; font-style:italic; background:var(--secondary); padding:12px; border-radius:12px; margin-top:10px; color:var(--text); border: 1px solid var(--border);">
+                        <div style="font-size:14px; font-style:italic; background:var(--secondary); padding:12px; border-radius:12px; margin-top:10px; color:var(--text); border: 1px solid var(--border); word-break: break-word; white-space: pre-wrap;">
                             "${req.symptom}" <br><span style="color:var(--danger); font-size:12px; font-style:normal; font-weight:600; display:block; margin-top:4px;">(${req.duration})</span>
                         </div>
                         <div class="web-req-actions">
@@ -1014,7 +1387,7 @@ this is the code : <!DOCTYPE html>
                 overdueHtml += `
                     <div class="overdue-item" onclick="loadFullData('${data.id}')">
                         <div>
-                            <b style="color:var(--text); font-size: 16px;">${data.p.name}</b><br>
+                            <b style="color:var(--text); font-size: 16px; word-break: break-word;">${data.p.name}</b><br>
                             <span style="font-size:12px; color:var(--text-light);">${data.days} days since last visit (${data.lastV})</span>
                         </div>
                         <span style="font-size:18px;">🔴</span>
@@ -1320,8 +1693,18 @@ this is the code : <!DOCTYPE html>
             db.ref('globalLabs/'+safeKey).update({ r: nR, u: nU });
         }
     }
-    function deleteFullLab(safeKey) { if(confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/'+activeId+'/labs/'+safeKey).remove(); }
-    function deleteLabEntry(safeKey, idx) { if(confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[safeKey].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h); } }
+    
+    function deleteFullLab(safeKey) { 
+        if(confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/'+activeId+'/labs/'+safeKey).remove(); 
+    }
+    
+    function deleteLabEntry(safeKey, idx) { 
+        if(confirm("Delete this entry?")) { 
+            const h = ptDetails[activeId].labs[safeKey].history; 
+            h.splice(idx,1); 
+            db.ref('patientDetails/'+activeId+'/labs/'+safeKey+'/history').set(h); 
+        } 
+    }
 
     function genImagingTags() {
         const grid = document.getElementById('imagingSelector'); grid.innerHTML = '';
@@ -1359,7 +1742,7 @@ this is the code : <!DOCTYPE html>
                                 </div>
                             </div>
                         </div>
-                        <div style="font-size:16px; color:var(--text); line-height:1.5;">Dx/Report: <b style="color:var(--img);">${h.val}</b></div>
+                        <div style="font-size:16px; color:var(--text); line-height:1.5; word-break: break-word;">Dx/Report: <b style="color:var(--img);">${h.val}</b></div>
                     </div>`;
             });
             
@@ -1400,20 +1783,37 @@ this is the code : <!DOCTYPE html>
             db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h);
         }
     }
-    function deleteFullImg(key) { if(confirm("Delete this entire imaging modality?")) db.ref('patientDetails/'+activeId+'/imaging/'+key).remove(); }
-    function deleteImgEntry(key, idx) { if(confirm("Delete this report?")) { const h = ptDetails[activeId].imaging[key].history; h.splice(idx,1); db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h); } }
+    
+    function deleteFullImg(key) { 
+        if(confirm("Delete this entire imaging modality?")) db.ref('patientDetails/'+activeId+'/imaging/'+key).remove(); 
+    }
+    
+    function deleteImgEntry(key, idx) { 
+        if(confirm("Delete this report?")) { 
+            const h = ptDetails[activeId].imaging[key].history; 
+            h.splice(idx,1); 
+            db.ref('patientDetails/'+activeId+'/imaging/'+key+'/history').set(h); 
+        } 
+    }
 
     function addVital() {
-        const w = document.getElementById('vW').value; const bp = document.getElementById('vBP').value; const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
+        const w = document.getElementById('vW').value; 
+        const bp = document.getElementById('vBP').value; 
+        const dt = document.getElementById('vVDt').value || new Date().toLocaleDateString('en-GB');
+        
         if(!w && !bp) return;
+        
         const vits = ptDetails[activeId].vitals || [];
         vits.push({ w, bp, dt });
         db.ref('patientDetails/'+activeId+'/vitals').set(vits);
-        document.getElementById('vW').value=''; document.getElementById('vBP').value='';
+        
+        document.getElementById('vW').value=''; 
+        document.getElementById('vBP').value='';
     }
 
     function renderVitals(vits) {
-        const list = document.getElementById('vitalList'); list.innerHTML = '';
+        const list = document.getElementById('vitalList'); 
+        list.innerHTML = '';
         
         let wSparkHtml = '';
         if(vits && vits.length > 1) {
@@ -1463,26 +1863,36 @@ this is the code : <!DOCTYPE html>
         }
     }
 
-    function deleteVital(idx) { if(confirm("Delete vitals?")) { const v = ptDetails[activeId].vitals; v.splice(idx,1); db.ref('patientDetails/'+activeId+'/vitals').set(v); } }
+    function deleteVital(idx) { 
+        if(confirm("Delete vitals?")) { 
+            const v = ptDetails[activeId].vitals; 
+            v.splice(idx,1); 
+            db.ref('patientDetails/'+activeId+'/vitals').set(v); 
+        } 
+    }
 
     function archiveSurgery() {
-        const d = document.getElementById('vOpDate').value; const t = document.getElementById('vOpDetail').value;
+        const d = document.getElementById('vOpDate').value; 
+        const t = document.getElementById('vOpDetail').value;
         if(!d || !t) return;
         const hist = ptDetails[activeId].surgicalHistory || [];
         hist.push({ d, t });
         db.ref('patientDetails/'+activeId+'/surgicalHistory').set(hist);
-        document.getElementById('vOpDate').value=''; document.getElementById('vOpDetail').value='';
+        
+        document.getElementById('vOpDate').value=''; 
+        document.getElementById('vOpDetail').value='';
     }
 
     function renderOpHistory(hist) {
-        const list = document.getElementById('opHistoryList'); list.innerHTML = '';
+        const list = document.getElementById('opHistoryList'); 
+        list.innerHTML = '';
         if(hist.length === 0) list.innerHTML = '<span style="color:var(--text-light); font-size:14px;">No procedures recorded.</span>';
         hist.slice().reverse().forEach(h => {
             list.innerHTML += `
                 <div class="health-widget" style="border-left: 6px solid var(--danger);">
                     <div>
                         <span class="health-label">📅 ${h.d}</span>
-                        <span class="health-val">${h.t}</span>
+                        <span class="health-val" style="word-break: break-word;">${h.t}</span>
                     </div>
                 </div>`;
         });
@@ -1530,8 +1940,8 @@ this is the code : <!DOCTYPE html>
                 
                 list.innerHTML += `
                     <div id="${fromSpotlight?'sp':'pt'}-${id}" class="pt-item ${(activeId == id && !fromSpotlight) ? 'active' : ''}" onclick="loadFullData('${id}')">
-                        <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
-                        <span class="pt-meta">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
+                        <strong style="font-size:16px; word-break: break-word;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
+                        <span class="pt-meta" style="word-break: break-word;">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
                         ${!fromSpotlight ? `
                         <div class="pt-controls" onclick="event.stopPropagation();">
                             <span class="btn-pin-pt ${pinClass}" style="font-size:20px;" onclick="togglePin('${id}', ${!!p.pinned})">${pinIcon}</span>
@@ -1566,16 +1976,17 @@ this is the code : <!DOCTYPE html>
     }
 
     function renderRems() {
-        const list = document.getElementById('remList'); list.innerHTML = '';
+        const list = document.getElementById('remList'); 
+        list.innerHTML = '';
         Object.keys(allReminders).filter(id => allReminders[id].status === 'pending').sort((a,b) => new Date(allReminders[a].date) - new Date(allReminders[b].date)).forEach(id => {
             const r = allReminders[id]; 
             const targetId = r.ptId || r.patientId; 
             list.innerHTML += `
                 <div class="apple-notification" onclick="loadFullData('${targetId}')">
                     <div class="notif-icon" style="background:rgba(0,122,255,0.1); color:var(--primary);">📅</div>
-                    <div style="flex-grow:1;">
-                        <b style="font-size:15px; display:block; color:var(--text);">${r.date}</b>
-                        <span style="font-size:14px; color:var(--text-light); font-weight:500;">${r.text}</span>
+                    <div style="flex-grow:1; min-width:0;">
+                        <b style="font-size:15px; display:block; color:var(--text); word-break: break-word;">${r.date}</b>
+                        <span style="font-size:14px; color:var(--text-light); font-weight:500; word-break: break-word;">${r.text}</span>
                     </div>
                     <button style="width:auto; padding:8px 15px; font-size:13px; border-radius:12px; background:var(--success); box-shadow:none;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">Done</button>
                 </div>`;
@@ -1587,10 +1998,10 @@ this is the code : <!DOCTYPE html>
         const cal = document.getElementById('opCalendar'); const today = new Date(); let rows = "";
         Object.keys(ptIdx).forEach(id => {
             const d = ptDetails[id] || {}; if(d.opD && new Date(d.opD) >= today) {
-                rows += `<tr><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text-light); font-weight:600;">${d.opD}</td><td style="padding:12px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary); font-size:15px;">${ptIdx[id].name}</b></td><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text); font-weight:500;">${d.opT}</td></tr>`;
+                rows += `<tr><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text-light); font-weight:600;">${d.opD}</td><td style="padding:12px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary); font-size:15px; word-break: break-word;">${ptIdx[id].name}</b></td><td style="padding:12px; border-bottom:1px solid var(--border); color:var(--text); font-weight:500; word-break: break-word;">${d.opT}</td></tr>`;
             }
         });
-        cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;"><tr><th style="padding-bottom:10px; color:var(--text);">Date</th><th style="padding-bottom:10px; color:var(--text);">Patient</th><th style="padding-bottom:10px; color:var(--text);">Procedure</th></tr>${rows}</table>` : "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px;'>No upcoming surgeries.</p>";
+        cal.innerHTML = rows ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse; table-layout: fixed;"><tr><th style="padding-bottom:10px; color:var(--text); width:30%;">Date</th><th style="padding-bottom:10px; color:var(--text); width:40%;">Patient</th><th style="padding-bottom:10px; color:var(--text); width:30%;">Procedure</th></tr>${rows}</table>` : "<p style='color:var(--text-light); padding:10px; text-align:center; font-size:14px;'>No upcoming surgeries.</p>";
     }
 
     function autoSyncTrigger() { 
@@ -1617,9 +2028,36 @@ this is the code : <!DOCTYPE html>
     }
 
     function manualSync() { saveAll(true); }
-    function deletePt(id) { if(confirm("Permanently delete this patient?")) { db.ref('patientIndex/'+id).remove(); db.ref('patientDetails/'+id).remove(); if(activeId===id) { document.getElementById('fileView').style.display='none'; document.getElementById('emptyState').style.display='block'; closeFluidView(); } } }
-    function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
-    function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
+    
+    function deletePt(id) { 
+        if(confirm("Permanently delete this patient?")) { 
+            db.ref('patientIndex/'+id).remove(); 
+            db.ref('patientDetails/'+id).remove(); 
+            if(activeId===id) { 
+                document.getElementById('fileView').style.display='none'; 
+                document.getElementById('emptyState').style.display='block'; 
+                closeFluidView(); 
+            } 
+        } 
+    }
+    
+    function updatePatientName(el) { 
+        if(activeId) { 
+            const n = el.innerText.trim(); 
+            db.ref('patientIndex/'+activeId).update({ name:n }); 
+            db.ref('patientDetails/'+activeId).update({ name:n }); 
+        } 
+    }
+    
+    function calcBMI() { 
+        const w = document.getElementById('bmiW').value; 
+        const h = document.getElementById('bmiH').value / 100; 
+        if(w && h) { 
+            document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); 
+        } else { 
+            document.getElementById('bmiRes').innerText = '--'; 
+        } 
+    }
 </script>
 </body>
 </html>
