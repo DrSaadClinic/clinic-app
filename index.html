@@ -90,16 +90,13 @@
         .os-greeting p { margin: 2px 0 0 0; font-size: 0.8em; color: var(--text-light); font-weight: 500; }
         
         .header-actions { display: flex; gap: 12px; align-items: center; }
-        .spotlight-btn { background: var(--secondary); color: var(--text-light); border: 1px solid var(--border); padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: none; width: auto; margin: 0; }
-        .spotlight-btn:hover { background: var(--card-bg); color: var(--text); border-color: var(--primary); }
-        
         .dark-btn { background: var(--secondary); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0; padding: 0; box-shadow: none; color: var(--text); }
         .dark-btn:hover { transform: scale(1.05); background: var(--card-bg); }
 
         .logo-large { width: 100px; height: 100px; border-radius: 50%; background: white; margin-bottom: 20px; border: 4px solid rgba(255,255,255,0.2); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         /* =========================================================
-           FLUID SPLIT-VIEW ARCHITECTURE (iPad Pro Style)
+           FLUID SPLIT-VIEW ARCHITECTURE (iPad Pro / Mobile Style)
            ========================================================= */
         .container { 
             max-width: 1600px; 
@@ -144,15 +141,27 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
         }
-        .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.5s ease; }
         
+        .container.fluid-active #backBtn { display: inline-block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* MOBILE FIX: Perfect Stacking UI */
         @media (max-width: 1024px) { 
-            .container { grid-template-columns: 1fr; padding: 15px; } 
-            .sidebar { width: 100%; }
-            .content { display: none; }
-            .container.fluid-active .content { display: block; animation: slideInRight 0.3s ease; }
+            .container { display: flex; flex-direction: column; padding: 15px; } 
+            
+            /* Swap order on mobile so Dashboard items show first, then Sidebar registry */
+            .content { order: 1; width: 100%; display: block; }
+            .sidebar { order: 2; width: 100%; display: block; }
+            
+            /* Hide the file view & empty state until patient is clicked */
+            #emptyState { display: none !important; }
+            #fileView { display: none; }
+            
+            /* When Patient is Clicked on Mobile */
+            .fluid-active .sidebar { display: none; }
+            .fluid-active #topDashGrid { display: none; }
+            .fluid-active #fileView { display: block; animation: slideInRight 0.3s ease; }
+            
             #backBtn { display: inline-block; }
         } 
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -172,6 +181,7 @@
             transition: var(--transition); 
         }
         .card:hover { box-shadow: var(--shadow-hover); }
+        @media (max-width: 768px) { .card { padding: 18px; border-radius: 18px; } }
         
         h3 { color: var(--text); margin: 0 0 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; font-weight: 700; letter-spacing: -0.3px; }
         
@@ -214,6 +224,13 @@
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
         button:active { transform: scale(0.96); }
+
+        /* iOS INLINE SEARCH BAR */
+        .ios-search-container { position: relative; margin-bottom: 15px; display: flex; gap: 8px; align-items: center; }
+        .ios-search-icon { position: absolute; left: 14px; top: 16px; font-size: 16px; opacity: 0.5; color: var(--text); }
+        .ios-search-input { margin: 0; padding-left: 40px; background: var(--secondary); border-radius: 14px; font-weight: 500; }
+        .ios-search-input:focus { background: var(--card-bg); }
+        .ios-date-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--secondary); border: 1px solid var(--border); border-radius: 14px; color: var(--text); box-shadow: none; margin: 0; flex-shrink: 0; }
 
         /* =========================================================
            iOS CONTEXT MENUS (Replacing Edit/Delete text)
@@ -289,27 +306,6 @@
         .health-label { font-size: 12px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
 
         /* =========================================================
-           SPOTLIGHT SEARCH OVERLAY
-           ========================================================= */
-        #spotlightOverlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-            z-index: 2000; display: none; justify-content: center; align-items: flex-start; 
-            padding-top: 15vh; opacity: 0; transition: opacity 0.3s; 
-        }
-        .spotlight-box { 
-            background: var(--card-bg); width: 650px; max-width: 90%; 
-            border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
-            overflow: hidden; transform: scale(0.95); transition: 0.3s; border: 1px solid var(--border); 
-        }
-        .spotlight-input { 
-            width: 100%; border: none; border-bottom: 1px solid var(--border); 
-            padding: 25px; font-size: 24px; border-radius: 0; background: transparent; 
-            margin: 0; box-shadow: none; color: var(--text); 
-        }
-        .spotlight-input:focus { box-shadow: none; border-bottom: 1px solid var(--primary); }
-
-        /* =========================================================
            SKELETON LOADING
            ========================================================= */
         .skeleton-wrapper { display: none; }
@@ -366,8 +362,9 @@
         .spark-bar:hover { opacity: 1; transform: scaleY(1.15); }
         .spark-bar.red { background: var(--danger); }
 
-        .rem-item { background: rgba(255, 149, 0, 0.1); border-left: 6px solid var(--warning); padding: 18px; border-radius: 14px; margin-bottom: 12px; cursor: pointer; transition: transform 0.1s; font-size: 15px; line-height: 1.4; color: var(--text); border: 1px solid var(--border); }
-        .rem-item:active { transform: scale(0.98); }
+        .apple-notification { background: var(--glass); border: 1px solid var(--border); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; gap: 15px; align-items: flex-start; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+        .apple-notification:hover { transform: scale(1.02); background: var(--card-bg); }
+        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: var(--secondary); }
         
         .overdue-item { background: rgba(255, 59, 48, 0.05); border-left: 6px solid var(--danger); padding: 16px; border-radius: 14px; margin-bottom: 10px; cursor: pointer; font-size: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; color: var(--text); border: 1px solid var(--border); }
         .overdue-item:hover { background: rgba(255, 59, 48, 0.1); transform: translateX(2px); }
@@ -383,6 +380,10 @@
         .toast { position: fixed; top: -100px; right: 20px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); padding: 18px 25px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); font-weight: bold; z-index: 9999; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 15px; border: 1px solid var(--border); }
         .toast.show { top: 25px; }
 
+        @media (max-width: 768px) {
+            .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .toast { left: 10px; right: 10px; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -397,13 +398,6 @@
     </div>
 </div>
 
-<div id="spotlightOverlay" onclick="if(event.target===this) closeSpotlight()">
-    <div class="spotlight-box">
-        <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Search patients, complaints, dates..." oninput="renderList(true)">
-        <div id="spotlightResults" style="max-height: 400px; overflow-y: auto; padding: 10px;"></div>
-    </div>
-</div>
-
 <div id="liveToast" class="toast">🔔 Notification</div>
 
 <header>
@@ -415,12 +409,12 @@
         </div>
     </div>
     <div class="header-actions">
-        <button class="spotlight-btn" onclick="openSpotlight()">🔍 <span>Search (Cmd+K)</span></button>
         <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
     </div>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
+    
     <div class="sidebar">
         
         <div class="card" id="webInboxCard" style="display:none; background: rgba(255, 149, 0, 0.05); border: 1px solid var(--warning);">
@@ -450,12 +444,14 @@
         <div class="card" style="background: transparent; border: none; box-shadow: none; padding: 0;">
             <h3 style="padding: 0 10px;">Registry <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:12px; font-weight: bold;">0</span></h3>
             
-            <div style="display:none;">
-                <input type="text" id="searchBox" placeholder="🔍 Search Name or C/O..." oninput="renderList()" style="margin:0; border-radius: 10px;">
-                <input type="date" id="searchDate" onchange="renderList()">
+            <div class="ios-search-container">
+                <span class="ios-search-icon">🔍</span>
+                <input type="text" id="searchBox" class="ios-search-input" placeholder="Search Name or C/O... (Cmd+K)" oninput="renderList()">
+                <button class="ios-date-btn" onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()">📅</button>
+                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute; top:-9999px; left:-9999px; width:0; height:0; opacity:0;">
             </div>
             
-            <div id="patientList" style="max-height:60vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
+            <div id="patientList" style="max-height:55vh; overflow-y:auto; margin-top:5px; padding-right:5px;"></div>
         </div>
     </div>
 
@@ -608,7 +604,7 @@
 
 <script>
     // =====================================================================
-    // OS UI ENGINE (Time, Dark Mode, Spotlight, Fluid View)
+    // OS UI ENGINE (Time, Dark Mode, Search Focus, Fluid View)
     // =====================================================================
     function updateClock() {
         const now = new Date();
@@ -618,26 +614,25 @@
         else if(hr < 17) greeting = "Good Afternoon";
         
         document.getElementById('timeGreeting').innerText = `${greeting}, Dr. Saad`;
-        const options = { weekday: 'long', month: 'long', day: 'numeric' };
-        document.getElementById('dateDisplay').innerText = now.toLocaleDateString('en-US', options);
+        
+        const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+        const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+        const dateStr = now.toLocaleDateString('en-US', dateOptions);
+        const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+        
+        document.getElementById('dateDisplay').innerText = `${dateStr} • ${timeStr}`;
     }
-    setInterval(updateClock, 60000); updateClock();
+    setInterval(updateClock, 10000); updateClock();
 
     function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
+    // Bind Cmd+K to inline search box
     document.addEventListener('keydown', e => {
-        if((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSpotlight(); }
+        if((e.metaKey || e.ctrlKey) && e.key === 'k') { 
+            e.preventDefault(); 
+            document.getElementById('searchBox').focus(); 
+        }
     });
-    function openSpotlight() {
-        const ov = document.getElementById('spotlightOverlay');
-        ov.style.display = 'flex';
-        setTimeout(() => { ov.style.opacity = '1'; document.getElementById('spotlightInput').focus(); }, 10);
-    }
-    function closeSpotlight() {
-        const ov = document.getElementById('spotlightOverlay');
-        ov.style.opacity = '0';
-        setTimeout(() => { ov.style.display = 'none'; document.getElementById('spotlightInput').value = ''; }, 300);
-    }
 
     function openFluidView() { document.getElementById('mainContent').classList.add('fluid-active'); }
     function closeFluidView() { 
@@ -880,11 +875,9 @@
         
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
         if(document.getElementById('pt-'+id)) document.getElementById('pt-'+id).classList.add('active');
-        if(document.getElementById('sp-'+id)) document.getElementById('sp-'+id).classList.add('active');
 
         checkActiveReminderBanner();
         openFluidView();
-        closeSpotlight();
 
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('fileView').style.display = 'block';
@@ -1458,13 +1451,13 @@
         });
     }
 
-    function renderList(fromSpotlight = false) {
-        const list = fromSpotlight ? document.getElementById('spotlightResults') : document.getElementById('patientList'); 
-        const qText = (fromSpotlight ? document.getElementById('spotlightInput') : document.getElementById('searchBox')).value.toLowerCase(); 
+    function renderList() {
+        const list = document.getElementById('patientList'); 
+        const qText = document.getElementById('searchBox').value.toLowerCase(); 
         
         const qDate = document.getElementById('searchDate').value; 
         let formattedQDate = "";
-        if(qDate && !fromSpotlight) {
+        if(qDate) {
             const [y, m, d] = qDate.split('-');
             formattedQDate = `${d}/${m}/${y}`; 
         }
@@ -1499,10 +1492,9 @@
                 const pinClass = p.pinned ? 'pinned' : '';
                 
                 list.innerHTML += `
-                    <div id="${fromSpotlight?'sp':'pt'}-${id}" class="pt-item ${(activeId == id && !fromSpotlight) ? 'active' : ''}" onclick="loadFullData('${id}')">
+                    <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
                         <strong style="font-size:16px;">${p.name}</strong>${p.isWaiting?' <span style="background:var(--waiting); color:white; padding:3px 6px; border-radius:6px; font-size:10px; margin-left:5px;">WAITING</span>':''}${p.hasPendingLab?' 🧪':''}${alertBadge}
                         <span class="pt-meta">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last Visit: ${lastVisit}</span>
-                        ${!fromSpotlight ? `
                         <div class="pt-controls" onclick="event.stopPropagation();">
                             <span class="btn-pin-pt ${pinClass}" style="font-size:20px;" onclick="togglePin('${id}', ${!!p.pinned})">${pinIcon}</span>
                             <div class="context-menu">
@@ -1511,11 +1503,11 @@
                                     <button class="danger-btn" onclick="deletePt('${id}')">Delete Patient</button>
                                 </div>
                             </div>
-                        </div>` : ''}
+                        </div>
                     </div>`;
             }
         });
-        if(!fromSpotlight) document.getElementById('waitCounter').innerText = Object.values(ptIdx).filter(x => x.isWaiting).length;
+        document.getElementById('waitCounter').innerText = Object.values(ptIdx).filter(x => x.isWaiting).length;
     }
 
     function addPatient() {
