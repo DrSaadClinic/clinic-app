@@ -1173,7 +1173,7 @@
     function updatePatientName(el) { if(activeId) { const n = el.innerText.trim(); db.ref('patientIndex/'+activeId).update({ name:n }); db.ref('patientDetails/'+activeId).update({ name:n }); } }
     function calcBMI() { const w = document.getElementById('bmiW').value; const h = document.getElementById('bmiH').value / 100; if(w && h) { document.getElementById('bmiRes').innerText = (w / (h*h)).toFixed(1); } else { document.getElementById('bmiRes').innerText = '--'; } }
 </script>
-    
+    <script>
     // 1. Instantly bypass login if the browser remembers you
     window.addEventListener('DOMContentLoaded', function() {
         if(localStorage.getItem('saadAuth') === 'true') {
@@ -1194,5 +1194,6 @@
         });
     }
 </script>
+
 </body>
 </html>
