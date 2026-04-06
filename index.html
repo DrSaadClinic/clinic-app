@@ -700,15 +700,32 @@
 
         <!-- Dashboard Row -->
         <div class="dash-grid">
-            <!-- Lab Referral Tracker Card -->
-            <div class="card" style="border-left: 5px solid var(--lab);">
-                <h3 style="color:var(--lab); border:none; margin-bottom:5px;">
-                    🧪 Lab Referral Stats
-                    <button class="action-btn" style="background:var(--lab); color:white; padding:4px 12px;" onclick="calculateLabStats()">Load Stats</button>
-                </h3>
-                <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span></div>
+            <!-- Advanced Lab Referral Tracker -->
+            <div class="card" style="border-left: 5px solid var(--lab); grid-column: span 1;">
+                <h3 style="color:var(--lab); border:none; margin-bottom:10px;">🧪 Lab Referral Stats</h3>
+                
+                <!-- Date Filters -->
+                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">FILTER BY DATE</label>
+                    <select id="labFilterType" onchange="toggleLabDateInputs()" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
+                        <option value="all">All Time</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                    
+                    <div id="labCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
+                        <input type="date" id="labStart" style="padding: 5px; font-size: 12px; margin: 0;">
+                        <input type="date" id="labEnd" style="padding: 5px; font-size: 12px; margin: 0;">
+                    </div>
+                    
+                    <button class="action-btn" style="background:var(--lab); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculateLabStats()">Load Statistics</button>
+                </div>
+
+                <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span></div>
                 <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
-                    <p style="color:var(--text-secondary);">Click Load to see test frequency.</p>
+                    <p style="color:var(--text-secondary); text-align: center; padding: 20px 0;">Select range and click Load.</p>
+                </div>
+            </div>
                 </div>
             </div>
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
@@ -1891,6 +1908,119 @@
                             <span style="color:var(--lab);">${patients.length}</span>
                         </div>
                         <div style="display:none; margin-top:5px;">
+                            ${patientListHtml}
+                        </div>
+                    </div>`;
+            });
+            list.innerHTML = html;
+        });
+    }
+    function toggleLabDateInputs() {
+        const type = document.getElementById('labFilterType').value;
+        document.getElementById('labCustomDates').style.display = (type === 'custom') ? 'grid' : 'none';
+    }
+
+    function calculateLabStats() {
+        const list = document.getElementById('statList');
+        const totalDisp = document.getElementById('statTotalDisplay');
+        const filterType = document.getElementById('labFilterType').value;
+        
+        const startVal = document.getElementById('labStart').value; // YYYY-MM-DD
+        const endVal = document.getElementById('labEnd').value;
+        
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        list.innerHTML = "Filtering Records...";
+        
+        db.ref('patientDetails').once('value', (snap) => {
+            const allDetails = snap.val() || {};
+            let globalCount = 0;
+            let testGroups = {};
+
+            Object.keys(allDetails).forEach(pid => {
+                const pData = allDetails[pid];
+                const labs = pData.labs || {};
+                const ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown Patient";
+
+                Object.keys(labs).forEach(labKey => {
+                    const labInfo = labs[labKey];
+                    const labName = labInfo.name || labKey;
+                    
+                    // We check dates in the history of this specific lab
+                    const history = labInfo.history || [];
+                    
+                    // If lab is pending and has no history, we count it as "current" if filtering by all/month
+                    // but for strict date tracking, we look at history entry dates
+                    let validEntries = [];
+
+                    if (history.length === 0 && filterType === 'all') {
+                        // Include pending labs in "All Time"
+                        validEntries.push({id: pid, name: ptName});
+                    }
+
+                    history.forEach(h => {
+                        const hDate = parseIraqiDate(h.dt); // Get timestamp
+                        const dObj = new Date(hDate);
+                        let include = false;
+
+                        if (filterType === 'all') {
+                            include = true;
+                        } else if (filterType === 'month') {
+                            if (dObj.getMonth() === currentMonth && dObj.getFullYear() === currentYear) {
+                                include = true;
+                            }
+                        } else if (filterType === 'custom') {
+                            const s = startVal ? new Date(startVal).getTime() : 0;
+                            const e = endVal ? new Date(endVal).getTime() : Infinity;
+                            if (hDate >= s && hDate <= e) include = true;
+                        }
+
+                        if (include) {
+                            validEntries.push({id: pid, name: ptName});
+                        }
+                    });
+
+                    // Add to groups
+                    if (validEntries.length > 0) {
+                        if (!testGroups[labName]) testGroups[labName] = [];
+                        validEntries.forEach(ent => {
+                            testGroups[labName].push(ent);
+                            globalCount++;
+                        });
+                    }
+                });
+            });
+
+            if (globalCount === 0) {
+                list.innerHTML = "No tests found for this period.";
+                totalDisp.innerHTML = `0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>`;
+                return;
+            }
+
+            totalDisp.innerHTML = `${globalCount} <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>`;
+            
+            let html = "";
+            const sortedTests = Object.keys(testGroups).sort((a,b) => testGroups[b].length - testGroups[a].length);
+
+            sortedTests.forEach(testName => {
+                const patients = testGroups[testName];
+                // Remove duplicates in names for the same test if they had multiple entries
+                const uniquePts = Array.from(new Set(patients.map(p => p.id)))
+                    .map(id => patients.find(p => p.id === id));
+
+                const patientListHtml = uniquePts.map(p => 
+                    `<div style="padding:5px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--lab); margin-left:10px; margin-top:4px; font-size:12px;" onclick="loadFullData('${p.id}')">👤 ${p.name}</div>`
+                ).join('');
+
+                html += `
+                    <div style="margin-bottom:8px; border:1px solid var(--separator); border-radius:10px; overflow:hidden;">
+                        <div style="display:flex; justify-content:space-between; padding:10px; background:var(--item-hover); cursor:pointer; font-weight:600;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none' ? 'block' : 'none')">
+                            <span>${testName}</span>
+                            <span style="color:var(--lab);">${patients.length}</span>
+                        </div>
+                        <div style="display:none; padding:5px; background:rgba(0,0,0,0.02);">
                             ${patientListHtml}
                         </div>
                     </div>`;
