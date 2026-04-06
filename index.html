@@ -45,26 +45,24 @@
         /* ============================================================
            DESIGN TOKENS — GLASS / TRANSLUCENT MODE
         ============================================================ */
-        [data-theme="glass"] {
-            --bg-root: #e8edf5;
+       [data-theme="glass"] {
+            --bg-root: #e2e8f0;
             --bg-canvas: none;
-            --card-bg: rgba(255, 255, 255, 0.42);
-            --card-border: rgba(255, 255, 255, 0.72);
-            --card-shadow: 0 8px 32px rgba(31, 60, 120, 0.10), 0 1.5px 0 rgba(255,255,255,0.85) inset;
-            --header-bg: rgba(235, 240, 252, 0.72);
-            --input-bg: rgba(255, 255, 255, 0.55);
-            --input-border: rgba(180, 200, 240, 0.6);
-            --text-primary: #1a1a2e;
-            --text-secondary: #4a5568;
-            --text-tertiary: #718096;
-            --separator: rgba(0,0,0,0.07);
-            --item-hover: rgba(255,255,255,0.6);
-            --item-active-bg: rgba(10, 132, 255, 0.12);
-            --login-bg: linear-gradient(145deg, #c9d6e8 0%, #dce6f5 50%, #c5d0e4 100%);
-            --login-card: rgba(255,255,255,0.55);
-            --scrollbar-thumb: rgba(0,0,0,0.15);
-            --backdrop-blur: blur(24px) saturate(180%);
-            --glass-anim: glass-aurora 12s ease infinite;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 8px 32px rgba(31, 60, 120, 0.15);
+            --header-bg: rgba(241, 245, 249, 0.9);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: #cbd5e1;
+            --text-primary: #0f172a; 
+            --text-secondary: #334155; 
+            --text-tertiary: #475569; 
+            --separator: rgba(0,0,0,0.12);
+            --item-hover: rgba(255,255,255,0.8);
+            --item-active-bg: rgba(10, 132, 255, 0.15);
+            --backdrop-blur: blur(20px) saturate(190%);
+            --glass-anim: none;
+        
 
             /* Override text colors inside elements that use hardcoded rgba white */
             --lab-btn-bg: rgba(255,255,255,0.4);
@@ -702,6 +700,17 @@
 
         <!-- Dashboard Row -->
         <div class="dash-grid">
+            <!-- Lab Referral Tracker Card -->
+            <div class="card" style="border-left: 5px solid var(--lab);">
+                <h3 style="color:var(--lab); border:none; margin-bottom:5px;">
+                    🧪 Lab Referral Stats
+                    <button class="action-btn" style="background:var(--lab); color:white; padding:4px 12px;" onclick="calculateLabStats()">Load Stats</button>
+                </h3>
+                <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span></div>
+                <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
+                    <p style="color:var(--text-secondary);">Click Load to see test frequency.</p>
+                </div>
+            </div>
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
 
             <div class="card">
@@ -1831,6 +1840,64 @@
             genImagingTags();
         }
     });
+    function calculateLabStats() {
+        const list = document.getElementById('statList');
+        const totalDisp = document.getElementById('statTotalDisplay');
+        list.innerHTML = "Analyzing Clinical Data...";
+        
+        db.ref('patientDetails').once('value', (snap) => {
+            const allDetails = snap.val() || {};
+            let globalCount = 0;
+            let testGroups = {}; // This will hold { "CBC": [patient1, patient2], "ESR": [patient1] }
+
+            Object.keys(allDetails).forEach(pid => {
+                const pData = allDetails[pid];
+                const labs = pData.labs || {};
+                const ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown Patient";
+
+                Object.keys(labs).forEach(labKey => {
+                    const labName = labs[labKey].name || labKey;
+                    globalCount++;
+
+                    if (!testGroups[labName]) {
+                        testGroups[labName] = [];
+                    }
+                    testGroups[labName].push({ id: pid, name: ptName });
+                });
+            });
+
+            if (globalCount === 0) {
+                list.innerHTML = "No lab data found in database.";
+                totalDisp.innerHTML = `0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span>`;
+                return;
+            }
+
+            totalDisp.innerHTML = `${globalCount} <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span>`;
+            
+            let html = "";
+            // Sort by most frequent tests first
+            const sortedTests = Object.keys(testGroups).sort((a,b) => testGroups[b].length - testGroups[a].length);
+
+            sortedTests.forEach(testName => {
+                const patients = testGroups[testName];
+                const patientListHtml = patients.map(p => 
+                    `<div style="padding:4px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--separator); margin-left:10px; margin-top:3px;" onclick="loadFullData('${p.id}')">↳ ${p.name}</div>`
+                ).join('');
+
+                html += `
+                    <div style="margin-bottom:12px; padding:8px; background:rgba(255,255,255,0.05); border-radius:10px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--text-primary); cursor:pointer;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none' ? 'block' : 'none')">
+                            <span>${testName} ▾</span>
+                            <span style="color:var(--lab);">${patients.length}</span>
+                        </div>
+                        <div style="display:none; margin-top:5px;">
+                            ${patientListHtml}
+                        </div>
+                    </div>`;
+            });
+            list.innerHTML = html;
+        });
+    }
 </script>
 </body>
 </html>
