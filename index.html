@@ -684,13 +684,13 @@
 
         <!-- Patient History List -->
         <div class="card">
-            <h3>History <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span></h3>
-            <div style="display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;">
-                <input type="text" id="searchBox" placeholder="🔍 Search Name or C/O…" oninput="renderList()" style="margin:0;">
-                <button onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()" style="width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:14px;cursor:pointer;color:var(--text-primary);">📅</button>
-                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute;top:-9999px;left:-9999px;width:0;height:0;opacity:0;">
-            </div>
-            <div id="patientList" style="max-height:540px; overflow-y:auto; margin-top:14px; padding-right:4px;"></div>
+           <h3>
+    History 
+    <div style="display:flex; gap:5px;">
+        <span id="totalPtCount" title="Total in Database" style="background:rgba(255,255,255,0.1); color:var(--text-secondary); padding:3px 8px; border-radius:10px; font-size:11px; border:1px solid var(--card-border);">Loading...</span>
+        <span id="waitCounter" title="Waiting Now" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span>
+    </div>
+</h3>
         </div>
 
     </div><!-- /sidebar -->
@@ -700,6 +700,41 @@
 
         <!-- Dashboard Row -->
         <div class="dash-grid">
+            <!-- Patient Flow Stats -->
+            <div class="card" style="border-left: 5px solid var(--call); grid-column: span 1;">
+                <h3 style="color:var(--call); border:none; margin-bottom:10px;">📈 Patient Flow Tracker</h3>
+                
+                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">TIME PERIOD</label>
+                    <select id="flowFilterType" onchange="document.getElementById('flowCustomDates').style.display = (this.value === 'custom') ? 'grid' : 'none';" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
+                        <option value="all">Total Registry</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                    
+                    <div id="flowCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
+                        <input type="date" id="flowStart" style="padding: 5px; font-size: 12px; margin: 0;">
+                        <input type="date" id="flowEnd" style="padding: 5px; font-size: 12px; margin: 0;">
+                    </div>
+                    
+                    <button class="action-btn" style="background:var(--call); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculatePatientFlow()">Generate Report</button>
+                </div>
+
+                <div id="flowSummary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; text-align: center;">
+                    <div style="background: rgba(48, 209, 88, 0.1); padding: 10px; border-radius: 12px;">
+                        <div id="countNew" style="font-size: 1.5em; font-weight: 800; color: var(--success);">0</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">NEW PTs</div>
+                    </div>
+                    <div style="background: rgba(10, 132, 255, 0.1); padding: 10px; border-radius: 12px;">
+                        <div id="countFollow" style="font-size: 1.5em; font-weight: 800; color: var(--primary);">0</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">FOLLOW-UPS</div>
+                    </div>
+                </div>
+
+                <div id="flowList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
+                    <p style="color:var(--text-secondary); text-align: center; padding: 10px 0;">No report generated.</p>
+                </div>
+            </div>
             <!-- Advanced Lab Referral Tracker -->
             <div class="card" style="border-left: 5px solid var(--lab); grid-column: span 1;">
                 <h3 style="color:var(--lab); border:none; margin-bottom:10px;">🧪 Lab Referral Stats</h3>
@@ -724,8 +759,6 @@
                 <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span></div>
                 <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
                     <p style="color:var(--text-secondary); text-align: center; padding: 20px 0;">Select range and click Load.</p>
-                </div>
-            </div>
                 </div>
             </div>
             <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
@@ -969,6 +1002,7 @@
             renderCalendarFromDB(); // ✅ FIX: use DB query, not local cache
             if (document.getElementById('overdueList').innerHTML.includes('overdue-item')) {
                 renderOverdueRadar();
+                document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
             }
         });
 
@@ -2027,6 +2061,69 @@
             });
             list.innerHTML = html;
         });
+    }
+    function calculatePatientFlow() {
+        const list = document.getElementById('flowList');
+        const fType = document.getElementById('flowFilterType').value;
+        const startVal = document.getElementById('flowStart').value;
+        const endVal = document.getElementById('flowEnd').value;
+        
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+
+        list.innerHTML = "Processing Registry...";
+        
+        let newPts = [];
+        let followPts = [];
+
+        Object.keys(ptIdx).forEach(id => {
+            const p = ptIdx[id];
+            const regDateTs = parseIraqiDate(p.dateAdded);
+            const dObj = new Date(regDateTs);
+            
+            // Check if New Patient in this period
+            let isNewInPeriod = false;
+            if (fType === 'all') isNewInPeriod = true;
+            else if (fType === 'month') {
+                if (dObj.getMonth() === curM && dObj.getFullYear() === curY) isNewInPeriod = true;
+            } else if (fType === 'custom') {
+                const s = startVal ? new Date(startVal).getTime() : 0;
+                const e = endVal ? new Date(endVal).getTime() : Infinity;
+                if (regDateTs >= s && regDateTs <= e) isNewInPeriod = true;
+            }
+
+            if (isNewInPeriod) {
+                newPts.push({id, name: p.name});
+            } else {
+                // If not "New" in this period, was there a "Follow up" visit in this period?
+                // We check the lastVisit as a quick indicator, or you can check visitDates
+                const lastVTs = parseIraqiDate(p.lastVisit);
+                const lvObj = new Date(lastVTs);
+                let isFollowInPeriod = false;
+
+                if (fType === 'month') {
+                    if (lvObj.getMonth() === curM && lvObj.getFullYear() === curY) isFollowInPeriod = true;
+                } else if (fType === 'custom') {
+                    const s = startVal ? new Date(startVal).getTime() : 0;
+                    const e = endVal ? new Date(endVal).getTime() : Infinity;
+                    if (lastVTs >= s && lastVTs <= e) isFollowInPeriod = true;
+                }
+
+                if (isFollowInPeriod) followPts.push({id, name: p.name});
+            }
+        });
+
+        document.getElementById('countNew').innerText = newPts.length;
+        document.getElementById('countFollow').innerText = followPts.length;
+
+        let html = `<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (${newPts.length}):</b>`;
+        html += newPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
+        
+        html += `<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (${followPts.length}):</b>`;
+        html += followPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
+
+        list.innerHTML = html;
     }
 </script>
 </body>
