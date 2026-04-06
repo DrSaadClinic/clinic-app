@@ -682,15 +682,22 @@
             <div id="bmiRes" style="font-weight:800; text-align:center; padding:10px 5px 0; font-size:2em; color:var(--primary);">--</div>
         </div>
 
-        <!-- Patient History List -->
+        <!-- Patient History List (Restored Search & UI) -->
         <div class="card">
-           <h3>
-    History 
-    <div style="display:flex; gap:5px;">
-        <span id="totalPtCount" title="Total in Database" style="background:rgba(255,255,255,0.1); color:var(--text-secondary); padding:3px 8px; border-radius:10px; font-size:11px; border:1px solid var(--card-border);">Loading...</span>
-        <span id="waitCounter" title="Waiting Now" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span>
-    </div>
-</h3>
+            <h3>
+                History 
+                <div style="display:flex; gap:5px;">
+                    <span id="totalPtCount" title="Total in Database" style="background:rgba(255,255,255,0.1); color:var(--text-secondary); padding:3px 8px; border-radius:10px; font-size:11px; border:1px solid var(--card-border);">Loading...</span>
+                    <span id="waitCounter" title="Waiting Now" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span>
+                </div>
+            </h3>
+            <div style="display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;">
+                <input type="text" id="searchBox" placeholder="🔍 Search Name or C/O…" oninput="renderList()" style="margin:0;">
+                <button onclick="document.getElementById('searchDate').showPicker ? document.getElementById('searchDate').showPicker() : document.getElementById('searchDate').click()" style="width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:14px;cursor:pointer;color:var(--text-primary);">📅</button>
+                <input type="date" id="searchDate" onchange="renderList()" style="position:absolute;top:-9999px;left:-9999px;width:0;height:0;opacity:0;">
+            </div>
+            <!-- This is the container where patients appear. If this is missing, the list won't load -->
+            <div id="patientList" style="max-height:540px; overflow-y:auto; margin-top:14px; padding-right:4px;"></div>
         </div>
 
     </div><!-- /sidebar -->
@@ -995,15 +1002,16 @@
         });
 
         // Patient index
+      // Patient index listener
         db.ref('patientIndex').on('value', snap => {
             ptIdx = snap.val() || {};
             isInitialLoad = false;
-            renderList();
-            renderCalendarFromDB(); // ✅ FIX: use DB query, not local cache
-            if (document.getElementById('overdueList').innerHTML.includes('overdue-item')) {
-                renderOverdueRadar();
-                document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
-            }
+            renderList(); // This draws the list
+            renderCalendarFromDB(); 
+            
+            // Update the Total Count Badge
+            const totalCount = Object.keys(ptIdx).length;
+            document.getElementById('totalPtCount').innerText = totalCount + " Patients";
         });
 
         // Reminders
@@ -2098,6 +2106,66 @@
             } else {
                 // If not "New" in this period, was there a "Follow up" visit in this period?
                 // We check the lastVisit as a quick indicator, or you can check visitDates
+                const lastVTs = parseIraqiDate(p.lastVisit);
+                const lvObj = new Date(lastVTs);
+                let isFollowInPeriod = false;
+
+                if (fType === 'month') {
+                    if (lvObj.getMonth() === curM && lvObj.getFullYear() === curY) isFollowInPeriod = true;
+                } else if (fType === 'custom') {
+                    const s = startVal ? new Date(startVal).getTime() : 0;
+                    const e = endVal ? new Date(endVal).getTime() : Infinity;
+                    if (lastVTs >= s && lastVTs <= e) isFollowInPeriod = true;
+                }
+
+                if (isFollowInPeriod) followPts.push({id, name: p.name});
+            }
+        });
+
+        document.getElementById('countNew').innerText = newPts.length;
+        document.getElementById('countFollow').innerText = followPts.length;
+
+        let html = `<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (${newPts.length}):</b>`;
+        html += newPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
+        
+        html += `<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (${followPts.length}):</b>`;
+        html += followPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
+
+        list.innerHTML = html;
+    }
+    function calculatePatientFlow() {
+        const list = document.getElementById('flowList');
+        const fType = document.getElementById('flowFilterType').value;
+        const startVal = document.getElementById('flowStart').value;
+        const endVal = document.getElementById('flowEnd').value;
+        
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+
+        list.innerHTML = "Processing Registry...";
+        
+        let newPts = [];
+        let followPts = [];
+
+        Object.keys(ptIdx).forEach(id => {
+            const p = ptIdx[id];
+            const regDateTs = parseIraqiDate(p.dateAdded);
+            const dObj = new Date(regDateTs);
+            
+            let isNewInPeriod = false;
+            if (fType === 'all') isNewInPeriod = true;
+            else if (fType === 'month') {
+                if (dObj.getMonth() === curM && dObj.getFullYear() === curY) isNewInPeriod = true;
+            } else if (fType === 'custom') {
+                const s = startVal ? new Date(startVal).getTime() : 0;
+                const e = endVal ? new Date(endVal).getTime() : Infinity;
+                if (regDateTs >= s && regDateTs <= e) isNewInPeriod = true;
+            }
+
+            if (isNewInPeriod) {
+                newPts.push({id, name: p.name});
+            } else {
                 const lastVTs = parseIraqiDate(p.lastVisit);
                 const lvObj = new Date(lastVTs);
                 let isFollowInPeriod = false;
