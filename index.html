@@ -546,9 +546,215 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        /* ===== TEXT PROTECTION SYSTEM STYLES ===== */
+
+/* Undo Button (appears after dangerous delete) */
+.undo-toast {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    background: linear-gradient(135deg, #FF453A 0%, #FF6961 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(255, 69, 58, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 600;
+    animation: slideUpUndo 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 380px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+@keyframes slideUpUndo {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.undo-btn {
+    background: white;
+    color: #FF453A;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.undo-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.undo-dismiss {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+.undo-dismiss:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Version History Panel */
+.version-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: var(--card-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--card-border);
+    border-radius: 22px;
+    padding: 28px;
+    z-index: 10000;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+    min-width: 480px;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: panelPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes panelPopIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.version-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+.version-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--separator);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+.version-item:hover {
+    background: rgba(10, 132, 255, 0.1);
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
+.version-item.current {
+    border-left: 4px solid var(--success);
+    background: rgba(48, 209, 88, 0.08);
+}
+.version-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.version-preview {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    max-height: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    font-family: 'SF Mono', Monaco, monospace;
+}
+.version-chars {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    background: rgba(0,0,0,0.2);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* Empty state warning */
+.empty-warning {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--danger);
+    font-size: 15px;
+}
+.empty-warning::before {
+    content: '⚠️';
+    display: block;
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+/* Restore button in header */
+.restore-btn-header {
+    background: rgba(255, 69, 58, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(255, 69, 58, 0.3);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.restore-btn-header:hover {
+    background: rgba(255, 69, 58, 0.25);
+    transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+    .version-panel {
+        min-width: auto;
+        width: 95vw;
+        padding: 20px;
+    }
+    .undo-toast {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        bottom: 80px;
+    }
+}
     </style>
 </head>
 <body>
+   <!-- UNDO TOAST (Hidden by default) -->
+<div id="undoToast" class="undo-toast" style="display:none;">
+    <span>⚠️ <strong id="undoMsg">Content cleared!</strong></span>
+    <button class="undo-btn" onclick="undoLastAction()">↩ Undo</button>
+    <button class="undo-dismiss" onclick="dismissUndo()">Dismiss</button>
+</div>
+
+<!-- VERSION HISTORY PANEL (Hidden by default) -->
+<div id="versionOverlay" class="version-overlay" style="display:none;" onclick="closeVersionPanel()"></div>
+<div id="versionPanel" class="version-panel" style="display:none;">
+    <h3 style="color:var(--primary); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+        📜 Version History
+        <button onclick="closeVersionPanel()" style="background:none; border:none; color:var(--text-secondary); font-size:24px; cursor:pointer;">&times;</button>
+    </h3>
+    <div id="versionList"></div>
+    <div style="margin-top:18px; display:flex; gap:10px;">
+        <button onclick="clearVersionHistory()" style="background:rgba(255,69,58,0.15); color:var(--danger); border:1px solid rgba(255,69,58,0.3);">Clear History</button>
+        <button onclick="closeVersionPanel()" style="flex:1;">Close</button>
+    </div>
+</div> 
 
 <div class="theme-transition-overlay" id="themeOverlay"></div>
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch Theme">&#127769;</button>
@@ -788,6 +994,14 @@
                 </div>
             <textarea id="vPres" oninput="handleFirstInput('vPres'); autoExpand(this); autoSyncTrigger()"></textarea>
             </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
+    <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Clinical History</span>
+    <div style="display:flex; gap:6px;">
+        <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="stampVisit('vPres')">+ Visit Stamp</button>
+        <!-- ADD THIS BUTTON: -->
+        <button class="restore-btn-header" onclick="openVersionPanel('vPres')" title="View & restore previous versions">📜 History</button>
+    </div>
+</div>
 
             <!-- Management -->
             <div class="section-block" style="border-left:4px solid var(--success);">
@@ -797,7 +1011,14 @@
                 </div>
                 <textarea id="vVisits" oninput="handleFirstInput('vVisits'); autoExpand(this); autoSyncTrigger()"></textarea>
             </div>
-
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
+    <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Management (Mx)</span>
+    <div style="display:flex; gap:6px;">
+        <button class="action-btn" style="color:var(--success); font-size:11px;" onclick="stampVisit('vVisits')">+ Visit Stamp</button>
+        <!-- ADD THIS BUTTON: -->
+        <button class="restore-btn-header" onclick="openVersionPanel('vVisits')" title="View & restore previous versions">📜 History</button>
+    </div>
+</div>
             <!-- AI Referral -->
             <div class="section-block" style="background:rgba(10,132,255,0.04); border-left:4px solid var(--primary);">
                 <span class="section-label" style="color:var(--primary);">AI Surgical Referral Engine</span>
@@ -1173,6 +1394,15 @@
                 visitsBox.value = d.visits || '';
                 setTimeout(() => autoExpand(visitsBox), 50);
             }
+            // Initialize protection snapshots for loaded data
+if (d.presentation && d.presentation.length > 0) {
+    presBox.dataset.lastSnapshot = d.presentation;
+    saveSnapshot('vPres', d.presentation, 'Loaded from cloud');
+}
+if (d.visits && d.visits.length > 0) {
+    visitsBox.dataset.lastSnapshot = d.visits;
+    saveSnapshot('vVisits', d.visits, 'Loaded from cloud');
+}
 
             document.getElementById('vOpDate').value = d.opD || '';
             document.getElementById('vOpDetail').value = d.opT || '';
@@ -1991,6 +2221,375 @@
             genImagingTags();
         }
     });
+    /* ================================================================
+   SMART TEXT PROTECTION SYSTEM v2.0
+   Prevents accidental deletion + Version History + Undo
+=============================================================== */
+
+// Global state for text protection
+const textProtection = {
+    // Stores snapshots per textarea: { vPres: [...], vVisits: [...] }
+    snapshots: {},
+    
+    // Last deleted content for quick undo
+    lastDeleted: null,
+    lastDeletedField: null,
+    
+    // Max versions to keep per field
+    MAX_VERSIONS: 5,
+    
+    // Minimum characters to consider as "content"
+    MIN_CONTENT_LENGTH: 10,
+    
+    // Undo timeout handle
+    undoTimeout: null,
+    
+    // Track which fields are protected
+    protectedFields: ['vPres', 'vVisits']
+};
+
+/**
+ * Initialize protection for a specific textarea
+ */
+function initTextProtection(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    
+    // Initialize snapshot array if not exists
+    if (!textProtection.snapshots[fieldId]) {
+        textProtection.snapshots[fieldId] = [];
+    }
+    
+    // Save initial snapshot if field has content
+    if (field.value && field.value.length >= textProtection.MIN_CONTENT_LENGTH) {
+        saveSnapshot(fieldId, field.value, 'Initial load');
+    }
+    
+    // Listen for changes with debounced snapshot saving
+    let saveTimer = null;
+    field.addEventListener('input', function(e) {
+        const oldValue = field.dataset.lastSnapshot || '';
+        const newValue = field.value;
+        
+        // Check for DANGEROUS DELETION (cleared significant content)
+        if (oldValue.length >= textProtection.MIN_CONTENT_LENGTH && 
+            newValue.length < textProtection.MIN_CONTENT_LENGTH &&
+            oldValue.length > newValue.length * 3) { // Lost more than 66% of content
+            
+            // Save what was deleted
+            textProtection.lastDeleted = oldValue;
+            textProtection.lastDeletedField = fieldId;
+            
+            // Show undo toast
+            showUndoToast(`"${getFieldLabel(fieldId)}" was cleared!`);
+            
+            // Auto-dismiss after 8 seconds
+            clearTimeout(textProtection.undoTimeout);
+            textProtection.undoTimeout = setTimeout(dismissUndo, 8000);
+        }
+        
+        // Update last known value
+        field.dataset.lastSnapshot = newValue;
+        
+        // Debounced snapshot save (save every 3 seconds of inactivity)
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+            if (newValue.length >= textProtection.MIN_CONTENT_LENGTH) {
+                saveSnapshot(fieldId, newValue, 'Auto-save');
+            }
+        }, 3000);
+    });
+    
+    // Also listen for Ctrl+A + Delete/Backspace specifically
+    field.addEventListener('keydown', function(e) {
+        // Detect Select All + Delete/Backspace combination
+        if ((e.key === 'Backspace' || e.key === 'Delete') && 
+            field.selectionStart === 0 && 
+            field.selectionEnd === field.value.length &&
+            field.value.length >= textProtection.MIN_CONTENT_LENGTH) {
+            
+            // Prevent default briefly to allow confirmation
+            e.preventDefault();
+            
+            // Store for potential undo
+            textProtection.lastDeleted = field.value;
+            textProtection.lastDeletedField = fieldId;
+            
+            // Show confirmation
+            if (confirm('⚠️ You are about to DELETE ALL content in "' + getFieldLabel(fieldId) + '"!\n\nClick OK to delete, or Cancel to keep it.')) {
+                // User confirmed - actually clear it
+                field.value = '';
+                field.dataset.lastSnapshot = '';
+                showUndoToast('Content deleted');
+                
+                // Auto-dismiss undo option
+                clearTimeout(textProtection.undoTimeout);
+                textProtection.undoTimeout = setTimeout(dismissUndo, 8000);
+            } else {
+                // User cancelled - keep content
+                showToast('Deletion cancelled ✓');
+            }
+            
+            // Trigger sync either way
+            autoSyncTrigger();
+        }
+    });
+}
+
+/**
+ * Get human-readable label for field
+ */
+function getFieldLabel(fieldId) {
+    const labels = {
+        'vPres': 'Clinical History',
+        'vVisits': 'Management Notes'
+    };
+    return labels[fieldId] || fieldId;
+}
+
+/**
+ * Save a version snapshot
+ */
+function saveSnapshot(fieldId, content, reason = 'Manual') {
+    if (!textProtection.snapshots[fieldId]) {
+        textProtection.snapshots[fieldId] = [];
+    }
+    
+    const snapshot = {
+        timestamp: new Date(),
+        content: content,
+        reason: reason,
+        charCount: content.length
+    };
+    
+    // Avoid duplicate consecutive saves
+    const lastSnap = textProtection.snapshots[fieldId][0];
+    if (lastSnap && lastSnap.content === content) return;
+    
+    // Add to beginning (newest first)
+    textProtection.snapshots[fieldId].unshift(snapshot);
+    
+    // Trim to max versions
+    if (textProtection.snapshots[fieldId].length > textProtection.MAX_VERSIONS) {
+        textProtection.snapshots[fieldId] = textProtection.snapshots[fieldId].slice(0, textProtection.MAX_VERSIONS);
+    }
+    
+    console.log(`📸 Snapshot saved: ${getFieldLabel(fieldId)} (${content.length} chars) - ${reason}`);
+}
+
+/**
+ * Show the undo toast notification
+ */
+function showUndoToast(message) {
+    const toast = document.getElementById('undoToast');
+    document.getElementById('undoMsg').textContent = message;
+    toast.style.display = 'flex';
+    
+    // Auto-hide after delay (reset on each call)
+    clearTimeout(textProtection.undoTimeout);
+    textProtection.undoTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+    }, 8000);
+}
+
+/**
+ * Dismiss the undo toast
+ */
+function dismissUndo() {
+    document.getElementById('undoToast').style.display = 'none';
+    textProtection.lastDeleted = null;
+    textProtection.lastDeletedField = null;
+}
+
+/**
+ * UNDO: Restore the last deleted content
+ */
+function undoLastAction() {
+    if (!textProtection.lastDeleted || !textProtection.lastDeletedField) {
+        showToast('Nothing to undo');
+        return;
+    }
+    
+    const fieldId = textProtection.lastDeletedField;
+    const field = document.getElementById(fieldId);
+    const restoredContent = textProtection.lastDeleted;
+    
+    if (!field) return;
+    
+    // Restore the content
+    field.value = restoredContent;
+    field.dataset.lastSnapshot = restoredContent;
+    field.dataset.userTyped = 'true';
+    
+    // Expand textarea
+    autoExpand(field);
+    
+    // Focus and move cursor to end
+    field.focus();
+    field.setSelectionRange(restoredContent.length, restoredContent.length);
+    
+    // Hide undo toast
+    dismissUndo();
+    
+    // Trigger save
+    autoSyncTrigger();
+    
+    // Show success message
+    showToast(`✅ ${getFieldLabel(fieldId)} restored! (${restoredContent.length} chars recovered)`);
+    
+    console.log(`↩️ Undid deletion in ${fieldId}: ${restoredContent.length} chars restored`);
+}
+
+/**
+ * Open the version history panel
+ */
+function openVersionPanel(fieldId) {
+    const overlay = document.getElementById('versionOverlay');
+    const panel = document.getElementById('versionPanel');
+    const list = document.getElementById('versionList');
+    
+    const versions = textProtection.snapshots[fieldId] || [];
+    const currentContent = document.getElementById(fieldId)?.value || '';
+    
+    if (versions.length === 0) {
+        list.innerHTML = '<div class="empty-warning">No saved versions yet.<br><br>Start typing and versions will be automatically saved.</div>';
+    } else {
+        let html = '';
+        
+        // Add current version at top
+        html += '<div class="version-item current">' +
+            '<div class="version-time">📍 Current (unsaved)</div>' +
+            '<div class="version-chars">' + currentContent.length + ' chars</div>' +
+            '<div class="version-preview">' + escapeHtml(currentContent.substring(0, 200)) + (currentContent.length > 200 ? '...' : '') + '</div>' +
+            '</div>';
+        
+        // List saved versions
+        versions.forEach((ver, idx) => {
+            const timeAgo = getTimeAgo(ver.timestamp);
+            const isCurrent = ver.content === currentContent;
+            
+            html += '<div class="version-item' + (isCurrent ? ' current' : '') + '" onclick="restoreVersion(\'' + fieldId + '\', ' + idx + ')">' +
+                '<div class="version-time">' + timeAgo + ' • ' + ver.reason + '</div>' +
+                '<div class="version-chars">' + ver.charCount + ' chars</div>' +
+                '<div class="version-preview">' + escapeHtml(ver.content.substring(0, 200)) + (ver.content.length > 200 ? '...' : '') + '</div>' +
+                '</div>';
+        });
+        
+        list.innerHTML = html;
+    }
+    
+    overlay.style.display = 'block';
+    panel.style.display = 'block';
+}
+
+/**
+ * Close version history panel
+ */
+function closeVersionPanel() {
+    document.getElementById('versionOverlay').style.display = 'none';
+    document.getElementById('versionPanel').style.display = 'none';
+}
+
+/**
+ * Restore a specific version from history
+ */
+function restoreVersion(fieldId, versionIndex) {
+    const versions = textProtection.snapshots[fieldId] || [];
+    if (versionIndex >= versions.length) return;
+    
+    const version = versions[versionIndex];
+    const field = document.getElementById(fieldId);
+    
+    if (!field) return;
+    
+    // Confirm restoration
+    const confirmRestore = confirm(
+        'Restore version from ' + formatTime(version.timestamp) + '?\n\n' +
+        'This version has ' + version.charCount + ' characters.\n' +
+        'Current content will be replaced.\n\n' +
+        '(You can undo this action)'
+    );
+    
+    if (!confirmRestore) return;
+    
+    // Save current content as snapshot first (so we can undo the restore!)
+    textProtection.lastDeleted = field.value;
+    textProtection.lastDeletedField = fieldId;
+    
+    // Restore the version
+    field.value = version.content;
+    field.dataset.lastSnapshot = version.content;
+    field.dataset.userTyped = 'true';
+    
+    autoExpand(field);
+    field.focus();
+    
+    // Close panel
+    closeVersionPanel();
+    
+    // Sync
+    autoSyncTrigger();
+    
+    // Show message with undo option
+    showUndoToast('Restored version from ' + getTimeAgo(version.timestamp));
+    showToast(`✅ Restored ${getFieldLabel(fieldId)} (${version.charCount} chars)`);
+}
+
+/**
+ * Clear version history for privacy/cleanup
+ */
+function clearVersionHistory() {
+    if (!confirm('Clear all saved version history? This cannot be undone.')) return;
+    
+    textProtection.protectedFields.forEach(fieldId => {
+        textProtection.snapshots[fieldId] = [];
+    });
+    
+    showToast('Version history cleared');
+    closeVersionPanel();
+}
+
+/* ================================================================
+   UTILITY FUNCTIONS FOR TEXT PROTECTION
+=============================================================== */
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+    return date.toLocaleDateString('en-GB') + ' ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatTime(date) {
+    return date.toLocaleDateString('en-GB') + ' at ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ================================================================
+   INITIALIZATION - Call this when patient loads
+=============================================================== */
+
+function initTextProtectionForPatient() {
+    // Initialize protection for both clinical textareas
+    textProtection.protectedFields.forEach(fieldId => {
+        initTextProtection(fieldId);
+    });
+    
+    console.log('🛡️ Text Protection System initialized');
+}
+
+// AUTO-INIT: Set up protection when DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure all elements exist
+    setTimeout(initTextProtectionForPatient, 500);
+});
 </script>
 </body>
 </html>
