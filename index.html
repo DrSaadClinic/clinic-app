@@ -1116,9 +1116,11 @@
     ================================================================ */
     function loadFullData(id) {
         if (activeListener) activeListener.off();
-        activeId = id;
+            activeId = id;
+    document.getElementById('vPres').dataset.activated = '';
+    document.getElementById('vVisits').dataset.activated = '';
 
-        db.ref('patientIndex/' + id).update({ isWaiting: false, hasPendingLab: false });
+    db.ref('patientIndex/' + id).update({ isWaiting: false, hasPendingLab: false });
 
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
         const ptEl = document.getElementById('pt-' + id);
@@ -1163,9 +1165,7 @@
             const presBox = document.getElementById('vPres');
             const visitsBox = document.getElementById('vVisits');
 
-                        presBox.dataset.activated = '';
-            visitsBox.dataset.activated = '';
-            if (document.activeElement !== presBox) {
+                                   if (document.activeElement !== presBox) {
                 presBox.value = d.presentation || '';
                 setTimeout(() => autoExpand(presBox), 50);
             }
