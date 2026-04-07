@@ -786,7 +786,7 @@
                     <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Clinical History</span>
                     <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="stampVisit('vPres')">+ Visit Stamp</button>
                 </div>
-                <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()"></textarea>
+            <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="autoStampTextarea('vPres')"></textarea>
             </div>
 
             <!-- Management -->
@@ -795,7 +795,7 @@
                     <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Management (Mx)</span>
                     <button class="action-btn" style="color:var(--success); font-size:11px;" onclick="stampVisit('vVisits')">+ Visit Stamp</button>
                 </div>
-                <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()"></textarea>
+                <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="autoStampTextarea('vVisits')"></textarea>
             </div>
 
             <!-- AI Referral -->
@@ -1008,20 +1008,31 @@
     /* ================================================================
        VISIT STAMP (manual, not auto on focus)
     ================================================================ */
-    function stampVisit(textareaId) {
+       function stampVisit(textareaId) {
         const box = document.getElementById(textareaId);
         if (!box || !activeId) return;
         const today = new Date().toLocaleDateString('en-GB');
         const stamp = '--- Visit: ' + today + ' ---\n';
         if (!box.value.includes(stamp)) {
-            box.value = box.value + (box.value ? '\n\n' : '') + stamp;
+            box.value = stamp + box.value;
             autoExpand(box);
             autoSyncTrigger();
             box.focus();
-            box.setSelectionRange(box.value.length, box.value.length);
+            box.setSelectionRange(0, 0);
         }
     }
 
+    function autoStampTextarea(textareaId) {
+        const box = document.getElementById(textareaId);
+        if (!box || !activeId) return;
+        const today = new Date().toLocaleDateString('en-GB');
+        const stamp = '--- Visit: ' + today + ' ---\n';
+        if (!box.value.includes(stamp)) {
+            box.value = stamp + box.value;
+            autoExpand(box);
+            autoSyncTrigger();
+        }
+    }
     /* ================================================================
        WEB REQUESTS
     ================================================================ */
@@ -1152,10 +1163,12 @@
 
             if (document.activeElement !== presBox) {
                 presBox.value = d.presentation || '';
+                autoStampTextarea('vPres');
                 setTimeout(() => autoExpand(presBox), 50);
             }
             if (document.activeElement !== visitsBox) {
                 visitsBox.value = d.visits || '';
+                autoStampTextarea('vVisits');
                 setTimeout(() => autoExpand(visitsBox), 50);
             }
 
