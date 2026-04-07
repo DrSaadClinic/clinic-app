@@ -2,16 +2,12 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dr. Saad Sabry Alzubaidy - Surgical Clinic</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
-        /* ============================================================
-           DESIGN TOKENS — DARK MODE (default)
-        ============================================================ */
         :root, [data-theme="dark"] {
             --primary: #0A84FF;
             --success: #30D158;
@@ -20,9 +16,7 @@
             --call: #5E5CE6;
             --lab: #64D2FF;
             --img: #BF5AF2;
-
             --bg-root: #000000;
-            --bg-canvas: radial-gradient(ellipse at 20% 20%, #0d1117 0%, #000000 60%);
             --card-bg: rgba(28, 28, 30, 0.72);
             --card-border: rgba(255, 255, 255, 0.09);
             --card-shadow: 0 8px 32px rgba(0,0,0,0.5);
@@ -39,39 +33,25 @@
             --login-card: rgba(22, 22, 26, 0.8);
             --scrollbar-thumb: rgba(255,255,255,0.18);
             --backdrop-blur: blur(18px);
-            --glass-anim: none;
         }
 
-        /* ============================================================
-           DESIGN TOKENS — GLASS / TRANSLUCENT MODE
-        ============================================================ */
-       [data-theme="glass"] {
+        [data-theme="glass"] {
             --bg-root: #e2e8f0;
-            --bg-canvas: none;
             --card-bg: rgba(255, 255, 255, 0.7);
             --card-border: rgba(255, 255, 255, 0.9);
             --card-shadow: 0 8px 32px rgba(31, 60, 120, 0.15);
             --header-bg: rgba(241, 245, 249, 0.9);
             --input-bg: rgba(255, 255, 255, 0.9);
             --input-border: #cbd5e1;
-            --text-primary: #0f172a; 
-            --text-secondary: #334155; 
-            --text-tertiary: #475569; 
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-tertiary: #475569;
             --separator: rgba(0,0,0,0.12);
             --item-hover: rgba(255,255,255,0.8);
             --item-active-bg: rgba(10, 132, 255, 0.15);
             --backdrop-blur: blur(20px) saturate(190%);
-            --glass-anim: none;
-        
-
-            /* Override text colors inside elements that use hardcoded rgba white */
-            --lab-btn-bg: rgba(255,255,255,0.4);
-            --lab-btn-color: #1a2340;
         }
 
-        /* ============================================================
-           ANIMATED AURORA BACKGROUND (Glass mode only)
-        ============================================================ */
         body::before {
             content: '';
             position: fixed;
@@ -97,17 +77,15 @@
         }
 
         [data-theme="glass"] body::after { opacity: 1; }
-
         @keyframes aurora-shift {
             0%, 100% { transform: scale(1) translate(0, 0); }
             33% { transform: scale(1.04) translate(-1%, 1%); }
             66% { transform: scale(0.97) translate(1%, -1%); }
         }
 
-        /* ============================================================
-           BASE
-        ============================================================ */
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
@@ -120,9 +98,18 @@
             min-height: 100vh;
         }
 
-        /* ============================================================
-           THEME TOGGLE BUTTON
-        ============================================================ */
+        /* Native form controls color scheme */
+        select, input[type="date"], input[type="number"], input[type="tel"] {
+            color-scheme: dark;
+        }
+        [data-theme="glass"] select,
+        [data-theme="glass"] input[type="date"],
+        [data-theme="glass"] input[type="number"],
+        [data-theme="glass"] input[type="tel"] {
+            color-scheme: light;
+        }
+
+        /* Theme toggle */
         .theme-toggle {
             position: fixed;
             bottom: 28px;
@@ -147,9 +134,7 @@
         .theme-toggle:hover { transform: scale(1.12) rotate(10deg); box-shadow: 0 8px 28px rgba(10,132,255,0.3); }
         .theme-toggle:active { transform: scale(0.92); }
 
-        /* ============================================================
-           HEADER
-        ============================================================ */
+        /* Header */
         header {
             background: var(--header-bg);
             backdrop-filter: var(--backdrop-blur);
@@ -171,16 +156,12 @@
         .logo-large { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 18px; border: 2px solid var(--card-border); object-fit: cover; box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
         header h2 { font-size: 1.1em; font-weight: 600; letter-spacing: 0.3px; color: var(--text-primary); }
 
-        /* ============================================================
-           LAYOUT
-        ============================================================ */
+        /* Layout */
         .container { max-width: 1540px; margin: auto; padding: 18px; display: grid; grid-template-columns: 360px 1fr; gap: 22px; align-items: start; }
         @media (max-width: 1024px) { .container { grid-template-columns: 310px 1fr; } }
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } }
 
-        /* ============================================================
-           CARD
-        ============================================================ */
+        /* Card */
         .card {
             background: var(--card-bg);
             backdrop-filter: var(--backdrop-blur);
@@ -194,11 +175,7 @@
         }
         .card:hover { transform: translateY(-2px); }
         @media (max-width: 768px) { .card { padding: 14px; border-radius: 18px; } }
-
-        [data-theme="glass"] .card {
-            /* Extra glass highlight line on top */
-            box-shadow: var(--card-shadow), 0 1px 0 rgba(255,255,255,0.9) inset;
-        }
+        [data-theme="glass"] .card { box-shadow: var(--card-shadow), 0 1px 0 rgba(255,255,255,0.9) inset; }
 
         h3 {
             color: var(--primary);
@@ -215,9 +192,7 @@
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px; align-items: start; }
         .scroll-card { max-height: 240px; overflow-y: auto; padding-right: 4px; }
 
-        /* ============================================================
-           INPUTS
-        ============================================================ */
+        /* Inputs */
         input, textarea {
             width: 100%;
             padding: 13px 16px;
@@ -227,7 +202,7 @@
             font-size: 15px;
             background: var(--input-bg);
             color: var(--text-primary);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
             font-family: inherit;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -239,16 +214,12 @@
             background: var(--input-bg);
         }
         input::placeholder, textarea::placeholder { color: var(--text-secondary); }
-        textarea { resize: none; overflow-y: hidden; min-height: 95px; line-height: 1.65; }
+        textarea { resize: none; min-height: 95px; line-height: 1.65; overflow-y: hidden; }
 
-        [data-theme="glass"] input,
-        [data-theme="glass"] textarea { color: #1a1a2e; }
-        [data-theme="glass"] input::placeholder,
-        [data-theme="glass"] textarea::placeholder { color: #6b7a99; }
+        [data-theme="glass"] input, [data-theme="glass"] textarea { color: #1a1a2e; }
+        [data-theme="glass"] input::placeholder, [data-theme="glass"] textarea::placeholder { color: #6b7a99; }
 
-        /* ============================================================
-           BUTTONS
-        ============================================================ */
+        /* Buttons */
         button {
             width: 100%;
             padding: 13px;
@@ -281,9 +252,22 @@
         }
         .action-btn:hover { background: var(--item-hover); }
 
-        /* ============================================================
-           PATIENT LIST ITEMS
-        ============================================================ */
+        .btn-ghost {
+            background: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border: none;
+            box-shadow: none;
+            text-decoration: underline;
+            padding: 10px 0 0;
+            cursor: pointer;
+            width: 100%;
+            font-family: inherit;
+            transition: color 0.2s;
+        }
+        .btn-ghost:hover { color: var(--text-primary); }
+
+        /* Patient list items */
         .pt-item {
             padding: 14px;
             border-bottom: 1px solid var(--separator);
@@ -306,9 +290,7 @@
         .btn-del-pt { color: var(--danger); font-size: 15px; opacity: 0.35; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
 
-        /* ============================================================
-           WEB REQUEST INBOX
-        ============================================================ */
+        /* Web request items */
         .web-req-item {
             background: rgba(0,0,0,0.15);
             border: 1px solid var(--card-border);
@@ -320,16 +302,12 @@
         .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .web-req-actions button { padding: 8px; font-size: 13px; border-radius: 12px; }
 
-        /* ============================================================
-           CONTENTEDITABLE
-        ============================================================ */
+        /* Contenteditable */
         [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: rgba(10,132,255,0.06); border-radius: 8px; box-shadow: 0 0 0 2px rgba(10,132,255,0.25); padding: 2px 5px; }
 
-        /* ============================================================
-           LAB / IMAGING TAGS
-        ============================================================ */
+        /* Lab / Imaging tags */
         .lab-tag-box {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -376,12 +354,9 @@
         [data-theme="glass"] .img-btn { background: rgba(255,255,255,0.5); color: #1a2340; border-color: rgba(160,190,240,0.5); }
         .img-btn:hover { background: rgba(191, 90, 242, 0.15); border-color: var(--img); color: var(--img); transform: scale(1.02); }
 
-        /* ============================================================
-           LAB ACCORDION
-        ============================================================ */
+        /* Lab accordion */
         .lab-accordion { background: rgba(0,0,0,0.15); border: 1px solid var(--card-border); border-radius: 15px; margin-bottom: 9px; overflow: hidden; }
         [data-theme="glass"] .lab-accordion { background: rgba(255,255,255,0.3); }
-
         .lab-header {
             background: rgba(255,255,255,0.04);
             padding: 14px;
@@ -402,17 +377,13 @@
         .val-normal { color: var(--success); font-weight: bold; }
         .val-abnormal { color: var(--danger); font-weight: bold; text-shadow: 0 0 8px rgba(255, 69, 58, 0.35); }
 
-        /* ============================================================
-           SPARKLINE
-        ============================================================ */
+        /* Sparkline */
         .sparkline-container { display: flex; align-items: flex-end; gap: 4px; height: 34px; margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--separator); justify-content: flex-start; }
         .spark-bar { width: 13px; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 4px; opacity: 0.75; transition: 0.3s; }
         .spark-bar:hover { opacity: 1; transform: scaleY(1.1); }
         .spark-bar.red { background: var(--danger); }
 
-        /* ============================================================
-           REMINDERS & OVERDUE
-        ============================================================ */
+        /* Reminders & Overdue */
         .rem-item {
             background: rgba(255, 159, 10, 0.12);
             border-left: 5px solid var(--warning);
@@ -446,9 +417,7 @@
         [data-theme="glass"] .overdue-item { background: rgba(255, 69, 58, 0.07); }
         .overdue-item:hover { background: rgba(255, 69, 58, 0.2); }
 
-        /* ============================================================
-           AI BOX
-        ============================================================ */
+        /* AI box */
         .ai-box {
             background: rgba(0,0,0,0.25);
             border: 1px solid var(--card-border);
@@ -462,9 +431,7 @@
         }
         [data-theme="glass"] .ai-box { background: rgba(255,255,255,0.4); color: #1a1a2e; }
 
-        /* ============================================================
-           LOGIN SCREEN
-        ============================================================ */
+        /* Login */
         .login-box {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--login-bg);
@@ -474,7 +441,6 @@
             transition: opacity 0.5s ease, visibility 0.5s;
         }
         .login-box.fade-out { opacity: 0; visibility: hidden; }
-
         .login-glass {
             background: var(--login-card);
             backdrop-filter: var(--backdrop-blur);
@@ -487,13 +453,10 @@
             animation: loginFadeIn 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
         }
         @keyframes loginFadeIn { from { opacity: 0; transform: scale(0.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
         .login-title { font-size: 1.6em; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
         .login-subtitle { color: var(--text-secondary); font-weight: 400; letter-spacing: 0.8px; margin-bottom: 26px; font-size: 0.95em; }
 
-        /* ============================================================
-           TOAST
-        ============================================================ */
+        /* Toast */
         .toast {
             position: fixed; top: -100px; right: 20px;
             background: var(--card-bg);
@@ -513,9 +476,7 @@
         .toast.show { top: 18px; }
         @media (max-width: 768px) { .toast { left: 10px; right: 10px; text-align: center; } }
 
-        /* ============================================================
-           SYNC INDICATOR
-        ============================================================ */
+        /* Sync indicator */
         #syncIndicator {
             font-size: 11px; color: var(--success); font-weight: bold; display: none;
             padding: 5px 12px; white-space: nowrap;
@@ -524,27 +485,7 @@
             border: 1px solid rgba(48, 209, 88, 0.28);
         }
 
-        /* ============================================================
-           MOBILE STACK UTILITY
-        ============================================================ */
-        @media (max-width: 768px) { .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; } }
-
-        /* ============================================================
-           SCROLLBARS
-        ============================================================ */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
-        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
-
-        /* ============================================================
-           TABLE RESPONSIVE
-        ============================================================ */
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
-
-        /* ============================================================
-           SECTION WRAPPERS (patient file)
-        ============================================================ */
+        /* Section blocks */
         .section-block {
             background: rgba(0,0,0,0.15);
             padding: 18px;
@@ -554,79 +495,63 @@
             transition: background 0.5s ease, border-color 0.5s ease;
         }
         [data-theme="glass"] .section-block { background: rgba(255,255,255,0.25); }
-
         .section-label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 9px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; display: block; margin-bottom: 9px;
         }
 
-        /* ============================================================
-           VITAL LOG ROWS
-        ============================================================ */
+        /* Vital rows */
         .vital-row {
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 14px;
-            background: rgba(255,255,255,0.04);
+            font-size: 14px; background: rgba(255,255,255,0.04);
             border: 1px solid var(--card-border);
-            padding: 11px 14px;
-            margin-bottom: 7px;
-            border-radius: 12px;
-            color: var(--text-primary);
+            padding: 11px 14px; margin-bottom: 7px;
+            border-radius: 12px; color: var(--text-primary);
         }
         [data-theme="glass"] .vital-row { background: rgba(255,255,255,0.4); }
 
-        /* ============================================================
-           GLASS MODE — SECTION BORDER ACCENTS (override dark left-border sections)
-        ============================================================ */
+        /* Glass theme section accents */
         [data-theme="glass"] .section-lab { border-left-color: var(--lab) !important; background: rgba(100,210,255,0.05) !important; }
         [data-theme="glass"] .section-img { border-left-color: var(--img) !important; background: rgba(191,90,242,0.05) !important; }
         [data-theme="glass"] .section-ops { border-left-color: var(--danger) !important; background: rgba(255,69,58,0.04) !important; }
         [data-theme="glass"] .section-vitals { border-left-color: #8E8E93 !important; background: rgba(255,255,255,0.2) !important; }
 
-        /* ============================================================
-           EMPTY STATE
-        ============================================================ */
+        /* Empty state */
         #emptyState {
-            text-align: center;
-            padding: 90px 20px;
-            color: var(--text-secondary);
-            border: 2px dashed var(--separator);
-            background: transparent !important;
+            text-align: center; padding: 90px 20px; color: var(--text-secondary);
+            border: 2px dashed var(--separator); background: transparent !important;
         }
 
-        /* ============================================================
-           GLASS THEME — LOGIN AURORA BACKGROUND
-        ============================================================ */
-        [data-theme="glass"] .login-box {
-            background: var(--login-bg);
-        }
-
-        /* ============================================================
-           TRANSITION OVERLAY — smooth theme switch
-        ============================================================ */
+        /* Theme transition overlay */
         .theme-transition-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 4999;
-            pointer-events: none;
-            opacity: 0;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 70%);
+            position: fixed; inset: 0; z-index: 4999; pointer-events: none;
+            opacity: 0; background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 70%);
             transition: opacity 0.35s ease;
         }
         .theme-transition-overlay.flash { opacity: 1; }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+
+        @media (max-width: 768px) { .mobile-stack { grid-template-columns: 1fr !important; gap: 10px !important; } }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-<!-- Theme transition flash -->
 <div class="theme-transition-overlay" id="themeOverlay"></div>
-
-<!-- Theme toggle -->
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch Theme">🌙</button>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch Theme">&#127769;</button>
 
 <!-- Login Screen -->
 <div id="loginScreen" class="login-box">
@@ -634,27 +559,27 @@
         <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
         <div class="login-title">Dr. Saad Sabry Alzubaidy</div>
         <div class="login-subtitle">Surgical Clinic</div>
-        <input type="password" id="passCode" placeholder="Enter Passcode…" oninput="checkAutoLogin()" style="width:260px; text-align:center; border-radius:20px; padding:15px; font-size:18px; letter-spacing:2px;">
+        <input type="password" id="passCode" placeholder="Enter Passcode..." oninput="checkAutoLogin()" style="width:260px; text-align:center; border-radius:20px; padding:15px; font-size:18px; letter-spacing:2px;">
         <div style="font-size:11px; opacity:0.45; margin-top:14px; color: var(--text-secondary);">Secured by 256-bit Cloud Encryption</div>
     </div>
 </div>
 
-<div id="liveToast" class="toast">🔔 Notification</div>
+<div id="liveToast" class="toast">&#128276; Notification</div>
 
 <header>
     <img src="logo.jpg" class="logo-img" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-    <h2>Dr. Saad Sabry Alzubaidy — Surgical Clinic</h2>
+    <h2>Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</h2>
 </header>
 
 <div id="mainContent" class="container" style="display:none;">
 
-    <!-- ==================== SIDEBAR ==================== -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
 
         <!-- Web Booking Inbox -->
         <div class="card" id="webInboxCard" style="display:none; background: rgba(255,159,10,0.08); border-color: rgba(255,159,10,0.35);">
             <h3 style="color:var(--warning); margin-bottom:10px; border:none;">
-                🌐 Web Requests
+                Web Requests
                 <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span>
             </h3>
             <div id="webReqList" style="max-height:280px; overflow-y:auto; padding-right:4px;"></div>
@@ -682,61 +607,52 @@
             <div id="bmiRes" style="font-weight:800; text-align:center; padding:10px 5px 0; font-size:2em; color:var(--primary);">--</div>
         </div>
 
-        <!-- Manual History Filter -->
-<div class="card">
-    <h3 style="margin-bottom:10px; border:none;">
-        History 
-        <div style="display:flex; gap:5px;">
-            <span id="totalPtCount" style="color:var(--text-secondary); font-size:11px; font-weight:400; padding:3px 0;">-- Patients</span>
-            <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span>
+        <!-- History Filter -->
+        <div class="card">
+            <h3 style="margin-bottom:10px; border:none;">
+                History
+                <div style="display:flex; gap:5px;">
+                    <span id="totalPtCount" style="color:var(--text-secondary); font-size:11px; font-weight:400; padding:3px 0;">-- Patients</span>
+                    <span id="waitCounter" style="background:var(--primary); color:white; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;">0</span>
+                </div>
+            </h3>
+
+            <input type="text" id="searchBox" placeholder="Search Name or C/O..." oninput="onSearch()" style="margin-bottom:8px;">
+
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:6px; align-items:center;">
+                <select id="filterMonth" style="margin:0; padding:10px; border-radius:12px; background:rgba(255,255,255,0.05); font-size:13px; color:var(--text-primary);">
+                    <option value="">All Months</option>
+                    <option value="01">January (01)</option>
+                    <option value="02">February (02)</option>
+                    <option value="03">March (03)</option>
+                    <option value="04">April (04)</option>
+                    <option value="05">May (05)</option>
+                    <option value="06">June (06)</option>
+                    <option value="07">July (07)</option>
+                    <option value="08">August (08)</option>
+                    <option value="09">September (09)</option>
+                    <option value="10">October (10)</option>
+                    <option value="11">November (11)</option>
+                    <option value="12">December (12)</option>
+                </select>
+                <input type="number" id="filterYear" placeholder="Year" style="margin:0; padding:10px; border-radius:12px; text-align:center;">
+                <button onclick="renderList()" style="width:auto; padding:10px 15px; background:var(--primary); border-radius:12px; font-size:13px;">Filter</button>
+            </div>
+
+            <button class="btn-ghost" id="filterActionBtn" onclick="filterAction()">Show All Patients</button>
+
+            <div id="patientList" style="max-height:540px; overflow-y:auto; margin-top:14px; padding-right:4px;"></div>
         </div>
-    </h3>
-
-    <!-- Text Search -->
-    <input type="text" id="searchBox" placeholder="🔍 Search Name or C/O…" oninput="renderList()" style="margin-bottom:8px;">
-
-    <!-- Manual Month/Year Selector -->
-    <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:6px; align-items:center;">
-        <select id="filterMonth" style="margin:0; padding:10px; border-radius:12px; background:rgba(255,255,255,0.05); font-size:13px; color:var(--text-primary);">
-            <option value="">All Months</option>
-            <option value="01">January (01)</option>
-            <option value="02">February (02)</option>
-            <option value="03">March (03)</option>
-            <option value="04">April (04)</option>
-            <option value="05">May (05)</option>
-            <option value="06">June (06)</option>
-            <option value="07">July (07)</option>
-            <option value="08">August (08)</option>
-            <option value="09">September (09)</option>
-            <option value="10">October (10)</option>
-            <option value="11">November (11)</option>
-            <option value="12">December (12)</option>
-        </select>
-
-        <input type="number" id="filterYear" placeholder="Year" value="2024" style="margin:0; padding:10px; border-radius:12px; text-align:center;">
-
-        <button onclick="renderList()" style="width:auto; padding:10px 15px; background:var(--primary); border-radius:12px; font-size:13px;">Filter</button>
-    </div>
-    
-    <button onclick="clearHistoryFilter()" style="background:none; color:var(--text-secondary); font-size:11px; border:none; box-shadow:none; text-decoration:underline; padding-top:10px; cursor:pointer; width:100%;">Clear All Filters</button>
-
-    <div id="patientList" style="max-height:540px; overflow-y:auto; margin-top:14px; padding-right:4px;"></div>
-</div>
-    <!-- Container for list -->
-    <div id="patientList" style="max-height:540px; overflow-y:auto; margin-top:14px; padding-right:4px;"></div>
-</div>
 
     </div><!-- /sidebar -->
 
-    <!-- ==================== CONTENT ==================== -->
+    <!-- CONTENT -->
     <div class="content">
 
-        <!-- Dashboard Row -->
         <div class="dash-grid">
-            <!-- Patient Flow Stats -->
+            <!-- Patient Flow -->
             <div class="card" style="border-left: 5px solid var(--call); grid-column: span 1;">
-                <h3 style="color:var(--call); border:none; margin-bottom:10px;">📈 Patient Flow Tracker</h3>
-                
+                <h3 style="color:var(--call); border:none; margin-bottom:10px;">Patient Flow Tracker</h3>
                 <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
                     <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">TIME PERIOD</label>
                     <select id="flowFilterType" onchange="document.getElementById('flowCustomDates').style.display = (this.value === 'custom') ? 'grid' : 'none';" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
@@ -744,15 +660,12 @@
                         <option value="month">This Month</option>
                         <option value="custom">Custom Range</option>
                     </select>
-                    
                     <div id="flowCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
                         <input type="date" id="flowStart" style="padding: 5px; font-size: 12px; margin: 0;">
                         <input type="date" id="flowEnd" style="padding: 5px; font-size: 12px; margin: 0;">
                     </div>
-                    
                     <button class="action-btn" style="background:var(--call); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculatePatientFlow()">Generate Report</button>
                 </div>
-
                 <div id="flowSummary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; text-align: center;">
                     <div style="background: rgba(48, 209, 88, 0.1); padding: 10px; border-radius: 12px;">
                         <div id="countNew" style="font-size: 1.5em; font-weight: 800; color: var(--success);">0</div>
@@ -763,16 +676,14 @@
                         <div style="font-size: 10px; color: var(--text-secondary);">FOLLOW-UPS</div>
                     </div>
                 </div>
-
                 <div id="flowList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
                     <p style="color:var(--text-secondary); text-align: center; padding: 10px 0;">No report generated.</p>
                 </div>
             </div>
-            <!-- Advanced Lab Referral Tracker -->
+
+            <!-- Lab Stats -->
             <div class="card" style="border-left: 5px solid var(--lab); grid-column: span 1;">
-                <h3 style="color:var(--lab); border:none; margin-bottom:10px;">🧪 Lab Referral Stats</h3>
-                
-                <!-- Date Filters -->
+                <h3 style="color:var(--lab); border:none; margin-bottom:10px;">Lab Referral Stats</h3>
                 <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
                     <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">FILTER BY DATE</label>
                     <select id="labFilterType" onchange="toggleLabDateInputs()" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
@@ -780,25 +691,25 @@
                         <option value="month">This Month</option>
                         <option value="custom">Custom Range</option>
                     </select>
-                    
                     <div id="labCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
                         <input type="date" id="labStart" style="padding: 5px; font-size: 12px; margin: 0;">
                         <input type="date" id="labEnd" style="padding: 5px; font-size: 12px; margin: 0;">
                     </div>
-                    
                     <button class="action-btn" style="background:var(--lab); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculateLabStats()">Load Statistics</button>
                 </div>
-
                 <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span></div>
                 <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
                     <p style="color:var(--text-secondary); text-align: center; padding: 20px 0;">Select range and click Load.</p>
                 </div>
             </div>
-            <div class="card"><h3>🔔 Reminders</h3><div id="remList" class="scroll-card"></div></div>
 
+            <!-- Reminders -->
+            <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
+
+            <!-- Overdue -->
             <div class="card">
                 <h3 style="margin-bottom:10px; border:none; display:flex; justify-content:space-between; align-items:center;">
-                    <span>🔴 25-Day Overdue</span>
+                    <span>25-Day Overdue</span>
                     <div style="display:flex; gap:6px;">
                         <button class="action-btn" style="color:var(--primary); font-size:11px; background:rgba(10,132,255,0.12); padding:4px 10px;" onclick="renderOverdueRadar()">Load</button>
                         <button class="action-btn" style="font-size:11px; background:rgba(255,255,255,0.08); padding:4px 10px;" onclick="dismissAllOverdue()">Clear</button>
@@ -809,31 +720,28 @@
                 </div>
             </div>
 
-            <div class="card"><h3>📅 Operations</h3>
+            <!-- Operations -->
+            <div class="card"><h3>Operations</h3>
                 <div class="table-responsive">
                     <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary);">No surgeries scheduled.</div>
                 </div>
             </div>
         </div>
 
-        <!-- Empty state -->
         <div id="emptyState" class="card">
             <p style="font-size:1.15em; font-weight:600;">Select a patient file to begin clinical review.</p>
         </div>
 
         <!-- Patient File View -->
         <div id="fileView" class="card" style="display:none;">
-
-            <!-- Name & WhatsApp -->
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div style="width:100%;">
                     <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:8px; font-size:1.5em;"></h2>
                     <div id="waArea" style="margin-top:8px;"></div>
                 </div>
-                <div id="syncIndicator" style="display:none; padding:5px 12px;">● SAVING</div>
+                <div id="syncIndicator" style="display:none; padding:5px 12px;">SAVING</div>
             </div>
 
-            <!-- Active Reminder Banner -->
             <div id="activeReminderBanner" style="display:none; background:rgba(255,159,10,0.12); border-left:5px solid var(--warning); padding:14px; border-radius:14px; margin-top:14px; color:var(--text-primary); font-weight:600; font-size:14px; border:1px solid rgba(255,159,10,0.3);"></div>
 
             <!-- Chief Complaint -->
@@ -847,7 +755,7 @@
                 <div>
                     <span class="section-label" style="color:var(--text-secondary);">BIO</span>
                     <p id="viewContact" style="font-weight:600; margin:6px 0 0; font-size:15px; color:var(--text-primary);"></p>
-                    <span style="font-size:13px; color:var(--primary); display:block; margin-top:10px; font-weight:600; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> ✎</span>
+                    <span style="font-size:13px; color:var(--primary); display:block; margin-top:10px; font-weight:600; cursor:pointer;" onclick="editRegDate()">Registered: <span id="viewRegDate"></span> &#9998;</span>
                 </div>
                 <div>
                     <span class="section-label" style="color:var(--text-secondary);">VISIT AUDIT (EDIT/DELETE)</span>
@@ -855,8 +763,7 @@
                 </div>
             </div>
 
-            <!-- Dismiss Overdue Btn -->
-            <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:rgba(255,69,58,0.12); color:var(--danger); border:1px solid var(--danger); margin-bottom:18px; display:none; padding:10px 15px; border-radius:12px; width:auto; box-shadow:none;">✕ Dismiss 25-Day Alert</button>
+            <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:rgba(255,69,58,0.12); color:var(--danger); border:1px solid var(--danger); margin-bottom:18px; display:none; padding:10px 15px; border-radius:12px; width:auto; box-shadow:none;">Dismiss 25-Day Alert</button>
 
             <!-- Task Scheduler -->
             <div class="card" style="background:rgba(255,214,10,0.05); border-color:rgba(255,214,10,0.25); margin-bottom:18px; padding:18px;">
@@ -868,26 +775,32 @@
                 </div>
             </div>
 
-            <!-- Clinical Sheet Insert -->
+            <!-- Insert Clinical Sheet -->
             <div style="display:flex; justify-content:flex-end; margin-bottom:-8px;">
-                <button onclick="insertClinicalSheet()" style="width:auto; background:rgba(255,255,255,0.08); padding:10px 18px; font-size:13px; border-radius:18px; box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:10; position:relative; top:14px; right:8px; border:1px solid var(--card-border);">📄 Insert Clinical Sheet</button>
+                <button onclick="insertClinicalSheet()" style="width:auto; background:rgba(255,255,255,0.08); padding:10px 18px; font-size:13px; border-radius:18px; box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:10; position:relative; top:14px; right:8px; border:1px solid var(--card-border);">Insert Clinical Sheet</button>
             </div>
 
             <!-- Clinical History -->
             <div class="section-block" style="border-left:4px solid var(--primary);">
-                <span class="section-label" style="color:var(--text-secondary);">Clinical History</span>
-                <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
+                    <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Clinical History</span>
+                    <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="stampVisit('vPres')">+ Visit Stamp</button>
+                </div>
+                <textarea id="vPres" oninput="autoExpand(this); autoSyncTrigger()"></textarea>
             </div>
 
             <!-- Management -->
             <div class="section-block" style="border-left:4px solid var(--success);">
-                <span class="section-label" style="color:var(--text-secondary);">Management (Mx)</span>
-                <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()" onfocus="smartStamp(this)"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
+                    <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Management (Mx)</span>
+                    <button class="action-btn" style="color:var(--success); font-size:11px;" onclick="stampVisit('vVisits')">+ Visit Stamp</button>
+                </div>
+                <textarea id="vVisits" oninput="autoExpand(this); autoSyncTrigger()"></textarea>
             </div>
 
             <!-- AI Referral -->
             <div class="section-block" style="background:rgba(10,132,255,0.04); border-left:4px solid var(--primary);">
-                <span class="section-label" style="color:var(--primary);">📋 AI Surgical Referral Engine</span>
+                <span class="section-label" style="color:var(--primary);">AI Surgical Referral Engine</span>
                 <button onclick="generateReferral()" style="background:var(--primary); margin:0;">Generate Professional Letter</button>
                 <div id="referralResult" class="ai-box" style="display:none;" contenteditable="true"></div>
             </div>
@@ -903,24 +816,24 @@
                 <div class="table-responsive"><div id="opHistoryList" style="margin-top:14px; font-size:13px; color:var(--text-primary);"></div></div>
             </div>
 
-            <!-- Advanced Pathology -->
+            <!-- Pathology -->
             <div class="section-block section-lab" style="border-left:4px solid var(--lab); background:rgba(100,210,255,0.04);">
-                <span class="section-label" style="color:var(--lab);">🧪 Advanced Pathology (Global Network)</span>
+                <span class="section-label" style="color:var(--lab);">Advanced Pathology (Global Network)</span>
                 <div class="lab-tag-box" id="labSelector"></div>
-                <button onclick="addNewCustomLab()" style="background:rgba(255,255,255,0.07); margin-top:14px; padding:11px; font-size:13px; width:auto; border-radius:14px; border:1px solid var(--card-border); color:var(--text-primary); box-shadow:none;">+ Create Custom Test (Updates Globally)</button>
+                <button onclick="addNewCustomLab()" style="background:rgba(255,255,255,0.07); margin-top:14px; padding:11px; font-size:13px; width:auto; border-radius:14px; border:1px solid var(--card-border); color:var(--text-primary); box-shadow:none;">+ Create Custom Test</button>
                 <div id="labResultsList" style="margin-top:18px;"></div>
             </div>
 
             <!-- Imaging -->
             <div class="section-block section-img" style="border-left:4px solid var(--img); background:rgba(191,90,242,0.04);">
-                <span class="section-label" style="color:var(--img);">📸 Imaging & Endoscopy Suite</span>
+                <span class="section-label" style="color:var(--img);">Imaging & Endoscopy Suite</span>
                 <div class="lab-tag-box" id="imagingSelector"></div>
                 <div id="imagingResultsList" style="margin-top:18px;"></div>
             </div>
 
             <!-- Vitals -->
             <div class="section-block section-vitals" style="border-left:4px solid #8E8E93;">
-                <span class="section-label" style="color:var(--text-secondary);">⚖️ Weight & BP Trends</span>
+                <span class="section-label" style="color:var(--text-secondary);">Weight & BP Trends</span>
                 <div class="mobile-stack" style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px;">
                     <input type="text" id="vW" placeholder="Wt (kg)" style="margin:0;">
                     <input type="text" id="vBP" placeholder="BP" style="margin:0;">
@@ -930,8 +843,7 @@
                 <div id="vitalList" style="margin-top:14px;"></div>
             </div>
 
-            <!-- Force Sync -->
-            <button onclick="manualSync()" style="background:var(--success); height:58px; font-size:16px; margin-top:8px; box-shadow:0 4px 16px rgba(48,209,88,0.3); border-radius:18px;">💾 Force Cloud Database Sync</button>
+            <button onclick="manualSync()" style="background:var(--success); height:58px; font-size:16px; margin-top:8px; box-shadow:0 4px 16px rgba(48,209,88,0.3); border-radius:18px;">Force Cloud Database Sync</button>
 
         </div><!-- /fileView -->
     </div><!-- /content -->
@@ -941,7 +853,7 @@
     /* ================================================================
        FIREBASE CONFIG
     ================================================================ */
-    const firebaseConfig = {
+    firebase.initializeApp({
         apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
         authDomain: "saad-clinic.firebaseapp.com",
         databaseURL: "https://saad-clinic-default-rtdb.firebaseio.com",
@@ -950,10 +862,8 @@
         messagingSenderId: "216860298716",
         appId: "1:216860298716:web:6f2e31e3267f8d1487d319",
         measurementId: "G-3DBY6CC5HD"
-    };
-    firebase.initializeApp(firebaseConfig);
+    });
     const db = firebase.database();
-    try { db.ref().keepSynced(true); } catch(e) {}
 
     /* ================================================================
        STATE
@@ -966,31 +876,28 @@
     let activeId = null;
     let syncTimeout = null;
     let activeListener = null;
-    let isInitialLoad = true;
+    let searchTimer = null;
+    let calendarTimer = null;
 
     /* ================================================================
-       THEME TOGGLE
+       THEME
     ================================================================ */
     function toggleTheme() {
         const html = document.documentElement;
         const overlay = document.getElementById('themeOverlay');
         const btn = document.getElementById('themeToggle');
-        const current = html.getAttribute('data-theme');
-        const next = current === 'dark' ? 'glass' : 'dark';
-
-        // Flash effect
+        const next = html.getAttribute('data-theme') === 'dark' ? 'glass' : 'dark';
         overlay.classList.add('flash');
         setTimeout(() => overlay.classList.remove('flash'), 350);
-
         html.setAttribute('data-theme', next);
-        btn.textContent = next === 'dark' ? '🌙' : '✦';
+        btn.textContent = next === 'dark' ? '\u{1F319}' : '\u2726';
         localStorage.setItem('saadTheme', next);
     }
 
     function applyStoredTheme() {
         const stored = localStorage.getItem('saadTheme') || 'dark';
         document.documentElement.setAttribute('data-theme', stored);
-        document.getElementById('themeToggle').textContent = stored === 'dark' ? '🌙' : '✦';
+        document.getElementById('themeToggle').textContent = stored === 'dark' ? '\u{1F319}' : '\u2726';
     }
 
     /* ================================================================
@@ -1013,7 +920,6 @@
        FIREBASE SYNC
     ================================================================ */
     function initSync() {
-        // Global labs
         db.ref('globalLabs').on('value', snap => {
             if (snap.exists()) { globalLabs = snap.val(); }
             else { globalLabs = initialLabs; db.ref('globalLabs').set(initialLabs); }
@@ -1021,31 +927,99 @@
             if (activeId && ptDetails[activeId]) renderLabs(ptDetails[activeId].labs || {});
         });
 
-        // Web bookings
         db.ref('pendingBookings').on('value', snap => {
             pendingBookings = snap.val() || {};
             renderWebRequests();
         });
 
-        // Patient index
-      // Patient index listener
         db.ref('patientIndex').on('value', snap => {
             ptIdx = snap.val() || {};
-            isInitialLoad = false;
-            renderList(); // This draws the list
-            renderCalendarFromDB(); 
-            
-            // Update the Total Count Badge
-            const totalCount = Object.keys(ptIdx).length;
-            document.getElementById('totalPtCount').innerText = totalCount + " Patients";
+            renderList();
+            scheduleCalendarRender();
+            document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
         });
 
-        // Reminders
         db.ref('reminders').on('value', snap => {
             allReminders = snap.val() || {};
             renderRems();
             checkActiveReminderBanner();
         });
+    }
+
+    function scheduleCalendarRender() {
+        clearTimeout(calendarTimer);
+        calendarTimer = setTimeout(renderCalendarFromDB, 300);
+    }
+
+    /* ================================================================
+       SEARCH DEBOUNCE
+    ================================================================ */
+    function onSearch() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(renderList, 200);
+    }
+
+    /* ================================================================
+       FILTER ACTION BUTTON
+    ================================================================ */
+    function isFilterActive() {
+        const q = document.getElementById('searchBox').value.trim();
+        const m = document.getElementById('filterMonth').value;
+        const y = document.getElementById('filterYear').value.trim();
+        const curYear = String(new Date().getFullYear());
+        return q !== '' || m !== '' || (y !== '' && y !== curYear);
+    }
+
+    function updateFilterBtn() {
+        const btn = document.getElementById('filterActionBtn');
+        if (isFilterActive()) {
+            btn.innerText = 'Clear Filter';
+            btn.onclick = clearHistoryFilter;
+        } else {
+            btn.innerText = 'Show All Patients';
+            btn.onclick = function() { renderList(); };
+        }
+    }
+
+    function filterAction() {
+        if (isFilterActive()) {
+            clearHistoryFilter();
+        } else {
+            renderList();
+        }
+    }
+
+    function clearHistoryFilter() {
+        document.getElementById('searchBox').value = '';
+        document.getElementById('filterMonth').value = '';
+        document.getElementById('filterYear').value = '';
+        renderList();
+    }
+
+    /* ================================================================
+       AUTO-EXPAND (no-jump version)
+    ================================================================ */
+    function autoExpand(field) {
+        if (field.scrollHeight > field.clientHeight + 1) {
+            field.style.height = field.scrollHeight + 'px';
+        }
+    }
+
+    /* ================================================================
+       VISIT STAMP (manual, not auto on focus)
+    ================================================================ */
+    function stampVisit(textareaId) {
+        const box = document.getElementById(textareaId);
+        if (!box || !activeId) return;
+        const today = new Date().toLocaleDateString('en-GB');
+        const stamp = '--- Visit: ' + today + ' ---\n';
+        if (!box.value.includes(stamp)) {
+            box.value = box.value + (box.value ? '\n\n' : '') + stamp;
+            autoExpand(box);
+            autoSyncTrigger();
+            box.focus();
+            box.setSelectionRange(box.value.length, box.value.length);
+        }
     }
 
     /* ================================================================
@@ -1056,28 +1030,23 @@
         const card = document.getElementById('webInboxCard');
         const countBadge = document.getElementById('webReqCount');
         const keys = Object.keys(pendingBookings);
-
         if (keys.length > 0) {
             card.style.display = 'block';
             countBadge.innerText = keys.length;
             list.innerHTML = '';
             keys.forEach(k => {
                 const req = pendingBookings[k];
-                list.innerHTML += `
-                    <div class="web-req-item">
-                        <div style="display:flex; justify-content:space-between;">
-                            <b style="font-size:15px; color:var(--primary);">${req.name}</b>
-                            <span style="font-size:12px; color:var(--text-secondary);">Age: ${req.age || '--'}</span>
-                        </div>
-                        <div style="font-size:13px; color:var(--text-primary); margin-top:5px;">📞 ${req.phone}</div>
-                        <div style="font-size:13px; font-style:italic; background:rgba(0,0,0,0.15); padding:8px; border-radius:10px; margin-top:7px; color:var(--text-primary);">
-                            "${req.symptom}" <br><span style="color:var(--danger); font-size:11px;">(${req.duration})</span>
-                        </div>
-                        <div class="web-req-actions">
-                            <button style="background:var(--success); color:white; border:none; cursor:pointer;" onclick="acceptWebBooking('${k}')">✅ Accept</button>
-                            <button style="background:rgba(255,69,58,0.12); color:var(--danger); border:1px solid var(--danger); cursor:pointer;" onclick="rejectWebBooking('${k}')">🗑️ Reject</button>
-                        </div>
-                    </div>`;
+                list.innerHTML += '<div class="web-req-item">' +
+                    '<div style="display:flex; justify-content:space-between;">' +
+                    '<b style="font-size:15px; color:var(--primary);">' + req.name + '</b>' +
+                    '<span style="font-size:12px; color:var(--text-secondary);">Age: ' + (req.age || '--') + '</span></div>' +
+                    '<div style="font-size:13px; color:var(--text-primary); margin-top:5px;">' + req.phone + '</div>' +
+                    '<div style="font-size:13px; font-style:italic; background:rgba(0,0,0,0.15); padding:8px; border-radius:10px; margin-top:7px; color:var(--text-primary);">' +
+                    '"' + req.symptom + '" <br><span style="color:var(--danger); font-size:11px;">(' + req.duration + ')</span></div>' +
+                    '<div class="web-req-actions">' +
+                    '<button style="background:var(--success); color:white; border:none; cursor:pointer;" onclick="acceptWebBooking(\'' + k + '\')">Accept</button>' +
+                    '<button style="background:rgba(255,69,58,0.12); color:var(--danger); border:1px solid var(--danger); cursor:pointer;" onclick="rejectWebBooking(\'' + k + '\')">Reject</button>' +
+                    '</div></div>';
             });
         } else {
             card.style.display = 'none';
@@ -1089,11 +1058,10 @@
         if (!req) return;
         const id = Date.now();
         const d = new Date().toLocaleDateString('en-GB');
-        const combinedComplaint = `[WEB] ${req.symptom} (${req.duration})`;
-        db.ref('patientIndex/' + id).set({ name: req.name, age: req.age || '', phone: req.phone || '', complaint: combinedComplaint, dateAdded: d, lastVisit: d, isWaiting: true, pinned: false });
-        db.ref('patientDetails/' + id).set({ name: req.name, presentation: `--- Online Booking Request ---\nSymptoms: ${req.symptom}\nDuration: ${req.duration}\n\n`, visits: '', visitDates: [] });
+        db.ref('patientIndex/' + id).set({ name: req.name, age: req.age || '', phone: req.phone || '', complaint: '[WEB] ' + req.symptom + ' (' + req.duration + ')', dateAdded: d, lastVisit: d, isWaiting: true, pinned: false });
+        db.ref('patientDetails/' + id).set({ name: req.name, presentation: '--- Online Booking Request ---\nSymptoms: ' + req.symptom + '\nDuration: ' + req.duration + '\n\n', visits: '', visitDates: [] });
         db.ref('pendingBookings/' + reqId).remove();
-        showToast(`✅ ${req.name} added to clinic registry!`);
+        showToast(req.name + ' added to clinic registry!');
     }
 
     function rejectWebBooking(reqId) {
@@ -1103,13 +1071,12 @@
     }
 
     /* ================================================================
-       ✅ FIX 2: CALENDAR — query Firebase directly (not local cache)
+       CALENDAR
     ================================================================ */
     function renderCalendarFromDB() {
         const cal = document.getElementById('opCalendar');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
         db.ref('patientDetails').once('value').then(snap => {
             const allDetails = snap.val() || {};
             let rows = '';
@@ -1119,28 +1086,16 @@
                     const opDate = new Date(d.opD);
                     if (opDate >= today) {
                         const patName = ptIdx[id] ? ptIdx[id].name : (d.name || 'Unknown');
-                        rows += `<tr>
-                            <td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">${d.opD}</td>
-                            <td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData('${id}')"><b style="color:var(--primary);">${patName}</b></td>
-                            <td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">${d.opT || ''}</td>
-                        </tr>`;
+                        rows += '<tr><td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + d.opD + '</td>' +
+                            '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + id + '\')"><b style="color:var(--primary);">' + patName + '</b></td>' +
+                            '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + (d.opT || '') + '</td></tr>';
                     }
                 }
             });
             cal.innerHTML = rows
-                ? `<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">
-                    <tr><th style="color:var(--text-secondary); padding:6px 10px;">Date</th><th style="color:var(--text-secondary); padding:6px 10px;">Patient</th><th style="color:var(--text-secondary); padding:6px 10px;">Procedure</th></tr>
-                    ${rows}</table>`
+                ? '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;"><tr><th style="color:var(--text-secondary); padding:6px 10px;">Date</th><th style="color:var(--text-secondary); padding:6px 10px;">Patient</th><th style="color:var(--text-secondary); padding:6px 10px;">Procedure</th></tr>' + rows + '</table>'
                 : "<p style='color:var(--text-secondary); padding:10px;'>No upcoming surgeries.</p>";
         });
-    }
-
-    /* ================================================================
-       AUTO-EXPAND TEXTAREA
-    ================================================================ */
-    function autoExpand(field) {
-        field.style.height = 'auto';
-        field.style.height = field.scrollHeight + 'px';
     }
 
     /* ================================================================
@@ -1149,6 +1104,7 @@
     function loadFullData(id) {
         if (activeListener) activeListener.off();
         activeId = id;
+
         db.ref('patientIndex/' + id).update({ isWaiting: false, hasPendingLab: false });
 
         document.querySelectorAll('.pt-item').forEach(el => el.classList.remove('active'));
@@ -1156,6 +1112,9 @@
         if (ptEl) ptEl.classList.add('active');
 
         checkActiveReminderBanner();
+
+        // Scroll content to top on patient switch
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         activeListener = db.ref('patientDetails/' + id);
         activeListener.on('value', snap => {
@@ -1173,7 +1132,7 @@
 
             document.getElementById('viewName').innerText = b.name || "Unknown";
             document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
-            document.getElementById('viewContact').innerHTML = `Age: ${b.age || '--'} | Mobile: ${b.phone || '--'}`;
+            document.getElementById('viewContact').innerHTML = 'Age: ' + (b.age || '--') + ' | Mobile: ' + (b.phone || '--');
             document.getElementById('viewRegDate').innerText = b.dateAdded || '--';
 
             let waNum = b.phone ? b.phone.replace(/\D/g, '') : '';
@@ -1184,16 +1143,21 @@
                 else if (!waNum.startsWith('964')) waNum = '964' + waNum;
             }
             document.getElementById('waArea').innerHTML = waNum
-                ? `<button onclick="sendWhatsApp('${waNum}','${b.name.replace(/'/g,"\\'")}') " style="background:#25d366;color:white;padding:8px 16px;border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 4px 10px rgba(37,211,102,0.3);width:auto;">💬 WhatsApp Direct</button>`
+                ? '<button onclick="sendWhatsApp(\'' + waNum + '\',\'' + b.name.replace(/'/g, "\\'") + '\')" style="background:#25d366;color:white;padding:8px 16px;border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 4px 10px rgba(37,211,102,0.3);width:auto;">WhatsApp Direct</button>'
                 : '';
 
+            // Only update textareas if NOT currently focused (prevents jump on sync)
             const presBox = document.getElementById('vPres');
-            presBox.value = d.presentation || '';
-            setTimeout(() => autoExpand(presBox), 50);
-
             const visitsBox = document.getElementById('vVisits');
-            visitsBox.value = d.visits || '';
-            setTimeout(() => autoExpand(visitsBox), 50);
+
+            if (document.activeElement !== presBox) {
+                presBox.value = d.presentation || '';
+                setTimeout(() => autoExpand(presBox), 50);
+            }
+            if (document.activeElement !== visitsBox) {
+                visitsBox.value = d.visits || '';
+                setTimeout(() => autoExpand(visitsBox), 50);
+            }
 
             document.getElementById('vOpDate').value = d.opD || '';
             document.getElementById('vOpDetail').value = d.opT || '';
@@ -1226,7 +1190,7 @@
     }
 
     /* ================================================================
-       ✅ FIX 3: REMINDER SORT — use parseIraqiDate for proper DD/MM/YYYY sort
+       REMINDERS
     ================================================================ */
     function renderRems() {
         const list = document.getElementById('remList');
@@ -1234,44 +1198,37 @@
         const pending = Object.keys(allReminders)
             .filter(id => allReminders[id].status === 'pending')
             .sort((a, b) => parseIraqiDate(allReminders[a].date) - parseIraqiDate(allReminders[b].date));
-
         pending.forEach(id => {
             const r = allReminders[id];
             const targetId = r.ptId || r.patientId;
-            list.innerHTML += `
-                <div class="rem-item" onclick="loadFullData('${targetId}')">
-                    <button style="float:right; background:var(--success); color:white; border:none; border-radius:10px; padding:7px 12px; font-size:13px; cursor:pointer; width:auto;" onclick="event.stopPropagation(); db.ref('reminders/${id}').update({status:'done'})">✓</button>
-                    <strong style="color:var(--warning); display:block; margin-bottom:4px;">${r.date}</strong>${r.text}
-                </div>`;
+            list.innerHTML += '<div class="rem-item" onclick="loadFullData(\'' + targetId + '\')">' +
+                '<button style="float:right; background:var(--success); color:white; border:none; border-radius:10px; padding:7px 12px; font-size:13px; cursor:pointer; width:auto;" onclick="event.stopPropagation(); db.ref(\'reminders/' + id + '\').update({status:\'done\'})">&#10003;</button>' +
+                '<strong style="color:var(--warning); display:block; margin-bottom:4px;">' + r.date + '</strong>' + r.text + '</div>';
         });
         if (!list.innerHTML) list.innerHTML = "<p style='color:var(--text-secondary); padding:10px;'>No pending tasks.</p>";
     }
 
     /* ================================================================
-       OVERDUE RADAR
+       OVERDUE
     ================================================================ */
     function renderOverdueRadar() {
         const list = document.getElementById('overdueList');
         if (!list) return;
-        list.innerHTML = '<div style="text-align:center;padding:10px;color:var(--text-secondary);font-size:13px;">Analyzing database…</div>';
+        list.innerHTML = '<div style="text-align:center;padding:10px;color:var(--text-secondary);font-size:13px;">Analyzing database...</div>';
         setTimeout(() => {
-            const overduePatients = Object.keys(ptIdx).map(id => {
+            const overdue = Object.keys(ptIdx).map(id => {
                 const p = ptIdx[id];
                 const lastV = p.lastVisit || p.dateAdded || "N/A";
-                const days = getDaysSince(lastV);
-                return { id, p, lastV, days };
-            }).filter(data => data.days >= 25 && data.p.dismissedVisit !== data.lastV)
+                return { id, p, lastV, days: getDaysSince(lastV) };
+            }).filter(d => d.days >= 25 && d.p.dismissedVisit !== d.lastV)
               .sort((a, b) => b.days - a.days);
-
-            if (!overduePatients.length) {
+            if (!overdue.length) {
                 list.innerHTML = "<p style='color:var(--text-secondary);padding:10px;text-align:center;font-size:13px;'>All patients are up to date.</p>";
                 return;
             }
-            list.innerHTML = overduePatients.map(data => `
-                <div class="overdue-item" onclick="loadFullData('${data.id}')">
-                    <div><b style="color:var(--primary);">${data.p.name}</b><br><span style="font-size:11px;color:var(--text-secondary);">${data.days} days since last visit (${data.lastV})</span></div>
-                    <span style="font-size:16px;">🔴</span>
-                </div>`).join('');
+            list.innerHTML = overdue.map(d =>
+                '<div class="overdue-item" onclick="loadFullData(\'' + d.id + '\')"><div><b style="color:var(--primary);">' + d.p.name + '</b><br><span style="font-size:11px;color:var(--text-secondary);">' + d.days + ' days since last visit (' + d.lastV + ')</span></div><span style="font-size:16px;">&#128308;</span></div>'
+            ).join('');
         }, 50);
     }
 
@@ -1283,7 +1240,7 @@
                 if (getDaysSince(lastV) >= 25) db.ref('patientIndex/' + id).update({ dismissedVisit: lastV });
             });
             document.getElementById('overdueList').innerHTML = "<p style='color:var(--text-secondary);padding:10px;text-align:center;font-size:13px;'>All alerts cleared.</p>";
-            showToast("✅ All alerts cleared.");
+            showToast("All alerts cleared.");
         }
     }
 
@@ -1291,8 +1248,8 @@
         const lastV = ptIdx[activeId].lastVisit || ptIdx[activeId].dateAdded;
         db.ref('patientIndex/' + activeId).update({ dismissedVisit: lastV });
         document.getElementById('dismissOverdueBtn').style.display = 'none';
-        if (document.getElementById('overdueList').innerHTML.includes('overdue-item')) renderOverdueRadar();
-        showToast("✅ Alert Dismissed for this cycle.");
+        if (document.getElementById('overdueList').querySelector('.overdue-item')) renderOverdueRadar();
+        showToast("Alert dismissed for this cycle.");
     }
 
     /* ================================================================
@@ -1302,15 +1259,11 @@
         const log = document.getElementById('visitHistoryLog');
         log.innerHTML = '';
         dates.slice().reverse().forEach((dt, i) => {
-            const rIdx = (dates.length - 1) - i;
-            log.innerHTML += `
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:7px 0;border-bottom:1px solid var(--separator);color:var(--text-primary);">
-                    <span>📅 ${dt}</span>
-                    <div>
-                        <button class="action-btn" style="color:var(--primary);margin-right:10px;" onclick="editVisit(${rIdx})">✎ Edit</button>
-                        <button class="action-btn" style="color:var(--danger);" onclick="deleteVisit(${rIdx})">✕ Del</button>
-                    </div>
-                </div>`;
+            const rIdx = dates.length - 1 - i;
+            log.innerHTML += '<div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:7px 0;border-bottom:1px solid var(--separator);color:var(--text-primary);">' +
+                '<span>' + dt + '</span><div>' +
+                '<button class="action-btn" style="color:var(--primary);margin-right:10px;" onclick="editVisit(' + rIdx + ')">&#9998; Edit</button>' +
+                '<button class="action-btn" style="color:var(--danger);" onclick="deleteVisit(' + rIdx + ')">&#10005; Del</button></div></div>';
         });
     }
 
@@ -1341,8 +1294,8 @@
         const b = ptIdx[activeId] || {};
         const d = ptDetails[activeId] || {};
         const date = new Date().toLocaleDateString('en-GB');
-        const ageStr = b.age ? `${b.age} years old` : "Unknown age";
-        const text = `DATE: ${date}\nTO: Specialist Colleague\nFROM: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nSUBJECT: Comprehensive Surgical Referral for ${b.name} (${ageStr})\n\n------------------------------------------------------------\n\nCHIEF COMPLAINT / REASON FOR REFERRAL:\n${b.complaint || "Referred for specialist surgical evaluation."}\n\nHISTORY OF PRESENT ILLNESS & OBJECTIVE FINDINGS:\n${d.presentation || "[No specific history recorded in system. Please consult directly with patient.]"}\n\nPROPOSED MANAGEMENT & INVESTIGATIONS TO DATE:\n${d.visits || "[No management recorded in system.]"}\n\nCLINICAL REQUEST:\nDear Colleague,\nI am referring this patient to your esteemed clinic for specialist evaluation and potential co-management. Please review the clinical summary detailed above. I would greatly appreciate your expert opinion and feedback regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon`;
+        const ageStr = b.age ? b.age + ' years old' : "Unknown age";
+        const text = 'DATE: ' + date + '\nTO: Specialist Colleague\nFROM: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nSUBJECT: Comprehensive Surgical Referral for ' + b.name + ' (' + ageStr + ')\n\n---\n\nCHIEF COMPLAINT / REASON FOR REFERRAL:\n' + (b.complaint || "Referred for specialist surgical evaluation.") + '\n\nHISTORY OF PRESENT ILLNESS & OBJECTIVE FINDINGS:\n' + (d.presentation || "[No specific history recorded in system.]") + '\n\nPROPOSED MANAGEMENT & INVESTIGATIONS TO DATE:\n' + (d.visits || "[No management recorded in system.]") + '\n\nCLINICAL REQUEST:\nDear Colleague,\nI am referring this patient to your esteemed clinic for specialist evaluation and potential co-management. Please review the clinical summary detailed above. I would greatly appreciate your expert opinion and feedback regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon';
         document.getElementById('referralResult').innerText = text;
         document.getElementById('referralResult').style.display = 'block';
     }
@@ -1373,10 +1326,10 @@
     }
 
     function addNewCustomLab() {
-        const name = prompt("Enter New Test Name (e.g., Cortisol):");
+        const name = prompt("Enter New Test Name:");
         if (name) {
-            const range = prompt("Enter Normal Range (e.g., 5-25):") || "N/A";
-            const unit = prompt("Enter Unit (e.g., mcg/dL):") || "";
+            const range = prompt("Enter Normal Range:") || "N/A";
+            const unit = prompt("Enter Unit:") || "";
             const safeKey = name.replace(/[\.\#\$\[\]]/g, '_');
             db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit });
             orderLab(safeKey, name, range, unit);
@@ -1392,61 +1345,47 @@
 
             let sparkHtml = '';
             if (data.history && data.history.length > 1) {
-                const values = [...data.history].slice(-5).map(h => {
+                const values = data.history.slice(-5).map(h => {
                     const num = parseFloat((h.val || "0").match(/[0-9]*\.?[0-9]+/) || [0]);
                     return { num, stat: h.stat };
                 });
                 const maxV = Math.max(...values.map(v => v.num));
                 if (maxV > 0) {
-                    const bars = values.map(v => {
+                    sparkHtml = '<div class="sparkline-container">' + values.map(v => {
                         const hPct = Math.max((v.num / maxV) * 100, 10);
-                        const colorClass = (v.stat === "High" || v.stat === "Low") ? "red" : "";
-                        return `<div class="spark-bar ${colorClass}" style="height:${hPct}%;" title="Value: ${v.num}"></div>`;
-                    }).join('');
-                    sparkHtml = `<div class="sparkline-container">${bars}</div>`;
+                        const cls = (v.stat === "High" || v.stat === "Low") ? "red" : "";
+                        return '<div class="spark-bar ' + cls + '" style="height:' + hPct + '%;" title="Value: ' + v.num + '"></div>';
+                    }).join('') + '</div>';
                 }
             }
 
             let hHtml = '';
             (data.history || []).slice().reverse().forEach((h, idx) => {
-                const rIdx = (data.history.length - 1) - idx;
-                let icon = "🟢", colorClass = "val-normal";
-                if (h.stat === "High") { icon = "🔴 ⬆️"; colorClass = "val-abnormal"; }
-                else if (h.stat === "Low") { icon = "🔴 ⬇️"; colorClass = "val-abnormal"; }
-                hHtml += `
-                    <div class="lab-row">
-                        <span style="color:var(--text-primary);">${h.dt}: <span class="${colorClass}" style="font-size:16px;">${h.val} <span style="font-size:12px;font-weight:normal;color:var(--text-secondary);">${data.unit || ''}</span> ${icon}</span></span>
-                        <div>
-                            <button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editLabEntry('${safeKey}',${rIdx})">✎ Edit</button>
-                            <button class="action-btn" style="color:var(--danger);" onclick="deleteLabEntry('${safeKey}',${rIdx})">✕</button>
-                        </div>
-                    </div>`;
+                const rIdx = data.history.length - 1 - idx;
+                let icon = "&#128994;", colorClass = "val-normal";
+                if (h.stat === "High") { icon = "&#128308; &#11014;"; colorClass = "val-abnormal"; }
+                else if (h.stat === "Low") { icon = "&#128308; &#11015;"; colorClass = "val-abnormal"; }
+                hHtml += '<div class="lab-row"><span style="color:var(--text-primary);">' + h.dt + ': <span class="' + colorClass + '" style="font-size:16px;">' + h.val + ' <span style="font-size:12px;font-weight:normal;color:var(--text-secondary);">' + (data.unit || '') + '</span> ' + icon + '</span></span><div>' +
+                    '<button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editLabEntry(\'' + safeKey + '\',' + rIdx + ')">&#9998;</button>' +
+                    '<button class="action-btn" style="color:var(--danger);" onclick="deleteLabEntry(\'' + safeKey + '\',' + rIdx + ')">&#10005;</button></div></div>';
             });
 
-            list.innerHTML += `
-                <div class="lab-accordion">
-                    <div class="lab-header" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display==='block'?'none':'block')">
-                        <span>${dispName}${data.pending ? ' <span style="color:var(--danger);font-size:12px;margin-left:8px;">(PENDING)</span>' : ''}</span>
-                        <span style="font-size:11px;color:var(--text-secondary);font-weight:normal;">Ref Range: ${data.range || 'N/A'} ▼</span>
-                    </div>
-                    <div class="lab-body">
-                        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-                            <button onclick="addLabVal('${safeKey}')" style="background:var(--lab);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;color:#000;">+ Add Result</button>
-                            <button onclick="editLabMeta('${safeKey}')" style="background:rgba(255,255,255,0.08);border:1px solid var(--card-border);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;color:var(--text-primary);box-shadow:none;">✎ Edit Range/Unit (Global)</button>
-                            <button onclick="deleteFullLab('${safeKey}')" style="background:rgba(255,69,58,0.1);color:var(--danger);border:1px solid var(--danger);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;box-shadow:none;">✕ Delete Test</button>
-                        </div>
-                        ${hHtml}
-                        ${sparkHtml}
-                    </div>
-                </div>`;
+            list.innerHTML += '<div class="lab-accordion"><div class="lab-header" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\'block\'?\'none\':\'block\')">' +
+                '<span>' + dispName + (data.pending ? ' <span style="color:var(--danger);font-size:12px;margin-left:8px;">(PENDING)</span>' : '') + '</span>' +
+                '<span style="font-size:11px;color:var(--text-secondary);font-weight:normal;">Ref Range: ' + (data.range || 'N/A') + ' &#9660;</span></div>' +
+                '<div class="lab-body"><div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">' +
+                '<button onclick="addLabVal(\'' + safeKey + '\')" style="background:var(--lab);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;color:#000;">+ Add Result</button>' +
+                '<button onclick="editLabMeta(\'' + safeKey + '\')" style="background:rgba(255,255,255,0.08);border:1px solid var(--card-border);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;color:var(--text-primary);box-shadow:none;">Edit Range/Unit</button>' +
+                '<button onclick="deleteFullLab(\'' + safeKey + '\')" style="background:rgba(255,69,58,0.1);color:var(--danger);border:1px solid var(--danger);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;box-shadow:none;">Delete Test</button></div>' +
+                hHtml + sparkHtml + '</div></div>';
         });
     }
 
     function addLabVal(safeKey) {
-        const v = prompt(`Enter numerical value:`);
+        const v = prompt("Enter numerical value:");
         if (!v) return;
         let status = "Normal";
-        const flag = prompt(`Flag result:\nLeave blank = Normal 🟢\n"H" = High 🔴⬆️\n"L" = Low 🔴⬇️`);
+        const flag = prompt('Flag result:\nLeave blank = Normal\n"H" = High\n"L" = Low');
         if (flag) {
             if (flag.toLowerCase() === 'h') status = "High";
             if (flag.toLowerCase() === 'l') status = "Low";
@@ -1460,14 +1399,12 @@
     function editLabEntry(safeKey, idx) {
         const entry = ptDetails[activeId].labs[safeKey].history[idx];
         const newVal = prompt("Edit Value:", entry.val);
-        const newFlag = prompt(`Flag (Currently ${entry.stat || 'Normal'}):\nBlank=Normal | H=High | L=Low`, entry.stat === "High" ? "H" : (entry.stat === "Low" ? "L" : ""));
+        const newFlag = prompt('Flag (Currently ' + entry.stat + '):\nBlank=Normal | H=High | L=Low', entry.stat === "High" ? "H" : (entry.stat === "Low" ? "L" : ""));
         const newDt = prompt("Edit Date:", entry.dt);
         if (newVal && newDt !== null) {
             let status = "Normal";
-            if (newFlag) {
-                if (newFlag.toLowerCase() === 'h') status = "High";
-                if (newFlag.toLowerCase() === 'l') status = "Low";
-            }
+            if (newFlag && newFlag.toLowerCase() === 'h') status = "High";
+            if (newFlag && newFlag.toLowerCase() === 'l') status = "Low";
             const h = ptDetails[activeId].labs[safeKey].history;
             h[idx] = { val: newVal, dt: newDt, stat: status };
             db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h);
@@ -1482,7 +1419,8 @@
             db.ref('globalLabs/' + safeKey).update({ r: nR, u: nU });
         }
     }
-    function deleteFullLab(safeKey) { if (confirm(`Permanently delete all records for this test?`)) db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove(); }
+
+    function deleteFullLab(safeKey) { if (confirm("Permanently delete all records for this test?")) db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove(); }
     function deleteLabEntry(safeKey, idx) { if (confirm("Delete this entry?")) { const h = ptDetails[activeId].labs[safeKey].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h); } }
 
     /* ================================================================
@@ -1490,7 +1428,7 @@
     ================================================================ */
     function genImagingTags() {
         const grid = document.getElementById('imagingSelector');
-        if (!grid) return; // ✅ FIX 8: null guard
+        if (!grid) return;
         grid.innerHTML = '';
         defaultImaging.forEach(name => {
             const btn = document.createElement('div');
@@ -1517,38 +1455,26 @@
             const data = images[key];
             let hHtml = '';
             (data.history || []).slice().reverse().forEach((h, idx) => {
-                const rIdx = (data.history.length - 1) - idx;
-                hHtml += `
-                    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--card-border);padding:12px;margin-bottom:7px;border-radius:12px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:7px;align-items:center;">
-                            <b style="font-size:14px;color:var(--text-primary);">📅 ${h.dt}</b>
-                            <div>
-                                <button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editImgEntry('${key}',${rIdx})">✎ Edit</button>
-                                <button class="action-btn" style="color:var(--danger);" onclick="deleteImgEntry('${key}',${rIdx})">✕</button>
-                            </div>
-                        </div>
-                        <div style="font-size:15px;color:var(--text-primary);line-height:1.4;">Dx/Report: <b>${h.val}</b></div>
-                    </div>`;
+                const rIdx = data.history.length - 1 - idx;
+                hHtml += '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--card-border);padding:12px;margin-bottom:7px;border-radius:12px;">' +
+                    '<div style="display:flex;justify-content:space-between;margin-bottom:7px;align-items:center;">' +
+                    '<b style="font-size:14px;color:var(--text-primary);">' + h.dt + '</b><div>' +
+                    '<button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editImgEntry(\'' + key + '\',' + rIdx + ')">&#9998;</button>' +
+                    '<button class="action-btn" style="color:var(--danger);" onclick="deleteImgEntry(\'' + key + '\',' + rIdx + ')">&#10005;</button></div></div>' +
+                    '<div style="font-size:15px;color:var(--text-primary);line-height:1.4;">Dx/Report: <b>' + h.val + '</b></div></div>';
             });
-            list.innerHTML += `
-                <div class="lab-accordion" style="border-color:rgba(191,90,242,0.3);">
-                    <div class="lab-header" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display==='block'?'none':'block')" style="background:rgba(191,90,242,0.1);color:var(--img);">
-                        <span>${data.name}${data.pending ? ' <span style="color:var(--danger);font-size:12px;margin-left:8px;">(PENDING)</span>' : ''}</span>
-                        <span style="font-size:11px;color:var(--text-secondary);font-weight:normal;">Click to Expand ▼</span>
-                    </div>
-                    <div class="lab-body">
-                        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-                            <button onclick="addImgVal('${key}')" style="background:var(--img);padding:10px 14px;font-size:13px;width:auto;border:none;color:white;border-radius:12px;font-weight:bold;">+ Add Report / Dx</button>
-                            <button onclick="deleteFullImg('${key}')" style="background:rgba(255,69,58,0.1);color:var(--danger);border:1px solid var(--danger);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;box-shadow:none;">✕ Delete Modality</button>
-                        </div>
-                        ${hHtml}
-                    </div>
-                </div>`;
+            list.innerHTML += '<div class="lab-accordion" style="border-color:rgba(191,90,242,0.3);"><div class="lab-header" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\'block\'?\'none\':\'block\')" style="background:rgba(191,90,242,0.1);color:var(--img);">' +
+                '<span>' + data.name + (data.pending ? ' <span style="color:var(--danger);font-size:12px;margin-left:8px;">(PENDING)</span>' : '') + '</span>' +
+                '<span style="font-size:11px;color:var(--text-secondary);font-weight:normal;">Click to Expand &#9660;</span></div>' +
+                '<div class="lab-body"><div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">' +
+                '<button onclick="addImgVal(\'' + key + '\')" style="background:var(--img);padding:10px 14px;font-size:13px;width:auto;border:none;color:white;border-radius:12px;font-weight:bold;">+ Add Report / Dx</button>' +
+                '<button onclick="deleteFullImg(\'' + key + '\')" style="background:rgba(255,69,58,0.1);color:var(--danger);border:1px solid var(--danger);padding:10px 14px;font-size:13px;width:auto;border-radius:12px;box-shadow:none;">Delete Modality</button></div>' +
+                hHtml + '</div></div>';
         });
     }
 
     function addImgVal(key) {
-        const v = prompt(`Enter Report/Dx for ${ptDetails[activeId].imaging[key].name}:`);
+        const v = prompt("Enter Report/Dx for " + ptDetails[activeId].imaging[key].name + ":");
         if (v) {
             const dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
             const h = ptDetails[activeId].imaging[key].history || [];
@@ -1567,11 +1493,12 @@
             db.ref('patientDetails/' + activeId + '/imaging/' + key + '/history').set(h);
         }
     }
+
     function deleteFullImg(key) { if (confirm("Delete this entire imaging modality?")) db.ref('patientDetails/' + activeId + '/imaging/' + key).remove(); }
     function deleteImgEntry(key, idx) { if (confirm("Delete this report?")) { const h = ptDetails[activeId].imaging[key].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/imaging/' + key + '/history').set(h); } }
 
     /* ================================================================
-       ✅ FIX 1: VITALS — fixed broken HTML in renderVitals
+       VITALS
     ================================================================ */
     function addVital() {
         const w = document.getElementById('vW').value;
@@ -1588,32 +1515,21 @@
     function renderVitals(vits) {
         const list = document.getElementById('vitalList');
         list.innerHTML = '';
-
         if (vits && vits.length > 1) {
             const weights = vits.map(v => parseFloat(v.w || 0)).filter(v => v > 0);
             if (weights.length > 1) {
                 const minW = Math.min(...weights) - 5;
                 const maxW = Math.max(...weights) + 5;
                 const range = maxW - minW;
-                const bars = weights.slice(-5).map(w => {
-                    const hPct = Math.max(((w - minW) / range) * 100, 10);
-                    return `<div class="spark-bar" style="height:${hPct}%;background:var(--text-secondary);" title="${w}kg"></div>`;
-                }).join('');
-                list.innerHTML += `<div class="sparkline-container" style="justify-content:flex-start;margin:0 0 10px;border:none;">${bars}</div>`;
+                list.innerHTML += '<div class="sparkline-container" style="margin:0 0 10px;border:none;">' +
+                    weights.slice(-5).map(w => '<div class="spark-bar" style="height:' + Math.max(((w - minW) / range) * 100, 10) + '%;background:var(--text-secondary);" title="' + w + 'kg"></div>').join('') + '</div>';
             }
         }
-
         vits.slice().reverse().forEach((v, idx) => {
-            const rIdx = (vits.length - 1) - idx;
-            // ✅ FIX: Complete, valid HTML — no broken tags
-            list.innerHTML += `
-                <div class="vital-row">
-                    <span>📅 <b>${v.dt}</b> | Wt: <b style="font-size:16px;">${v.w || '--'}</b>kg | BP: <b style="font-size:16px;">${v.bp || '--'}</b></span>
-                    <div>
-                        <button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editVital(${rIdx})">✎ Edit</button>
-                        <button class="action-btn" style="color:var(--danger);" onclick="deleteVital(${rIdx})">✕</button>
-                    </div>
-                </div>`;
+            const rIdx = vits.length - 1 - idx;
+            list.innerHTML += '<div class="vital-row"><span>' + v.dt + ' | Wt: <b style="font-size:16px;">' + (v.w || '--') + '</b>kg | BP: <b style="font-size:16px;">' + (v.bp || '--') + '</b></span><div>' +
+                '<button class="action-btn" style="color:var(--primary);margin-right:12px;" onclick="editVital(' + rIdx + ')">&#9998;</button>' +
+                '<button class="action-btn" style="color:var(--danger);" onclick="deleteVital(' + rIdx + ')">&#10005;</button></div></div>';
         });
     }
 
@@ -1628,6 +1544,7 @@
             db.ref('patientDetails/' + activeId + '/vitals').set(vits);
         }
     }
+
     function deleteVital(idx) { if (confirm("Delete vitals?")) { const v = ptDetails[activeId].vitals; v.splice(idx, 1); db.ref('patientDetails/' + activeId + '/vitals').set(v); } }
 
     /* ================================================================
@@ -1646,32 +1563,28 @@
 
     function renderOpHistory(hist) {
         const list = document.getElementById('opHistoryList');
-        list.innerHTML = `<b style="color:var(--text-secondary);margin-bottom:8px;display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Surgery Registry:</b>`;
+        list.innerHTML = '<b style="color:var(--text-secondary);margin-bottom:8px;display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Surgery Registry:</b>';
         hist.slice().reverse().forEach(h => {
-            list.innerHTML += `<div style="background:rgba(255,69,58,0.1);border-left:4px solid var(--danger);padding:11px;margin-bottom:7px;border-radius:12px;font-weight:bold;font-size:14px;color:var(--text-primary);">📅 ${h.d} — ${h.t}</div>`;
+            list.innerHTML += '<div style="background:rgba(255,69,58,0.1);border-left:4px solid var(--danger);padding:11px;margin-bottom:7px;border-radius:12px;font-weight:bold;font-size:14px;color:var(--text-primary);">' + h.d + ' &mdash; ' + h.t + '</div>';
         });
     }
 
     /* ================================================================
-       PATIENT LIST RENDER
+       PATIENT LIST
     ================================================================ */
-   function renderList() {
+    function renderList() {
         const list = document.getElementById('patientList');
         const qText = document.getElementById('searchBox').value.toLowerCase();
-        const selMonth = document.getElementById('filterMonth').value; // e.g. "05"
-        const selYear = document.getElementById('filterYear').value;   // e.g. "2024"
+        const selMonth = document.getElementById('filterMonth').value;
+        const selYear = document.getElementById('filterYear').value.trim();
+        const curYear = String(new Date().getFullYear());
 
-        // Build the date string to look for (e.g., "/05/2024")
         let dateQuery = "";
-        if (selMonth && selYear) {
-            dateQuery = `/${selMonth}/${selYear}`;
-        } else if (selYear && !selMonth) {
-            dateQuery = `/${selYear}`;
-        }
+        if (selMonth && selYear) dateQuery = '/' + selMonth + '/' + selYear;
+        else if (selYear && selYear !== curYear) dateQuery = '/' + selYear;
 
         list.innerHTML = '';
-        
-        // Sorting: Pinned first, then by date
+
         const sortedIds = Object.keys(ptIdx).sort((a, b) => {
             const pA = ptIdx[a], pB = ptIdx[b];
             if ((pA.pinned ? 1 : 0) !== (pB.pinned ? 1 : 0)) return (pB.pinned ? 1 : 0) - (pA.pinned ? 1 : 0);
@@ -1681,49 +1594,35 @@
         sortedIds.forEach(id => {
             const p = ptIdx[id];
             const lastVisit = p.lastVisit || p.dateAdded || "N/A";
-            
-            // 1. Check Text Search
             const textMatch = p.name.toLowerCase().includes(qText) || (p.complaint && p.complaint.toLowerCase().includes(qText));
-            
-            // 2. Check Date Filter
-            // This looks inside "15/05/2024" for "/05/2024"
             const dateMatch = dateQuery ? (p.dateAdded.includes(dateQuery) || (p.lastVisit && p.lastVisit.includes(dateQuery))) : true;
-            
+
             if (textMatch && dateMatch) {
                 const days = getDaysSince(lastVisit);
                 const isOverdue = (days >= 25 && p.dismissedVisit !== lastVisit);
-                const alertBadge = isOverdue ? `<span style="font-size:13px;margin-left:4px;">🔴</span>` : '';
-                const pinIcon = p.pinned ? '⭐' : '☆';
+                const alertBadge = isOverdue ? '<span style="font-size:13px;margin-left:4px;">&#128308;</span>' : '';
+                const pinIcon = p.pinned ? '&#11088;' : '&#9734;';
                 const pinClass = p.pinned ? 'pinned' : '';
 
-                list.innerHTML += `
-                    <div id="pt-${id}" class="pt-item ${activeId == id ? 'active' : ''}" onclick="loadFullData('${id}')">
-                        <strong>${p.name}</strong>
-                        ${p.isWaiting ? ' <span style="background:var(--primary);color:white;padding:2px 6px;border-radius:8px;font-size:10px;margin-left:4px;">WAITING</span>' : ''}
-                        ${p.hasPendingLab ? ' 🧪' : ''}${alertBadge}
-                        <span class="pt-meta">Reg: ${p.dateAdded} &nbsp;|&nbsp; Last: ${lastVisit}</span>
-                        <div class="pt-controls">
-                            <span class="btn-pin-pt ${pinClass}" onclick="event.stopPropagation(); togglePin('${id}',${!!p.pinned})">${pinIcon}</span>
-                            <span class="btn-del-pt" onclick="event.stopPropagation(); deletePt('${id}')">✕</span>
-                        </div>
-                    </div>`;
+                list.innerHTML += '<div id="pt-' + id + '" class="pt-item ' + (activeId == id ? 'active' : '') + '" onclick="loadFullData(\'' + id + '\')">' +
+                    '<strong>' + p.name + '</strong>' +
+                    (p.isWaiting ? ' <span style="background:var(--primary);color:white;padding:2px 6px;border-radius:8px;font-size:10px;margin-left:4px;">WAITING</span>' : '') +
+                    (p.hasPendingLab ? ' &#129514;' : '') + alertBadge +
+                    '<span class="pt-meta">Reg: ' + p.dateAdded + ' &nbsp;|&nbsp; Last: ' + lastVisit + '</span>' +
+                    '<div class="pt-controls"><span class="btn-pin-pt ' + pinClass + '" onclick="event.stopPropagation(); togglePin(\'' + id + '\',' + !!p.pinned + ')">' + pinIcon + '</span>' +
+                    '<span class="btn-del-pt" onclick="event.stopPropagation(); deletePt(\'' + id + '\')">&#10005;</span></div></div>';
             }
         });
 
-        // Update counts
         document.getElementById('waitCounter').innerText = Object.values(ptIdx).filter(x => x.isWaiting).length;
         document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
-    }
 
-    function clearHistoryFilter() {
-        document.getElementById('searchBox').value = "";
-        document.getElementById('filterMonth').value = "";
-        document.getElementById('filterYear').value = new Date().getFullYear();
-        renderList();
+        // Update filter button state
+        updateFilterBtn();
     }
 
     /* ================================================================
-       ADD PATIENT
+       ADD / DELETE PATIENT
     ================================================================ */
     function addPatient() {
         const n = document.getElementById('newName').value;
@@ -1732,8 +1631,28 @@
         const d = new Date().toLocaleDateString('en-GB');
         db.ref('patientIndex/' + id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true, pinned: false });
         db.ref('patientDetails/' + id).set({ name: n, presentation: '', visits: '', visitDates: [] });
-        ["newName", "newAge", "newPhone", "newComp"].forEach(i => document.getElementById(i).value = '');
-        showToast("✅ Patient Registered successfully.");
+        ['newName', 'newAge', 'newPhone', 'newComp'].forEach(i => document.getElementById(i).value = '');
+        showToast("Patient Registered successfully.");
+    }
+
+    function deletePt(id) {
+        if (confirm("Permanently delete this patient and all related data?")) {
+            db.ref('patientIndex/' + id).remove();
+            db.ref('patientDetails/' + id).remove();
+            // Clean up related reminders
+            Object.keys(allReminders).forEach(remId => {
+                const r = allReminders[remId];
+                if ((r.ptId === id || r.patientId === id) && r.status === 'pending') {
+                    db.ref('reminders/' + remId).remove();
+                }
+            });
+            if (activeId === id) {
+                if (activeListener) activeListener.off();
+                activeId = null;
+                document.getElementById('fileView').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
     }
 
     /* ================================================================
@@ -1742,14 +1661,14 @@
     function addPatientReminder() {
         const t = document.getElementById('vRemText').value || "Follow-up visit";
         const d = document.getElementById('vRemDate').value || new Date().toLocaleDateString('en-GB');
-        db.ref('reminders').push({ text: `[${ptIdx[activeId].name}] ${t}`, date: d, status: 'pending', ptId: activeId });
+        db.ref('reminders').push({ text: '[' + ptIdx[activeId].name + '] ' + t, date: d, status: 'pending', ptId: activeId });
         document.getElementById('vRemText').value = '';
         document.getElementById('vRemDate').value = '';
-        showToast("✅ Task scheduled.");
+        showToast("Task scheduled.");
     }
 
     /* ================================================================
-       ✅ FIX 5: SAVE — visit date stamping decoupled from text content
+       SAVE — decoupled from text focus
     ================================================================ */
     function autoSyncTrigger() {
         document.getElementById('syncIndicator').style.display = 'flex';
@@ -1757,14 +1676,13 @@
         syncTimeout = setTimeout(() => saveAll(false), 2000);
     }
 
-    function saveAll(manual = false) {
+    function saveAll(manual) {
         if (!activeId) return;
         const today = new Date().toLocaleDateString('en-GB');
         const detailRef = db.ref('patientDetails/' + activeId);
         detailRef.once('value').then(snap => {
             const d = snap.val() || {};
             const dates = d.visitDates || [];
-            // ✅ FIX: stamp visit date whenever saveAll runs today, not just if the date appears in text
             if (!dates.includes(today)) dates.push(today);
             detailRef.update({
                 presentation: document.getElementById('vPres').value,
@@ -1775,7 +1693,7 @@
             });
             if (dates.length > 0) db.ref('patientIndex/' + activeId).update({ lastVisit: dates[dates.length - 1] });
             document.getElementById('syncIndicator').style.display = 'none';
-            if (manual) showToast("💾 Cloud Sync Successful");
+            if (manual) showToast("Cloud Sync Successful");
         });
     }
 
@@ -1784,17 +1702,6 @@
     /* ================================================================
        MISC
     ================================================================ */
-    function deletePt(id) {
-        if (confirm("Permanently delete this patient?")) {
-            db.ref('patientIndex/' + id).remove();
-            db.ref('patientDetails/' + id).remove();
-            if (activeId === id) {
-                document.getElementById('fileView').style.display = 'none';
-                document.getElementById('emptyState').style.display = 'block';
-            }
-        }
-    }
-
     function updatePatientName(el) {
         if (activeId) {
             const n = el.innerText.trim();
@@ -1833,7 +1740,7 @@
         const banner = document.getElementById('activeReminderBanner');
         const activeRem = Object.values(allReminders).find(r => (r.ptId === activeId || r.patientId === activeId) && r.status === 'pending');
         if (activeRem) {
-            banner.innerHTML = `⚠️ CLINICAL ALERT / TASK: ${activeRem.text} <span style="float:right;">${activeRem.date}</span>`;
+            banner.innerHTML = 'CLINICAL ALERT / TASK: ' + activeRem.text + ' <span style="float:right;">' + activeRem.date + '</span>';
             banner.style.display = 'block';
         } else {
             banner.style.display = 'none';
@@ -1842,29 +1749,19 @@
 
     function insertClinicalSheet() {
         if (!activeId) return;
-        const template = `🛑 C/O (Chief Complaint):\n\n🩺 HPI (History of Present Illness):\n\n💊 PMHx (Past Medical):\n[ ] DM | [ ] HTN | [ ] Cardiac | [ ] Asthma\n\n🔪 PSHx (Past Surgical):\n\n⚠️ Allergies:\nNKDA\n\n🫀 Systemic Review:\nUnremarkable\n\n🔬 Local Examination:\n\n📝 Additional Notes / Plan:\n`;
+        const template = 'C/O (Chief Complaint):\n\nHPI (History of Present Illness):\n\nPMHx (Past Medical):\n[ ] DM | [ ] HTN | [ ] Cardiac | [ ] Asthma\n\nPSHx (Past Surgical):\n\nAllergies:\nNKDA\n\nSystemic Review:\nUnremarkable\n\nLocal Examination:\n\nAdditional Notes / Plan:\n';
         const box = document.getElementById('vPres');
         box.value = box.value + (box.value ? '\n\n' : '') + template;
         autoExpand(box);
         autoSyncTrigger();
-        showToast("📄 Sheet Template Inserted.");
-    }
-
-    function smartStamp(t) {
-        const today = new Date().toLocaleDateString('en-GB');
-        const stamp = `--- Visit: ${today} ---`;
-        if (!t.value.includes(stamp)) {
-            t.value = t.value + (t.value ? "\n\n" : "") + `${stamp}\n`;
-            autoExpand(t);
-            autoSyncTrigger();
-        }
+        showToast("Sheet Template Inserted.");
     }
 
     function sendWhatsApp(num, name) {
-        const template = `تحية طيبة وبعد ${name}،\nيرجى التفضل بالعلم أن موعد المراجعة الطبية الخاص بكم مع الدكتور سعد صبري الزبيدي محدد يوم [اليوم] بتاريخ [التاريخ] عند الساعة [الوقت].\nنحن حريصون على متابعة حالتكم الصحية لضمان أفضل النتائج. يرجى تأكيد الموعد لطفاً.\nعيادة الدكتور سعد صبري الزبيدي - الجراحة العامة. 📋🩺`;
+        const template = 'Greetings ' + name + ',\nThis is a reminder that your medical consultation appointment with Dr. Saad Sabry Alzubaidy is scheduled for [DAY] on [DATE] at [TIME].\nPlease confirm your appointment at your earliest convenience.\nDr. Saad Sabry Alzubaidy - General Surgery Clinic.';
         try { navigator.clipboard.writeText(template); } catch (err) {}
-        window.open(`https://wa.me/${num}?text=${encodeURIComponent(template)}`, '_blank');
-        showToast("✅ WhatsApp opened & template drafted!");
+        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(template), '_blank');
+        showToast("WhatsApp opened & template drafted!");
     }
 
     function showToast(msg) {
@@ -1875,7 +1772,138 @@
     }
 
     /* ================================================================
-       INITIAL LABS DATA
+       LAB / PATIENT FLOW STATS
+    ================================================================ */
+    function toggleLabDateInputs() {
+        document.getElementById('labCustomDates').style.display = document.getElementById('labFilterType').value === 'custom' ? 'grid' : 'none';
+    }
+
+    function calculateLabStats() {
+        const list = document.getElementById('statList');
+        const totalDisp = document.getElementById('statTotalDisplay');
+        const filterType = document.getElementById('labFilterType').value;
+        const startVal = document.getElementById('labStart').value;
+        const endVal = document.getElementById('labEnd').value;
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+        list.innerHTML = "Filtering Records...";
+
+        db.ref('patientDetails').once('value', snap => {
+            const allDetails = snap.val() || {};
+            let globalCount = 0;
+            let testGroups = {};
+
+            Object.keys(allDetails).forEach(pid => {
+                const pData = allDetails[pid];
+                const labs = pData.labs || {};
+                const ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown";
+
+                Object.keys(labs).forEach(labKey => {
+                    const labInfo = labs[labKey];
+                    const labName = labInfo.name || labKey;
+                    const history = labInfo.history || [];
+                    let validEntries = [];
+
+                    if (history.length === 0 && filterType === 'all') {
+                        validEntries.push({ id: pid, name: ptName });
+                    }
+                    history.forEach(h => {
+                        const hDate = parseIraqiDate(h.dt);
+                        const dObj = new Date(hDate);
+                        let include = false;
+                        if (filterType === 'all') include = true;
+                        else if (filterType === 'month') include = dObj.getMonth() === curM && dObj.getFullYear() === curY;
+                        else if (filterType === 'custom') {
+                            const s = startVal ? new Date(startVal).getTime() : 0;
+                            const e = endVal ? new Date(endVal).getTime() : Infinity;
+                            include = hDate >= s && hDate <= e;
+                        }
+                        if (include) validEntries.push({ id: pid, name: ptName });
+                    });
+
+                    if (validEntries.length > 0) {
+                        if (!testGroups[labName]) testGroups[labName] = [];
+                        validEntries.forEach(ent => { testGroups[labName].push(ent); globalCount++; });
+                    }
+                });
+            });
+
+            if (globalCount === 0) {
+                list.innerHTML = "No tests found for this period.";
+                totalDisp.innerHTML = '0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>';
+                return;
+            }
+            totalDisp.innerHTML = globalCount + ' <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>';
+
+            let html = '';
+            Object.keys(testGroups).sort((a, b) => testGroups[b].length - testGroups[a].length).forEach(testName => {
+                const patients = testGroups[testName];
+                const uniquePts = Array.from(new Set(patients.map(p => p.id))).map(id => patients.find(p => p.id === id));
+                html += '<div style="margin-bottom:8px; border:1px solid var(--separator); border-radius:10px; overflow:hidden;">' +
+                    '<div style="display:flex; justify-content:space-between; padding:10px; background:var(--item-hover); cursor:pointer; font-weight:600;" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\'none\'?\'block\':\'none\')">' +
+                    '<span>' + testName + '</span><span style="color:var(--lab);">' + patients.length + '</span></div>' +
+                    '<div style="display:none; padding:5px; background:rgba(0,0,0,0.02);">' +
+                    uniquePts.map(p => '<div style="padding:5px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--lab); margin-left:10px; margin-top:4px; font-size:12px;" onclick="loadFullData(\'' + p.id + '\')">' + p.name + '</div>').join('') +
+                    '</div></div>';
+            });
+            list.innerHTML = html;
+        });
+    }
+
+    function calculatePatientFlow() {
+        const list = document.getElementById('flowList');
+        const fType = document.getElementById('flowFilterType').value;
+        const startVal = document.getElementById('flowStart').value;
+        const endVal = document.getElementById('flowEnd').value;
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+        list.innerHTML = "Processing Registry...";
+
+        let newPts = [];
+        let followPts = [];
+
+        Object.keys(ptIdx).forEach(id => {
+            const p = ptIdx[id];
+            const regDateTs = parseIraqiDate(p.dateAdded);
+            const dObj = new Date(regDateTs);
+            let isNewInPeriod = false;
+            if (fType === 'all') isNewInPeriod = true;
+            else if (fType === 'month') isNewInPeriod = dObj.getMonth() === curM && dObj.getFullYear() === curY;
+            else if (fType === 'custom') {
+                const s = startVal ? new Date(startVal).getTime() : 0;
+                const e = endVal ? new Date(endVal).getTime() : Infinity;
+                isNewInPeriod = regDateTs >= s && regDateTs <= e;
+            }
+            if (isNewInPeriod) {
+                newPts.push({ id, name: p.name });
+            } else {
+                const lastVTs = parseIraqiDate(p.lastVisit);
+                const lvObj = new Date(lastVTs);
+                let isFollow = false;
+                if (fType === 'month') isFollow = lvObj.getMonth() === curM && lvObj.getFullYear() === curY;
+                else if (fType === 'custom') {
+                    const s = startVal ? new Date(startVal).getTime() : 0;
+                    const e = endVal ? new Date(endVal).getTime() : Infinity;
+                    isFollow = lastVTs >= s && lastVTs <= e;
+                }
+                if (isFollow) followPts.push({ id, name: p.name });
+            }
+        });
+
+        document.getElementById('countNew').innerText = newPts.length;
+        document.getElementById('countFollow').innerText = followPts.length;
+
+        let html = '<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (' + newPts.length + '):</b>';
+        html += newPts.map(p => '<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData(\'' + p.id + '\')">' + p.name + '</div>').join('') || "None";
+        html += '<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (' + followPts.length + '):</b>';
+        html += followPts.map(p => '<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData(\'' + p.id + '\')">' + p.name + '</div>').join('') || "None";
+        list.innerHTML = html;
+    }
+
+    /* ================================================================
+       INITIAL DATA
     ================================================================ */
     const initialLabs = {
         "CBC_Male": { n: "CBC (Male)", u: "g/dL", r: "Hb: 13.5-17.5 | PCV: 41-50% | WBC: 4-11k | PLT: 150-450k" },
@@ -1885,13 +1913,13 @@
         "ASO_TITER": { n: "ASO TITER", u: "IU/mL", r: "< 200" },
         "LATEX_RF": { n: "LATEX (RF)", u: "IU/mL", r: "< 14" },
         "ROSE_BENGAL": { n: "ROSE BENGAL", u: "", r: "Negative" },
-        "S_IRON": { n: "S.IRON", u: "µg/dL", r: "M: 65-175 | F: 50-170" },
+        "S_IRON": { n: "S.IRON", u: "\u00b5g/dL", r: "M: 65-175 | F: 50-170" },
         "S_FERRITIN": { n: "S.FERRITIN", u: "ng/mL", r: "M: 30-400 | F: 15-150" },
         "PT": { n: "PT", u: "sec", r: "11-13.5" },
         "PTT": { n: "PTT", u: "sec", r: "25-35" },
         "INR": { n: "INR", u: "", r: "0.8-1.2" },
         "BT": { n: "BT", u: "min", r: "2-7" },
-        "D_DIMER": { n: "D-DIMER", u: "µg/mL (FEU)", r: "< 0.5" },
+        "D_DIMER": { n: "D-DIMER", u: "\u00b5g/mL (FEU)", r: "< 0.5" },
         "S_CHOLESTEROL": { n: "S.CHOLESTEROL", u: "mg/dL", r: "< 200" },
         "S_TRIGLYCERIDE": { n: "S.TRIGLYCERIDE", u: "mg/dL", r: "< 150" },
         "TOTAL_LIPID": { n: "TOTAL LIPID PROFILE", u: "mg/dL", r: "400-800" },
@@ -1925,7 +1953,7 @@
         "URINE_C_S": { n: "URINE C+S", u: "", r: "No growth" },
         "GSE": { n: "GSE", u: "", r: "No parasites/occult blood" },
         "STOOL_H_PYLORI": { n: "STOOL H.PYLORI (Ag)", u: "", r: "Negative" },
-        "STOOL_CALPROTECTIN": { n: "STOOL CALPROTECTIN", u: "µg/g", r: "< 50" },
+        "STOOL_CALPROTECTIN": { n: "STOOL CALPROTECTIN", u: "\u00b5g/g", r: "< 50" },
         "S_H_PYLORI": { n: "S.H.PYLORI (Ab)", u: "", r: "Negative" },
         "SALMONELLA": { n: "SALMONELLA", u: "", r: "Negative" },
         "VIRAL_MARKER": { n: "VIRAL MARKER", u: "", r: "Non-reactive" },
@@ -1940,7 +1968,7 @@
     ================================================================ */
     window.addEventListener('DOMContentLoaded', () => {
         applyStoredTheme();
-        // ✅ FIX 4: Single auth check — removed duplicate listener
+        document.getElementById('filterYear').value = new Date().getFullYear();
         if (localStorage.getItem('saadAuth') === 'true') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'grid';
@@ -1948,300 +1976,6 @@
             genImagingTags();
         }
     });
-    function calculateLabStats() {
-        const list = document.getElementById('statList');
-        const totalDisp = document.getElementById('statTotalDisplay');
-        list.innerHTML = "Analyzing Clinical Data...";
-        
-        db.ref('patientDetails').once('value', (snap) => {
-            const allDetails = snap.val() || {};
-            let globalCount = 0;
-            let testGroups = {}; // This will hold { "CBC": [patient1, patient2], "ESR": [patient1] }
-
-            Object.keys(allDetails).forEach(pid => {
-                const pData = allDetails[pid];
-                const labs = pData.labs || {};
-                const ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown Patient";
-
-                Object.keys(labs).forEach(labKey => {
-                    const labName = labs[labKey].name || labKey;
-                    globalCount++;
-
-                    if (!testGroups[labName]) {
-                        testGroups[labName] = [];
-                    }
-                    testGroups[labName].push({ id: pid, name: ptName });
-                });
-            });
-
-            if (globalCount === 0) {
-                list.innerHTML = "No lab data found in database.";
-                totalDisp.innerHTML = `0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span>`;
-                return;
-            }
-
-            totalDisp.innerHTML = `${globalCount} <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Total Tests Sent</span>`;
-            
-            let html = "";
-            // Sort by most frequent tests first
-            const sortedTests = Object.keys(testGroups).sort((a,b) => testGroups[b].length - testGroups[a].length);
-
-            sortedTests.forEach(testName => {
-                const patients = testGroups[testName];
-                const patientListHtml = patients.map(p => 
-                    `<div style="padding:4px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--separator); margin-left:10px; margin-top:3px;" onclick="loadFullData('${p.id}')">↳ ${p.name}</div>`
-                ).join('');
-
-                html += `
-                    <div style="margin-bottom:12px; padding:8px; background:rgba(255,255,255,0.05); border-radius:10px;">
-                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--text-primary); cursor:pointer;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none' ? 'block' : 'none')">
-                            <span>${testName} ▾</span>
-                            <span style="color:var(--lab);">${patients.length}</span>
-                        </div>
-                        <div style="display:none; margin-top:5px;">
-                            ${patientListHtml}
-                        </div>
-                    </div>`;
-            });
-            list.innerHTML = html;
-        });
-    }
-    function toggleLabDateInputs() {
-        const type = document.getElementById('labFilterType').value;
-        document.getElementById('labCustomDates').style.display = (type === 'custom') ? 'grid' : 'none';
-    }
-
-    function calculateLabStats() {
-        const list = document.getElementById('statList');
-        const totalDisp = document.getElementById('statTotalDisplay');
-        const filterType = document.getElementById('labFilterType').value;
-        
-        const startVal = document.getElementById('labStart').value; // YYYY-MM-DD
-        const endVal = document.getElementById('labEnd').value;
-        
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        list.innerHTML = "Filtering Records...";
-        
-        db.ref('patientDetails').once('value', (snap) => {
-            const allDetails = snap.val() || {};
-            let globalCount = 0;
-            let testGroups = {};
-
-            Object.keys(allDetails).forEach(pid => {
-                const pData = allDetails[pid];
-                const labs = pData.labs || {};
-                const ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown Patient";
-
-                Object.keys(labs).forEach(labKey => {
-                    const labInfo = labs[labKey];
-                    const labName = labInfo.name || labKey;
-                    
-                    // We check dates in the history of this specific lab
-                    const history = labInfo.history || [];
-                    
-                    // If lab is pending and has no history, we count it as "current" if filtering by all/month
-                    // but for strict date tracking, we look at history entry dates
-                    let validEntries = [];
-
-                    if (history.length === 0 && filterType === 'all') {
-                        // Include pending labs in "All Time"
-                        validEntries.push({id: pid, name: ptName});
-                    }
-
-                    history.forEach(h => {
-                        const hDate = parseIraqiDate(h.dt); // Get timestamp
-                        const dObj = new Date(hDate);
-                        let include = false;
-
-                        if (filterType === 'all') {
-                            include = true;
-                        } else if (filterType === 'month') {
-                            if (dObj.getMonth() === currentMonth && dObj.getFullYear() === currentYear) {
-                                include = true;
-                            }
-                        } else if (filterType === 'custom') {
-                            const s = startVal ? new Date(startVal).getTime() : 0;
-                            const e = endVal ? new Date(endVal).getTime() : Infinity;
-                            if (hDate >= s && hDate <= e) include = true;
-                        }
-
-                        if (include) {
-                            validEntries.push({id: pid, name: ptName});
-                        }
-                    });
-
-                    // Add to groups
-                    if (validEntries.length > 0) {
-                        if (!testGroups[labName]) testGroups[labName] = [];
-                        validEntries.forEach(ent => {
-                            testGroups[labName].push(ent);
-                            globalCount++;
-                        });
-                    }
-                });
-            });
-
-            if (globalCount === 0) {
-                list.innerHTML = "No tests found for this period.";
-                totalDisp.innerHTML = `0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>`;
-                return;
-            }
-
-            totalDisp.innerHTML = `${globalCount} <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>`;
-            
-            let html = "";
-            const sortedTests = Object.keys(testGroups).sort((a,b) => testGroups[b].length - testGroups[a].length);
-
-            sortedTests.forEach(testName => {
-                const patients = testGroups[testName];
-                // Remove duplicates in names for the same test if they had multiple entries
-                const uniquePts = Array.from(new Set(patients.map(p => p.id)))
-                    .map(id => patients.find(p => p.id === id));
-
-                const patientListHtml = uniquePts.map(p => 
-                    `<div style="padding:5px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--lab); margin-left:10px; margin-top:4px; font-size:12px;" onclick="loadFullData('${p.id}')">👤 ${p.name}</div>`
-                ).join('');
-
-                html += `
-                    <div style="margin-bottom:8px; border:1px solid var(--separator); border-radius:10px; overflow:hidden;">
-                        <div style="display:flex; justify-content:space-between; padding:10px; background:var(--item-hover); cursor:pointer; font-weight:600;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none' ? 'block' : 'none')">
-                            <span>${testName}</span>
-                            <span style="color:var(--lab);">${patients.length}</span>
-                        </div>
-                        <div style="display:none; padding:5px; background:rgba(0,0,0,0.02);">
-                            ${patientListHtml}
-                        </div>
-                    </div>`;
-            });
-            list.innerHTML = html;
-        });
-    }
-    function calculatePatientFlow() {
-        const list = document.getElementById('flowList');
-        const fType = document.getElementById('flowFilterType').value;
-        const startVal = document.getElementById('flowStart').value;
-        const endVal = document.getElementById('flowEnd').value;
-        
-        const now = new Date();
-        const curM = now.getMonth();
-        const curY = now.getFullYear();
-
-        list.innerHTML = "Processing Registry...";
-        
-        let newPts = [];
-        let followPts = [];
-
-        Object.keys(ptIdx).forEach(id => {
-            const p = ptIdx[id];
-            const regDateTs = parseIraqiDate(p.dateAdded);
-            const dObj = new Date(regDateTs);
-            
-            // Check if New Patient in this period
-            let isNewInPeriod = false;
-            if (fType === 'all') isNewInPeriod = true;
-            else if (fType === 'month') {
-                if (dObj.getMonth() === curM && dObj.getFullYear() === curY) isNewInPeriod = true;
-            } else if (fType === 'custom') {
-                const s = startVal ? new Date(startVal).getTime() : 0;
-                const e = endVal ? new Date(endVal).getTime() : Infinity;
-                if (regDateTs >= s && regDateTs <= e) isNewInPeriod = true;
-            }
-
-            if (isNewInPeriod) {
-                newPts.push({id, name: p.name});
-            } else {
-                // If not "New" in this period, was there a "Follow up" visit in this period?
-                // We check the lastVisit as a quick indicator, or you can check visitDates
-                const lastVTs = parseIraqiDate(p.lastVisit);
-                const lvObj = new Date(lastVTs);
-                let isFollowInPeriod = false;
-
-                if (fType === 'month') {
-                    if (lvObj.getMonth() === curM && lvObj.getFullYear() === curY) isFollowInPeriod = true;
-                } else if (fType === 'custom') {
-                    const s = startVal ? new Date(startVal).getTime() : 0;
-                    const e = endVal ? new Date(endVal).getTime() : Infinity;
-                    if (lastVTs >= s && lastVTs <= e) isFollowInPeriod = true;
-                }
-
-                if (isFollowInPeriod) followPts.push({id, name: p.name});
-            }
-        });
-
-        document.getElementById('countNew').innerText = newPts.length;
-        document.getElementById('countFollow').innerText = followPts.length;
-
-        let html = `<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (${newPts.length}):</b>`;
-        html += newPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
-        
-        html += `<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (${followPts.length}):</b>`;
-        html += followPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
-
-        list.innerHTML = html;
-    }
-    function calculatePatientFlow() {
-        const list = document.getElementById('flowList');
-        const fType = document.getElementById('flowFilterType').value;
-        const startVal = document.getElementById('flowStart').value;
-        const endVal = document.getElementById('flowEnd').value;
-        
-        const now = new Date();
-        const curM = now.getMonth();
-        const curY = now.getFullYear();
-
-        list.innerHTML = "Processing Registry...";
-        
-        let newPts = [];
-        let followPts = [];
-
-        Object.keys(ptIdx).forEach(id => {
-            const p = ptIdx[id];
-            const regDateTs = parseIraqiDate(p.dateAdded);
-            const dObj = new Date(regDateTs);
-            
-            let isNewInPeriod = false;
-            if (fType === 'all') isNewInPeriod = true;
-            else if (fType === 'month') {
-                if (dObj.getMonth() === curM && dObj.getFullYear() === curY) isNewInPeriod = true;
-            } else if (fType === 'custom') {
-                const s = startVal ? new Date(startVal).getTime() : 0;
-                const e = endVal ? new Date(endVal).getTime() : Infinity;
-                if (regDateTs >= s && regDateTs <= e) isNewInPeriod = true;
-            }
-
-            if (isNewInPeriod) {
-                newPts.push({id, name: p.name});
-            } else {
-                const lastVTs = parseIraqiDate(p.lastVisit);
-                const lvObj = new Date(lastVTs);
-                let isFollowInPeriod = false;
-
-                if (fType === 'month') {
-                    if (lvObj.getMonth() === curM && lvObj.getFullYear() === curY) isFollowInPeriod = true;
-                } else if (fType === 'custom') {
-                    const s = startVal ? new Date(startVal).getTime() : 0;
-                    const e = endVal ? new Date(endVal).getTime() : Infinity;
-                    if (lastVTs >= s && lastVTs <= e) isFollowInPeriod = true;
-                }
-
-                if (isFollowInPeriod) followPts.push({id, name: p.name});
-            }
-        });
-
-        document.getElementById('countNew').innerText = newPts.length;
-        document.getElementById('countFollow').innerText = followPts.length;
-
-        let html = `<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (${newPts.length}):</b>`;
-        html += newPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
-        
-        html += `<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (${followPts.length}):</b>`;
-        html += followPts.map(p => `<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData('${p.id}')">• ${p.name}</div>`).join('') || "None";
-
-        list.innerHTML = html;
-    }
 </script>
 </body>
 </html>
