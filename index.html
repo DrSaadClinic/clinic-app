@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dr. Saad Sabry Alzubaidy - Surgical Clinic</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
@@ -83,7 +83,7 @@
             66% { transform: scale(0.97) translate(1%, -1%); }
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         html { scroll-behavior: smooth; }
 
@@ -96,6 +96,7 @@
             letter-spacing: 0.2px;
             transition: background 0.6s ease, color 0.4s ease;
             min-height: 100vh;
+            touch-action: manipulation; /* iOS 15 Fix */
         }
 
         /* Native form controls color scheme */
@@ -765,7 +766,8 @@
         <img src="logo.jpg" class="logo-large" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
         <div class="login-title">Dr. Saad Sabry Alzubaidy</div>
         <div class="login-subtitle">Surgical Clinic</div>
-        <input type="password" id="passCode" placeholder="Enter Passcode..." oninput="checkAutoLogin()" style="width:260px; text-align:center; border-radius:20px; padding:15px; font-size:18px; letter-spacing:2px;">
+        <!-- FIX: Added autocomplete="off" -->
+        <input type="password" id="passCode" placeholder="Enter Passcode..." autocomplete="off" oninput="checkAutoLogin()" style="width:260px; text-align:center; border-radius:20px; padding:15px; font-size:18px; letter-spacing:2px;">
         <div style="font-size:11px; opacity:0.45; margin-top:14px; color: var(--text-secondary);">Secured by 256-bit Cloud Encryption</div>
     </div>
 </div>
@@ -1126,6 +1128,9 @@
     ================================================================ */
     function checkAutoLogin() {
         if (document.getElementById('passCode').value === 'saad2026') {
+            // FIX: Force blur to close keyboard and prevent iOS 15 freeze
+            document.getElementById('passCode').blur();
+            
             localStorage.setItem('saadAuth', 'true');
             document.getElementById('loginScreen').classList.add('fade-out');
             setTimeout(() => {
@@ -2215,6 +2220,9 @@ if (d.visits && d.visits.length > 0) {
         applyStoredTheme();
         document.getElementById('filterYear').value = new Date().getFullYear();
         if (localStorage.getItem('saadAuth') === 'true') {
+            // FIX: Blur any active element to prevent iOS 15 keyboard freeze on load
+            if(document.activeElement) document.activeElement.blur();
+
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'grid';
             initSync();
