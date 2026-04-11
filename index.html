@@ -495,130 +495,131 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        
         /* ===== REGISTRY PANEL STYLES ===== */
-.reg-period-btn {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--card-border);
-    color: var(--text-primary);
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.reg-period-btn:hover { background: rgba(10,132,255,0.15); border-color: var(--primary); }
-.reg-period-btn.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-    box-shadow: 0 4px 14px rgba(10,132,255,0.35);
-}
+        .reg-period-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reg-period-btn:hover { background: rgba(10,132,255,0.15); border-color: var(--primary); }
+        .reg-period-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(10,132,255,0.35);
+        }
 
-.reg-stat-card {
-    background: rgba(255,255,255,0.04);
-    border: 2px solid transparent;
-    border-radius: 18px;
-    padding: 20px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
-}
-.reg-stat-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-.reg-stat-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    border-color: var(--primary);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
-}
-.reg-stat-card:hover::before { opacity: 1; }
-.reg-stat-card.active {
-    border-color: var(--primary);
-    background: rgba(10,132,255,0.1);
-}
+        .reg-stat-card {
+            background: rgba(255,255,255,0.04);
+            border: 2px solid transparent;
+            border-radius: 18px;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .reg-stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .reg-stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+        }
+        .reg-stat-card:hover::before { opacity: 1; }
+        .reg-stat-card.active {
+            border-color: var(--primary);
+            background: rgba(10,132,255,0.1);
+        }
 
-.reg-stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    margin: 0 auto 12px;
-}
+        .reg-stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin: 0 auto 12px;
+        }
 
-.reg-stat-number {
-    font-size: 2.2em;
-    font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1.1;
-    margin-bottom: 6px;
-}
+        .reg-stat-number {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
 
-.reg-stat-label {
-    font-size: 11.5px;
-    color: var(--text-secondary);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+        .reg-stat-label {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-.reg-patient-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--separator);
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    background: rgba(255,255,255,0.02);
-}
-.reg-patient-row:hover {
-    background: var(--item-hover);
-    transform: translateX(4px);
-}
-.reg-patient-name {
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--primary);
-}
-.reg-patient-meta {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 3px;
-}
-.reg-open-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 7px 16px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.reg-open-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(10,132,255,0.35);
-}
+        .reg-patient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--separator);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.02);
+        }
+        .reg-patient-row:hover {
+            background: var(--item-hover);
+            transform: translateX(4px);
+        }
+        .reg-patient-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--primary);
+        }
+        .reg-patient-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+        .reg-open-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reg-open-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(10,132,255,0.35);
+        }
 
-@media (max-width: 768px) {
-    #registryPanel { min-width: auto !important; width: 98vw; padding: 16px; }
-    #regStatsGrid { grid-template-columns: repeat(2, 1fr) !important; }
-    .reg-stat-number { font-size: 1.6em; }
-}
+        @media (max-width: 768px) {
+            #registryPanel { min-width: auto !important; width: 98vw; padding: 16px; }
+            #regStatsGrid { grid-template-columns: repeat(2, 1fr) !important; }
+            .reg-stat-number { font-size: 1.6em; }
+        }
 
         /* ===== TEXT PROTECTION SYSTEM STYLES ===== */
         .undo-toast {
@@ -805,6 +806,92 @@
     </div>
 </div>
 
+<!-- REGISTRY STATS PANEL - FIXED: Now OUTSIDE of script tag! -->
+<div id="registryOverlay" class="version-overlay" style="display:none;" onclick="closeRegistryPanel()"></div>
+
+<div id="registryPanel" class="version-panel" style="min-width:900px; max-width:95vw;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="color:var(--primary); margin:0; font-size:1.6em;">📋 Patient Registry & Statistics</h2>
+        <button onclick="closeRegistryPanel()" style="background:none; border:none; color:var(--text-secondary); font-size:28px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+
+    <!-- TIME PERIOD FILTERS -->
+    <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:16px; margin-bottom:24px; border:1px solid var(--card-border);">
+        <label style="font-size:11px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-secondary); display:block; margin-bottom:10px;">⏰ Select Time Period</label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="reg-period-btn active" data-period="all" onclick="selectRegPeriod('all')">All Time</button>
+            <button class="reg-period-btn" data-period="thismonth" onclick="selectRegPeriod('thismonth')">This Month</button>
+            <button class="reg-period-btn" data-period="lastmonth" onclick="selectRegPeriod('lastmonth')">Last Month</button>
+            <button class="reg-period-btn" data-period="3months" onclick="selectRegPeriod('3months')">3 Months</button>
+            <button class="reg-period-btn" data-period="6months" onclick="selectRegPeriod('6months')">6 Months</button>
+        </div>
+        <div id="regPeriodLabel" style="margin-top:10px; font-size:13px; color:var(--text-secondary);"></div>
+    </div>
+
+    <!-- STAT CARDS GRID -->
+    <div id="regStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:16px; margin-bottom:28px;">
+        
+        <div class="reg-stat-card" data-category="total" onclick="showRegCategory('total')">
+            <div class="reg-stat-icon" style="background:var(--primary);">👥</div>
+            <div class="reg-stat-number" id="statTotal">--</div>
+            <div class="reg-stat-label">Total Patients</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="new" onclick="showRegCategory('new')">
+            <div class="reg-stat-icon" style="background:var(--success);">✨</div>
+            <div class="reg-stat-number" id="statNew">--</div>
+            <div class="reg-stat-label">New Registrations</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="returning" onclick="showRegCategory('returning')">
+            <div class="reg-stat-icon" style="background:var(--call);">🔄</div>
+            <div class="reg-stat-number" id="statReturning">--</div>
+            <div class="reg-stat-label">Returning Visits</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="labs" onclick="showRegCategory('labs')">
+            <div class="reg-stat-icon" style="background:var(--lab);">🔬</div>
+            <div class="reg-stat-number" id="statLabs">--</div>
+            <div class="reg-stat-label">Lab Referrals</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="waiting" onclick="showRegCategory('waiting')">
+            <div class="reg-stat-icon" style="background:var(--warning);">⏳</div>
+            <div class="reg-stat-number" id="statWaiting">--</div>
+            <div class="reg-stat-label">Waiting Room</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="overdue" onclick="showRegCategory('overdue')">
+            <div class="reg-stat-icon" style="background:var(--danger);">⚠️</div>
+            <div class="reg-stat-number" id="statOverdue">--</div>
+            <div class="reg-stat-label">Overdue 25+ Days</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="pinned" onclick="showRegCategory('pinned')">
+            <div class="reg-stat-icon" style="background:#FFD60A; color:#000;">⭐</div>
+            <div class="reg-stat-number" id="statPinned">--</div>
+            <div class="reg-stat-label">Pinned Patients</div>
+        </div>
+
+    </div>
+
+    <!-- PATIENT LIST AREA -->
+    <div style="background:rgba(0,0,0,0.15); border-radius:16px; border:1px solid var(--card-border); overflow:hidden;">
+        <div style="padding:16px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid var(--separator); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong id="regListTitle" style="color:var(--primary); font-size:15px;">Select a category above</strong>
+                <span id="regListCount" style="color:var(--text-secondary); font-size:12px; margin-left:10px;"></span>
+            </div>
+            <input type="text" id="regSearchInput" placeholder="Search in results..." oninput="filterRegList()" style="width:220px; padding:8px 14px; border-radius:10px; font-size:13px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-primary);">
+        </div>
+        <div id="regPatientList" style="max-height:400px; overflow-y:auto; padding:12px;">
+            <p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">Click any statistic card above to view the patient list</p>
+        </div>
+    </div>
+
+</div>
+
 <div class="theme-transition-overlay" id="themeOverlay"></div>
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch Theme">&#127769;</button>
 
@@ -890,68 +977,73 @@
     <div class="content">
 
         <!-- MINIMAL DASHBOARD -->
-<div class="dash-grid">
-    
-    <!-- Registry Entry Point -->
-    <div class="card" style="grid-column: span 2; background: linear-gradient(135deg, rgba(10,132,255,0.1) 0%, rgba(94,92,230,0.1) 100%); border: 2px solid var(--primary); cursor:pointer; transition:all 0.3s;" onclick="openRegistryPanel()">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0;">
-            <div>
-                <h3 style="color:var(--primary); border:none; margin:0; font-size:1.4em;">📋 Patient Registry</h3>
-                <p style="color:var(--text-secondary); margin:8px 0 0; font-size:14px;">Browse patients • Filter by time period • View statistics</p>
+        <div class="dash-grid">
+            
+            <!-- Registry Entry Point -->
+            <div class="card" style="grid-column: span 2; background: linear-gradient(135deg, rgba(10,132,255,0.1) 0%, rgba(94,92,230,0.1) 100%); border: 2px solid var(--primary); cursor:pointer; transition:all 0.3s;" onclick="openRegistryPanel()">
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0;">
+                    <div>
+                        <h3 style="color:var(--primary); border:none; margin:0; font-size:1.4em;">📋 Patient Registry</h3>
+                        <p style="color:var(--text-secondary); margin:8px 0 0; font-size:14px;">Browse patients • Filter by time period • View statistics</p>
+                    </div>
+                    <div style="background:var(--primary); color:white; width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 6px 20px rgba(10,132,255,0.4);">
+                        →
+                    </div>
+                </div>
+                <div style="display:flex; gap:20px; margin-top:18px; flex-wrap:wrap;">
+                    <div style="background:rgba(255,255,255,0.08); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                        <div id="dashTotalPts" style="font-size:1.8em; font-weight:800; color:var(--primary);">--</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Total Patients</div>
+                    </div>
+                    <div style="background:rgba(48,209,88,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                        <div id="dashNewThisMonth" style="font-size:1.8em; font-weight:800; color:var(--success);">--</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">New This Month</div>
+                    </div>
+                    <div style="background:rgba(255,159,10,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                        <div id="dashWaiting" style="font-size:1.8em; font-weight:800; color:var(--warning);">--</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">In Waiting</div>
+                    </div>
+                    <div style="background:rgba(255,69,58,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                        <div id="dashOverdue" style="font-size:1.8em; font-weight:800; color:var(--danger);">--</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Overdue 25+ Days</div>
+                    </div>
+                </div>
             </div>
-            <div style="background:var(--primary); color:white; width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 6px 20px rgba(10,132,255,0.4);">
-                →
-            </div>
-        </div>
-        <div style="display:flex; gap:20px; margin-top:18px; flex-wrap:wrap;">
-            <div style="background:rgba(255,255,255,0.08); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
-                <div id="dashTotalPts" style="font-size:1.8em; font-weight:800; color:var(--primary);">--</div>
-                <div style="font-size:11px; color:var(--text-secondary);">Total Patients</div>
-            </div>
-            <div style="background:rgba(48,209,88,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
-                <div id="dashNewThisMonth" style="font-size:1.8em; font-weight:800; color:var(--success);">--</div>
-                <div style="font-size:11px; color:var(--text-secondary);">New This Month</div>
-            </div>
-            <div style="background:rgba(255,159,10,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
-                <div id="dashWaiting" style="font-size:1.8em; font-weight:800; color:var(--warning);">--</div>
-                <div style="font-size:11px; color:var(--text-secondary);">In Waiting</div>
-            </div>
-            <div style="background:rgba(255,69,58,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
-                <div id="dashOverdue" style="font-size:1.8em; font-weight:800; color:var(--danger);">--</div>
-                <div style="font-size:11px; color:var(--text-secondary);">Overdue 25+ Days</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Reminders -->
-    <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
+            <!-- Reminders -->
+            <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
 
-    <!-- Overdue Quick View -->
-    <div class="card">
-        <h3 style="margin-bottom:10px; border:none; display:flex; justify-content:space-between; align-items:center;">
-            <span>⚠️ Overdue Alerts</span>
-            <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="openRegistryPanel('overdue')">View All →</button>
-        </h3>
-        <div id="overdueList" class="scroll-card">
-            <p style="color:var(--text-secondary); padding:10px; text-align:center; font-size:13px; margin:0;">Click "View All" or open Registry.</p>
-        </div>
-    </div>
-
-    <!-- Operations -->
-    <div class="card">
-        <h3 style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-            <span>🔪 Operations Schedule</span>
-            <div style="display:flex; gap:8px;">
-                <button id="opTabUpcoming" class="action-btn" style="background:var(--primary); color:white; padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('upcoming')">Upcoming</button>
-                <button id="opTabHistory" class="action-btn" style="background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('history')">History</button>
+            <!-- Overdue Quick View -->
+            <div class="card">
+                <h3 style="margin-bottom:10px; border:none; display:flex; justify-content:space-between; align-items:center;">
+                    <span>⚠️ Overdue Alerts</span>
+                    <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="openRegistryPanel('overdue')">View All →</button>
+                </h3>
+                <div id="overdueList" class="scroll-card">
+                    <p style="color:var(--text-secondary); padding:10px; text-align:center; font-size:13px; margin:0;">Click "View All" or open Registry.</p>
+                </div>
             </div>
-        </h3>
-        <div class="table-responsive">
-            <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary); min-height:120px;">Loading...</div>
-        </div>
-    </div>
 
-</div>
+            <!-- Operations -->
+            <div class="card">
+                <h3 style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>🔪 Operations Schedule</span>
+                    <div style="display:flex; gap:8px;">
+                        <button id="opTabUpcoming" class="action-btn" style="background:var(--primary); color:white; padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('upcoming')">Upcoming</button>
+                        <button id="opTabHistory" class="action-btn" style="background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('history')">History</button>
+                    </div>
+                </h3>
+                <div class="table-responsive">
+                    <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary); min-height:120px;">Loading...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="card">
+            <p style="font-size:1.15em; font-weight:600;">Select a patient file to begin clinical review.</p>
+        </div>
 
         <!-- Patient File View -->
         <div id="fileView" class="card" style="display:none;">
@@ -1163,32 +1255,33 @@
         clearTimeout(calendarTimer);
         calendarTimer = setTimeout(renderCalendarFromDB, 300);
     }
-/* ================================================================
-   OPERATIONS TAB SYSTEM
-=============================================================== */
-var currentOpTab = 'upcoming';
 
-function switchOpTab(tab) {
-    currentOpTab = tab;
-    
-    // Update button styles
-    var btnUpcoming = document.getElementById('opTabUpcoming');
-    var btnHistory = document.getElementById('opTabHistory');
-    
-    if (tab === 'upcoming') {
-        btnUpcoming.style.background = 'var(--primary)';
-        btnUpcoming.style.color = 'white';
-        btnHistory.style.background = 'rgba(255,255,255,0.1)';
-        btnHistory.style.color = 'var(--text-primary)';
-    } else {
-        btnHistory.style.background = 'var(--primary)';
-        btnHistory.style.color = 'white';
-        btnUpcoming.style.background = 'rgba(255,255,255,0.1)';
-        btnUpcoming.style.color = 'var(--text-primary)';
+    /* ================================================================
+       OPERATIONS TAB SYSTEM
+    ================================================================ */
+    var currentOpTab = 'upcoming';
+
+    function switchOpTab(tab) {
+        currentOpTab = tab;
+        
+        var btnUpcoming = document.getElementById('opTabUpcoming');
+        var btnHistory = document.getElementById('opTabHistory');
+        
+        if (tab === 'upcoming') {
+            btnUpcoming.style.background = 'var(--primary)';
+            btnUpcoming.style.color = 'white';
+            btnHistory.style.background = 'rgba(255,255,255,0.1)';
+            btnHistory.style.color = 'var(--text-primary)';
+        } else {
+            btnHistory.style.background = 'var(--primary)';
+            btnHistory.style.color = 'white';
+            btnUpcoming.style.background = 'rgba(255,255,255,0.1)';
+            btnUpcoming.style.color = 'var(--text-primary)';
+        }
+        
+        renderCalendarFromDB();
     }
-    
-    renderCalendarFromDB();
-}
+
     /* ================================================================
        SEARCH DEBOUNCE
     ================================================================ */
@@ -1323,101 +1416,73 @@ function switchOpTab(tab) {
        CALENDAR
     ================================================================ */
     function renderCalendarFromDB() {
-    var cal = document.getElementById('opCalendar');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    db.ref('patientDetails').once('value').then(function(snap) {
-        var allDetails = snap.val() || {};
-        var rows = '';
-        var pIds = Object.keys(allDetails);
+        var cal = document.getElementById('opCalendar');
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
         
-        // Collect all operations
-        var allOps = [];
-        
-        for (var i = 0; i < pIds.length; i++) {
-            var id = pIds[i];
-            var d = allDetails[id];
+        db.ref('patientDetails').once('value').then(function(snap) {
+            var allDetails = snap.val() || {};
+            var rows = '';
+            var pIds = Object.keys(allDetails);
             
-            // Check both scheduled op (opD/opT) AND surgical history
-            if (d.opD && d.opT) {
-                allOps.push({
-                    id: id,
-                    date: d.opD,
-                    procedure: d.opT,
-                    type: 'scheduled'
-                });
-            }
+            var allOps = [];
             
-            // Also check surgicalHistory array
-            if (d.surgicalHistory && Array.isArray(d.surgicalHistory)) {
-                for (var j = 0; j < d.surgicalHistory.length; j++) {
-                    var histOp = d.surgicalHistory[j];
-                    if (histOp.d && histOp.t) {
-                        allOps.push({
-                            id: id,
-                            date: histOp.d,
-                            procedure: histOp.t,
-                            type: 'history'
-                        });
+            for (var i = 0; i < pIds.length; i++) {
+                var id = pIds[i];
+                var d = allDetails[id];
+                
+                if (d.opD && d.opT) {
+                    allOps.push({ id: id, date: d.opD, procedure: d.opT, type: 'scheduled' });
+                }
+                
+                if (d.surgicalHistory && Array.isArray(d.surgicalHistory)) {
+                    for (var j = 0; j < d.surgicalHistory.length; j++) {
+                        var histOp = d.surgicalHistory[j];
+                        if (histOp.d && histOp.t) {
+                            allOps.push({ id: id, date: histOp.d, procedure: histOp.t, type: 'history' });
+                        }
                     }
                 }
             }
-        }
-        
-        // Sort by date (newest first for history, oldest first for upcoming)
-        allOps.sort(function(a, b) {
-            return new Date(a.date) - new Date(b.date);
-        });
-        
-        // Filter based on current tab
-        var filteredOps = [];
-        for (var k = 0; k < allOps.length; k++) {
-            var opDate = new Date(allOps[k].date);
-            if (currentOpTab === 'upcoming' && opDate >= today) {
-                filteredOps.push(allOps[k]);
-            } else if (currentOpTab === 'history' && opDate < today) {
-                filteredOps.push(allOps[k]);
-            }
-        }
-        
-        // Reverse history to show most recent first
-        if (currentOpTab === 'history') {
-            filteredOps.reverse();
-        }
-        
-        // Generate HTML rows
-        for (var m = 0; m < filteredOps.length; m++) {
-            var op = filteredOps[m];
-            var patName = ptIdx[op.id] ? ptIdx[op.id].name : (allDetails[op.id].name || 'Unknown');
-            var rowClass = op.type === 'scheduled' ? '' : 'style="background:rgba(255,159,10,0.08);"';
-            var typeBadge = op.type === 'history' ? ' <span style="font-size:10px;color:var(--warning);">✓ Done</span>' : '';
             
-            rows += '<tr ' + rowClass + '>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.date + '</td>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + op.id + '\')"><b style="color:var(--primary);">' + patName + '</b>' + typeBadge + '</td>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.procedure + '</td></tr>';
-        }
-        
-        // Display results
-        if (filteredOps.length === 0) {
-            var emptyMsg = currentOpTab === 'upcoming' 
-                ? "No upcoming surgeries scheduled." 
-                : "No past operations recorded.";
-            cal.innerHTML = "<p style='color:var(--text-secondary); padding:20px; text-align:center;'>" + emptyMsg + "</p>";
-        } else {
-            var tableTitle = currentOpTab === 'upcoming' ? 'Upcoming Surgeries' : 'Post-Op History';
-            cal.innerHTML = 
-                '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">' +
-                '<tr><th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Date</th>' +
-                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Patient (click to open)</th>' +
-                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Procedure</th></tr>' +
-                rows + '</table>' +
-                '<div style="margin-top:10px; padding:8px; background:rgba(10,132,255,0.08); border-radius:8px; font-size:12px; color:var(--text-secondary);">' +
-                '<strong style="color:var(--primary);">' + filteredOps.length + '</strong> ' + (currentOpTab === 'upcoming' ? 'upcoming' : 'past') + ' operation(s)</div>';
-        }
-    });
-}
+            allOps.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+            
+            var filteredOps = [];
+            for (var k = 0; k < allOps.length; k++) {
+                var opDate = new Date(allOps[k].date);
+                if (currentOpTab === 'upcoming' && opDate >= today) filteredOps.push(allOps[k]);
+                else if (currentOpTab === 'history' && opDate < today) filteredOps.push(allOps[k]);
+            }
+            
+            if (currentOpTab === 'history') filteredOps.reverse();
+            
+            for (var m = 0; m < filteredOps.length; m++) {
+                var op = filteredOps[m];
+                var patName = ptIdx[op.id] ? ptIdx[op.id].name : (allDetails[op.id].name || 'Unknown');
+                var rowClass = op.type === 'scheduled' ? '' : 'style="background:rgba(255,159,10,0.08);"';
+                var typeBadge = op.type === 'history' ? ' <span style="font-size:10px;color:var(--warning);">✓ Done</span>' : '';
+                
+                rows += '<tr ' + rowClass + '>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.date + '</td>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + op.id + '\')"><b style="color:var(--primary);">' + patName + '</b>' + typeBadge + '</td>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.procedure + '</td></tr>';
+            }
+            
+            if (filteredOps.length === 0) {
+                var emptyMsg = currentOpTab === 'upcoming' ? "No upcoming surgeries scheduled." : "No past operations recorded.";
+                cal.innerHTML = "<p style='color:var(--text-secondary); padding:20px; text-align:center;'>" + emptyMsg + "</p>";
+            } else {
+                cal.innerHTML = 
+                    '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">' +
+                    '<tr><th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Date</th>' +
+                    '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Patient (click to open)</th>' +
+                    '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Procedure</th></tr>' +
+                    rows + '</table>' +
+                    '<div style="margin-top:10px; padding:8px; background:rgba(10,132,255,0.08); border-radius:8px; font-size:12px; color:var(--text-secondary);">' +
+                    '<strong style="color:var(--primary);">' + filteredOps.length + '</strong> ' + (currentOpTab === 'upcoming' ? 'upcoming' : 'past') + ' operation(s)</div>';
+            }
+        });
+    }
 
     /* ================================================================
        LOAD PATIENT
@@ -2145,164 +2210,6 @@ function switchOpTab(tab) {
     }
 
     /* ================================================================
-       LAB / PATIENT FLOW STATS
-    ================================================================ */
-    function toggleLabDateInputs() {
-        document.getElementById('labCustomDates').style.display = document.getElementById('labFilterType').value === 'custom' ? 'grid' : 'none';
-    }
-
-    function calculateLabStats() {
-        var list = document.getElementById('statList');
-        var totalDisp = document.getElementById('statTotalDisplay');
-        var filterType = document.getElementById('labFilterType').value;
-        var startVal = document.getElementById('labStart').value;
-        var endVal = document.getElementById('labEnd').value;
-        var now = new Date();
-        var curM = now.getMonth();
-        var curY = now.getFullYear();
-        list.innerHTML = "Filtering Records...";
-
-        db.ref('patientDetails').once('value', function(snap) {
-            var allDetails = snap.val() || {};
-            var globalCount = 0;
-            var testGroups = {};
-            var pIds = Object.keys(allDetails);
-
-            for (var pi = 0; pi < pIds.length; pi++) {
-                var pid = pIds[pi];
-                var pData = allDetails[pid];
-                var labs = pData.labs || {};
-                var ptName = ptIdx[pid] ? ptIdx[pid].name : "Unknown";
-                var labKeys = Object.keys(labs);
-
-                for (var li = 0; li < labKeys.length; li++) {
-                    var labKey = labKeys[li];
-                    var labInfo = labs[labKey];
-                    var labName = labInfo.name || labKey;
-                    var history = labInfo.history || [];
-                    var validEntries = [];
-
-                    if (history.length === 0 && filterType === 'all') {
-                        validEntries.push({ id: pid, name: ptName });
-                    }
-                    for (var hi = 0; hi < history.length; hi++) {
-                        var h = history[hi];
-                        var hDate = parseIraqiDate(h.dt);
-                        var dObj = new Date(hDate);
-                        var include = false;
-                        if (filterType === 'all') include = true;
-                        else if (filterType === 'month') include = dObj.getMonth() === curM && dObj.getFullYear() === curY;
-                        else if (filterType === 'custom') {
-                            var s = startVal ? new Date(startVal).getTime() : 0;
-                            var e = endVal ? new Date(endVal).getTime() : 9999999999999;
-                            include = hDate >= s && hDate <= e;
-                        }
-                        if (include) validEntries.push({ id: pid, name: ptName });
-                    }
-
-                    if (validEntries.length > 0) {
-                        if (!testGroups[labName]) testGroups[labName] = [];
-                        for (var ve = 0; ve < validEntries.length; ve++) {
-                            testGroups[labName].push(validEntries[ve]);
-                            globalCount++;
-                        }
-                    }
-                }
-            }
-
-            if (globalCount === 0) {
-                list.innerHTML = "No tests found for this period.";
-                totalDisp.innerHTML = '0 <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>';
-                return;
-            }
-            totalDisp.innerHTML = globalCount + ' <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span>';
-
-            var html = '';
-            var tgKeys = Object.keys(testGroups).sort(function(a, b) { return testGroups[b].length - testGroups[a].length; });
-            for (var t = 0; t < tgKeys.length; t++) {
-                var testName = tgKeys[t];
-                var patients = testGroups[testName];
-                var uniqueMap = {};
-                var uniquePts = [];
-                for (var up = 0; up < patients.length; up++) {
-                    if (!uniqueMap[patients[up].id]) {
-                        uniqueMap[patients[up].id] = true;
-                        uniquePts.push(patients[up]);
-                    }
-                }
-                var ptHtml = '';
-                for (var p = 0; p < uniquePts.length; p++) {
-                    ptHtml += '<div style="padding:5px 10px; color:var(--primary); cursor:pointer; border-left:2px solid var(--lab); margin-left:10px; margin-top:4px; font-size:12px;" onclick="loadFullData(\'' + uniquePts[p].id + '\')">' + uniquePts[p].name + '</div>';
-                }
-                html += '<div style="margin-bottom:8px; border:1px solid var(--separator); border-radius:10px; overflow:hidden;">' +
-                    '<div style="display:flex; justify-content:space-between; padding:10px; background:var(--item-hover); cursor:pointer; font-weight:600;" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\'none\'?\'block\':\'none\')">' +
-                    '<span>' + testName + '</span><span style="color:var(--lab);">' + patients.length + '</span></div>' +
-                    '<div style="display:none; padding:5px; background:rgba(0,0,0,0.02);">' + ptHtml + '</div></div>';
-            }
-            list.innerHTML = html;
-        });
-    }
-
-    function calculatePatientFlow() {
-        var list = document.getElementById('flowList');
-        var fType = document.getElementById('flowFilterType').value;
-        var startVal = document.getElementById('flowStart').value;
-        var endVal = document.getElementById('flowEnd').value;
-        var now = new Date();
-        var curM = now.getMonth();
-        var curY = now.getFullYear();
-        list.innerHTML = "Processing Registry...";
-
-        var newPts = [];
-        var followPts = [];
-        var ids = Object.keys(ptIdx);
-
-        for (var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            var p = ptIdx[id];
-            var regDateTs = parseIraqiDate(p.dateAdded);
-            var dObj = new Date(regDateTs);
-            var isNewInPeriod = false;
-            if (fType === 'all') isNewInPeriod = true;
-            else if (fType === 'month') isNewInPeriod = dObj.getMonth() === curM && dObj.getFullYear() === curY;
-            else if (fType === 'custom') {
-                var s = startVal ? new Date(startVal).getTime() : 0;
-                var e = endVal ? new Date(endVal).getTime() : 9999999999999;
-                isNewInPeriod = regDateTs >= s && regDateTs <= e;
-            }
-            if (isNewInPeriod) {
-                newPts.push({ id: id, name: p.name });
-            } else {
-                var lastVTs = parseIraqiDate(p.lastVisit);
-                var lvObj = new Date(lastVTs);
-                var isFollow = false;
-                if (fType === 'month') isFollow = lvObj.getMonth() === curM && lvObj.getFullYear() === curY;
-                else if (fType === 'custom') {
-                    var s2 = startVal ? new Date(startVal).getTime() : 0;
-                    var e2 = endVal ? new Date(endVal).getTime() : 9999999999999;
-                    isFollow = lastVTs >= s2 && lastVTs <= e2;
-                }
-                if (isFollow) followPts.push({ id: id, name: p.name });
-            }
-        }
-
-        document.getElementById('countNew').innerText = newPts.length;
-        document.getElementById('countFollow').innerText = followPts.length;
-
-        var html = '<b style="display:block; margin-bottom:8px; color:var(--success);">New Registrations (' + newPts.length + '):</b>';
-        for (var n = 0; n < newPts.length; n++) {
-            html += '<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData(\'' + newPts[n].id + '\')">' + newPts[n].name + '</div>';
-        }
-        if (!newPts.length) html += "None";
-        html += '<b style="display:block; margin-top:15px; margin-bottom:8px; color:var(--primary);">Follow-up Visits (' + followPts.length + '):</b>';
-        for (var f = 0; f < followPts.length; f++) {
-            html += '<div style="padding:4px 0; color:var(--text-primary); cursor:pointer;" onclick="loadFullData(\'' + followPts[f].id + '\')">' + followPts[f].name + '</div>';
-        }
-        if (!followPts.length) html += "None";
-        list.innerHTML = html;
-    }
-
-    /* ================================================================
        INITIAL DATA
     ================================================================ */
     var initialLabs = {
@@ -2456,7 +2363,7 @@ function switchOpTab(tab) {
         textProtection.lastDeletedField = null;
     }
 
-    function undoLastAction() {
+   function undoLastAction() {
         if (!textProtection.lastDeleted || !textProtection.lastDeletedField) { showToast('Nothing to undo'); return; }
         var fieldId = textProtection.lastDeletedField;
         var field = document.getElementById(fieldId);
@@ -2472,7 +2379,6 @@ function switchOpTab(tab) {
         autoSyncTrigger();
         showToast('\u2705 ' + getFieldLabel(fieldId) + ' restored! (' + restoredContent.length + ' chars recovered)');
     }
-
     function openVersionPanel(fieldId) {
         var overlay = document.getElementById('versionOverlay');
         var panel = document.getElementById('versionPanel');
