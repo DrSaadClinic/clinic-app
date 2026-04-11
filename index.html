@@ -2363,7 +2363,7 @@
         textProtection.lastDeletedField = null;
     }
 
-   function undoLastAction() {
+    function undoLastAction() {
         if (!textProtection.lastDeleted || !textProtection.lastDeletedField) { showToast('Nothing to undo'); return; }
         var fieldId = textProtection.lastDeletedField;
         var field = document.getElementById(fieldId);
@@ -2377,8 +2377,10 @@
         field.setSelectionRange(restoredContent.length, restoredContent.length);
         dismissUndo();
         autoSyncTrigger();
-        showToast('\u2705 ' + getFieldLabel(fieldId) + ' restored! (' + restoredContent.length + ' chars recovered)');
+        showToast('\u2705 '
+                  ' + getFieldLabel(fieldId) + ' restored! (' + restoredContent.length + ' chars recovered)');
     }
+
     function openVersionPanel(fieldId) {
         var overlay = document.getElementById('versionOverlay');
         var panel = document.getElementById('versionPanel');
@@ -2459,359 +2461,362 @@
     }
 
     /* ================================================================
-   REGISTRY STATS PANEL
-=============================================================== */
-var regCurrentPeriod = 'all';
-var regCurrentCategory = null;
+       REGISTRY STATS PANEL - FIXED VERSION
+    ================================================================ */
+    var regCurrentPeriod = 'all';
+    var regCurrentCategory = null;
 
-function openRegistryPanel(preselectedCategory) {
-    document.getElementById('registryOverlay').style.display = 'block';
-    document.getElementById('registryPanel').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    if (preselectedCategory) {
-        selectRegPeriod('all');
-        setTimeout(function() { showRegCategory(preselectedCategory); }, 300);
-    } else {
-        selectRegPeriod('all');
+    function openRegistryPanel(preselectedCategory) {
+        document.getElementById('registryOverlay').style.display = 'block';
+        document.getElementById('registryPanel').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset active states on cards
+        document.querySelectorAll('.reg-stat-card').forEach(function(el) { el.classList.remove('active'); });
+        
+        if (preselectedCategory) {
+            selectRegPeriod('all');
+            setTimeout(function() { showRegCategory(preselectedCategory); }, 300);
+        } else {
+            selectRegPeriod('all');
+            calculateAllRegStats();
+        }
+    }
+
+    function closeRegistryPanel() {
+        document.getElementById('registryOverlay').style.display = 'none';
+        document.getElementById('registryPanel').style.display = 'none';
+        document.body.style.overflow = '';
+        regCurrentCategory = null;
+        
+        // Remove active states
+        document.querySelectorAll('.reg-stat-card').forEach(function(el) { el.classList.remove('active'); });
+    }
+
+    function selectRegPeriod(period) {
+        regCurrentPeriod = period;
+        var now = new Date();
+        
+        // Update button styles
+        document.querySelectorAll('.reg-period-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+            if (btn.dataset.period === period) btn.classList.add('active');
+        });
+        
+        // FIX BUG #2: Use 'now' instead of undefined 'newDate'
+        var labels = {
+            'all': 'Showing all records in database',
+            'thismonth': 'Showing: ' + getMonthName(now.getMonth()) + ' ' + now.getFullYear(),
+            'lastmonth': 'Showing: ' + getMonthName(now.getMonth() - 1) + ' ' + (now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()),
+            '3months': 'Showing: Last 90 days',
+            '6months': 'Showing: Last 180 days'
+        };
+        document.getElementById('regPeriodLabel').innerText = labels[period] || '';
+        
         calculateAllRegStats();
-    }
-}
-
-function closeRegistryPanel() {
-    document.getElementById('registryOverlay').style.display = 'none';
-    document.getElementById('registryPanel').style.display = 'none';
-    document.body.style.overflow = '';
-    regCurrentCategory = null;
-    
-    // Remove active states
-    document.querySelectorAll('.reg-stat-card').forEach(function(el) { el.classList.remove('active'); });
-}
-
-function selectRegPeriod(period) {
-    regCurrentPeriod = period;
-    
-    // Update button styles
-    document.querySelectorAll('.reg-period-btn').forEach(function(btn) {
-        btn.classList.remove('active');
-        if (btn.dataset.period === period) btn.classList.add('active');
-    });
-    
-    // Update label
-    var labels = {
-        'all': 'Showing all records in database',
-        'thismonth': 'Showing: ' + getMonthName(new Date().getMonth()) + ' ' + new Date().getFullYear(),
-        'lastmonth': 'Showing: ' + getMonthName(new Date().getMonth() - 1) + ' ' + (newDate.getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()),
-        '3months': 'Showing: Last 90 days',
-        '6months': 'Showing: Last 180 days'
-    };
-    document.getElementById('regPeriodLabel').innerText = labels[period] || '';
-    
-    calculateAllRegStats();
-    
-    // Re-render current category if selected
-    if (regCurrentCategory) showRegCategory(regCurrentCategory);
-}
-
-function getDateRangeForPeriod(period) {
-    var now = new Date();
-    var start, end;
-    
-    switch(period) {
-        case 'thismonth':
-            start = new Date(now.getFullYear(), now.getMonth(), 1);
-            end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            break;
-        case 'lastmonth':
-            start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            end = new Date(now.getFullYear(), now.getMonth(), 0);
-            break;
-        case '3months':
-            start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-            end = now;
-            break;
-        case '6months':
-            start = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
-            end = now;
-            break;
-        default:
-            return null; // All time
-    }
-    
-    return { start: start, end: end };
-}
-
-function isDateInRange(dateStr, range) {
-    if (!range) return true;
-    var dateVal = parseIraqiDate(dateStr);
-    return dateVal >= range.start.getTime() && dateVal <= range.end.getTime();
-}
-
-function calculateAllRegStats() {
-    var range = getDateRangeForPeriod(regCurrentPeriod);
-    var ids = Object.keys(ptIdx);
-    
-    var total = 0, newCount = 0, returningCount = 0, labsCount = 0;
-    var waitingCount = 0, overdueCount = 0, pinnedCount = 0;
-    
-    for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        var p = ptIdx[id];
-        total++;
         
-        // New registration check
-        if (!range || isDateInRange(p.dateAdded, range)) newCount++;
+        // Re-render current category if selected
+        if (regCurrentCategory) showRegCategory(regCurrentCategory);
+    }
+
+    function getDateRangeForPeriod(period) {
+        var now = new Date();
+        var start, end;
         
-        // Returning visit check (visited in period but registered before period)
-        if (range && p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range)) {
-            returningCount++;
-        } else if (!range && p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded)) {
-            returningCount++;
+        switch(period) {
+            case 'thismonth':
+                start = new Date(now.getFullYear(), now.getMonth(), 1);
+                end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+            case 'lastmonth':
+                start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                end = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+            case '3months':
+                start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                end = now;
+                break;
+            case '6months':
+                start = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+                end = now;
+                break;
+            default:
+                return null; // All time
         }
         
-        // Waiting room
-        if (p.isWaiting) waitingCount++;
-        
-        // Overdue
-        var days = getDaysSince(p.lastVisit || p.dateAdded);
-        if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdueCount++;
-        
-        // Pinned
-        if (p.pinned) pinnedCount++;
+        return { start: start, end: end };
     }
-    
-    // Update stat cards with animation
-    animateStatNumber('statTotal', total);
-    animateStatNumber('statNew', newCount);
-    animateStatNumber('statReturning', returningCount);
-    animateStatNumber('statWaiting', waitingCount);
-    animateStatNumber('statOverdue', overdueCount);
-    animateStatNumber('statPinned', pinnedCount);
-    
-    // Labs count (needs separate DB query)
-    db.ref('patientDetails').once('value', function(snap) {
-        var allDetails = snap.val() || {};
-        var labEntries = 0;
-        var pIds = Object.keys(allDetails);
-        for (var pi = 0; pi < pIds.length; pi++) {
-            var pd = allDetails[pIds[pi]];
-            if (pd.labs) {
-                var labKeys = Object.keys(pd.labs);
-                for (var li = 0; li < labKeys.length; li++) {
-                    var lab = pd.labs[labKeys[li]];
-                    if (lab.history && lab.history.length > 0) {
-                        for (var hi = 0; hi < lab.history.length; hi++) {
-                            if (!range || isDateInRange(lab.history[hi].dt, range)) labEntries++;
-                        }
-                    } else if (!range) {
-                        labEntries++; // Count pending orders too for "all time"
-                    }
-                }
+
+    function isDateInRange(dateStr, range) {
+        if (!range) return true;
+        var dateVal = parseIraqiDate(dateStr);
+        return dateVal >= range.start.getTime() && dateVal <= range.end.getTime();
+    }
+
+    function calculateAllRegStats() {
+        var range = getDateRangeForPeriod(regCurrentPeriod);
+        var ids = Object.keys(ptIdx);
+        
+        var total = 0, newCount = 0, returningCount = 0;
+        var waitingCount = 0, overdueCount = 0, pinnedCount = 0;
+        
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var p = ptIdx[id];
+            total++;
+            
+            // New registration check
+            if (!range || isDateInRange(p.dateAdded, range)) newCount++;
+            
+            // Returning visit check
+            if (range && p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range)) {
+                returningCount++;
+            } else if (!range && p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded)) {
+                returningCount++;
             }
-        }
-        animateStatNumber('statLabs', labEntries);
-    });
-    
-    // Also update main dashboard mini-stats
-    updateDashboardMiniStats();
-}
-
-function animateStatNumber(elementId, targetValue) {
-    var el = document.getElementById(elementId);
-    if (!el) return;
-    el.innerText = targetValue;
-    el.style.transform = 'scale(1.2)';
-    setTimeout(function() { el.style.transform = 'scale(1)'; }, 200);
-}
-
-function showRegCategory(category) {
-    regCurrentCategory = category;
-    
-    // Update active state on cards
-    document.querySelectorAll('.reg-stat-card').forEach(function(el) {
-        el.classList.remove('active');
-        if (el.dataset.category === category) el.classList.add('active');
-    });
-    
-    // Update title
-    var titles = {
-        'total': '👥 All Patients',
-        'new': '✨ New Registrations',
-        'returning': '🔄 Returning Patients',
-        'labs': '🔬 Lab Referrals',
-        'waiting': '⏳ Waiting Room',
-        'overdue': '⚠️ Overdue Patients (25+ Days)',
-        'pinned': '⭐ Pinned / Starred Patients'
-    };
-    document.getElementById('regListTitle').innerText = titles[category] || 'Patients';
-    
-    // Build filtered list
-    renderRegPatientList(category);
-}
-
-function renderRegPatientList(category) {
-    var list = document.getElementById('regPatientList');
-    var range = getDateRangeForPeriod(regCurrentPeriod);
-    var ids = Object.keys(ptIdx);
-    var matchedIds = [];
-    
-    for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        var p = ptIdx[id];
-        var include = false;
-        
-        switch(category) {
-            case 'total':
-                include = true;
-                break;
-            case 'new':
-                include = !range || isDateInRange(p.dateAdded, range);
-                break;
-            case 'returning':
-                if (range) {
-                    include = p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range);
-                } else {
-                    include = p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded);
-                }
-                break;
-            case 'waiting':
-                include = p.isWaiting === true;
-                break;
-            case 'overdue':
-                var days = getDaysSince(p.lastVisit || p.dateAdded);
-                include = days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded);
-                break;
-            case 'pinned':
-                include = p.pinned === true;
-                break;
-            case 'labs':
-                // Labs need special handling - we'll mark these and query details later
-                include = true; // Will filter after DB query
-                break;
+            
+            // Waiting room
+            if (p.isWaiting) waitingCount++;
+            
+            // Overdue
+            var days = getDaysSince(p.lastVisit || p.dateAdded);
+            if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdueCount++;
+            
+            // Pinned
+            if (p.pinned) pinnedCount++;
         }
         
-        if (include) matchedIds.push(id);
-    }
-    
-    // Special handling for labs category
-    if (category === 'labs') {
-        matchedIds = [];
+        // Update stat cards with animation
+        animateStatNumber('statTotal', total);
+        animateStatNumber('statNew', newCount);
+        animateStatNumber('statReturning', returningCount);
+        animateStatNumber('statWaiting', waitingCount);
+        animateStatNumber('statOverdue', overdueCount);
+        animateStatNumber('statPinned', pinnedCount);
+        
+        // Labs count (needs separate DB query)
         db.ref('patientDetails').once('value', function(snap) {
             var allDetails = snap.val() || {};
+            var labEntries = 0;
             var pIds = Object.keys(allDetails);
-            
             for (var pi = 0; pi < pIds.length; pi++) {
-                var pid = pIds[pi];
-                var pd = allDetails[pid];
+                var pd = allDetails[pIds[pi]];
                 if (pd.labs) {
-                    var hasLabInPeriod = false;
                     var labKeys = Object.keys(pd.labs);
                     for (var li = 0; li < labKeys.length; li++) {
                         var lab = pd.labs[labKeys[li]];
                         if (lab.history && lab.history.length > 0) {
                             for (var hi = 0; hi < lab.history.length; hi++) {
-                                if (!range || isDateInRange(lab.history[hi].dt, range)) {
-                                    hasLabInPeriod = true;
-                                    break;
-                                }
+                                if (!range || isDateInRange(lab.history[hi].dt, range)) labEntries++;
                             }
+                        } else if (!range) {
+                            labEntries++;
                         }
-                        if (hasLabInPeriod) break;
-                    }
-                    if (hasLabInPeriod || (!range && labKeys.length > 0)) {
-                        matchedIds.push(pid);
                     }
                 }
             }
-            
-            finishRenderingRegList(matchedIds, category);
+            animateStatNumber('statLabs', labEntries);
         });
-        return;
-    }
-    
-    finishRenderingRegList(matchedIds, category);
-}
-
-function finishRenderingRegList(matchedIds, category) {
-    var list = document.getElementById('regPatientList');
-    document.getElementById('regListCount').innerText = '(' + matchedIds.length + ' patients)';
-    
-    if (matchedIds.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">No patients found in this category for the selected period.</p>';
-        return;
-    }
-    
-    // Sort by last visit (most recent first)
-    matchedIds.sort(function(a, b) {
-        return parseIraqiDate(ptIdx[b].lastVisit || ptIdx[b].dateAdded) - 
-               parseIraqiDate(ptIdx[a].lastVisit || ptIdx[a].dateAdded);
-    });
-    
-    var html = '';
-    for (var i = 0; i < matchedIds.length; i++) {
-        var id = matchedIds[i];
-        var p = ptIdx[id];
-        var days = getDaysSince(p.lastVisit || p.dateAdded);
-        var overdueBadge = (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) 
-            ? '<span style="color:var(--danger); font-size:12px; margin-left:6px;">⚠️</span>' : '';
-        var waitingBadge = p.isWaiting ? '<span style="background:var(--primary); color:white; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:6px;">WAITING</span>' : '';
-        var pinnedBadge = p.pinned ? '<span style="color:#FFD60A; font-size:12px; margin-left:4px;">⭐</span>' : '';
         
-        html += '<div class="reg-patient-row" data-name="' + (p.name || '').toLowerCase() + '" onclick="closeRegistryPanel(); setTimeout(function(){loadFullData(\'' + id + '\')},200);">' +
-            '<div>' +
-                '<div class="reg-patient-name">' + (p.name || 'Unknown') + pinnedBadge + waitingBadge + overdueBadge + '</div>' +
-                '<div class="reg-patient-meta">' +
-                    'Registered: ' + (p.dateAdded || '--') + 
-                    ' | Last Visit: ' + (p.lastVisit || '--') +
-                    (p.complaint ? ' | C/O: ' + p.complaint.substring(0, 40) + (p.complaint.length > 40 ? '...' : '') : '') +
+        // Also update main dashboard mini-stats
+        updateDashboardMiniStats();
+    }
+
+    function animateStatNumber(elementId, targetValue) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        el.innerText = targetValue;
+        el.style.transform = 'scale(1.2)';
+        setTimeout(function() { el.style.transform = 'scale(1)'; }, 200);
+    }
+
+    function showRegCategory(category) {
+        regCurrentCategory = category;
+        
+        // Update active state on cards
+        document.querySelectorAll('.reg-stat-card').forEach(function(el) {
+            el.classList.remove('active');
+            if (el.dataset.category === category) el.classList.add('active');
+        });
+        
+        // Update title
+        var titles = {
+            'total': '👥 All Patients',
+            'new': '✨ New Registrations',
+            'returning': '🔄 Returning Patients',
+            'labs': '🔬 Lab Referrals',
+            'waiting': '⏳ Waiting Room',
+            'overdue': '⚠️ Overdue Patients (25+ Days)',
+            'pinned': '⭐ Pinned / Starred Patients'
+        };
+        document.getElementById('regListTitle').innerText = titles[category] || 'Patients';
+        
+        // Build filtered list
+        renderRegPatientList(category);
+    }
+
+    function renderRegPatientList(category) {
+        var list = document.getElementById('regPatientList');
+        var range = getDateRangeForPeriod(regCurrentPeriod);
+        var ids = Object.keys(ptIdx);
+        var matchedIds = [];
+        
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var p = ptIdx[id];
+            var include = false;
+            
+            switch(category) {
+                case 'total':
+                    include = true;
+                    break;
+                case 'new':
+                    include = !range || isDateInRange(p.dateAdded, range);
+                    break;
+                case 'returning':
+                    if (range) {
+                        include = p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range);
+                    } else {
+                        include = p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded);
+                    }
+                    break;
+                case 'waiting':
+                    include = p.isWaiting === true;
+                    break;
+                case 'overdue':
+                    var days = getDaysSince(p.lastVisit || p.dateAdded);
+                    include = days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded);
+                    break;
+                case 'pinned':
+                    include = p.pinned === true;
+                    break;
+                case 'labs':
+                    include = true; // Will filter after DB query
+                    break;
+            }
+            
+            if (include) matchedIds.push(id);
+        }
+        
+        // Special handling for labs category
+        if (category === 'labs') {
+            matchedIds = [];
+            db.ref('patientDetails').once('value', function(snap) {
+                var allDetails = snap.val() || {};
+                var pIds = Object.keys(allDetails);
+                
+                for (var pi = 0; pi < pIds.length; pi++) {
+                    var pid = pIds[pi];
+                    var pd = allDetails[pid];
+                    if (pd.labs) {
+                        var hasLabInPeriod = false;
+                        var labKeys = Object.keys(pd.labs);
+                        for (var li = 0; li < labKeys.length; li++) {
+                            var lab = pd.labs[labKeys[li]];
+                            if (lab.history && lab.history.length > 0) {
+                                for (var hi = 0; hi < lab.history.length; hi++) {
+                                    if (!range || isDateInRange(lab.history[hi].dt, range)) {
+                                        hasLabInPeriod = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (hasLabInPeriod) break;
+                        }
+                        if (hasLabInPeriod || (!range && labKeys.length > 0)) {
+                            matchedIds.push(pid);
+                        }
+                    }
+                }
+                
+                finishRenderingRegList(matchedIds, category);
+            });
+            return;
+        }
+        
+        finishRenderingRegList(matchedIds, category);
+    }
+
+    function finishRenderingRegList(matchedIds, category) {
+        var list = document.getElementById('regPatientList');
+        document.getElementById('regListCount').innerText = '(' + matchedIds.length + ' patients)';
+        
+        if (matchedIds.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">No patients found in this category for the selected period.</p>';
+            return;
+        }
+        
+        // Sort by last visit (most recent first)
+        matchedIds.sort(function(a, b) {
+            return parseIraqiDate(ptIdx[b].lastVisit || ptIdx[b].dateAdded) - 
+                   parseIraqiDate(ptIdx[a].lastVisit || ptIdx[a].dateAdded);
+        });
+        
+        var html = '';
+        for (var i = 0; i < matchedIds.length; i++) {
+            var id = matchedIds[i];
+            var p = ptIdx[id];
+            var days = getDaysSince(p.lastVisit || p.dateAdded);
+            var overdueBadge = (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) 
+                ? '<span style="color:var(--danger); font-size:12px; margin-left:6px;">⚠️</span>' : '';
+            var waitingBadge = p.isWaiting ? '<span style="background:var(--primary); color:white; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:6px;">WAITING</span>' : '';
+            var pinnedBadge = p.pinned ? '<span style="color:#FFD60A; font-size:12px; margin-left:4px;">⭐</span>' : '';
+            
+            html += '<div class="reg-patient-row" data-name="' + (p.name || '').toLowerCase() + '" onclick="closeRegistryPanel(); setTimeout(function(){loadFullData(\'' + id + '\')},200);">' +
+                '<div>' +
+                    '<div class="reg-patient-name">' + (p.name || 'Unknown') + pinnedBadge + waitingBadge + overdueBadge + '</div>' +
+                    '<div class="reg-patient-meta">' +
+                        'Registered: ' + (p.dateAdded || '--') + 
+                        ' | Last Visit: ' + (p.lastVisit || '--') +
+                        (p.complaint ? ' | C/O: ' + p.complaint.substring(0, 40) + (p.complaint.length > 40 ? '...' : '') : '') +
+                    '</div>' +
                 '</div>' +
-            '</div>' +
-            '<button class="reg-open-btn">Open File →</button>' +
-        '</div>';
+                '<button class="reg-open-btn">Open File →</button>' +
+            '</div>';
+        }
+        
+        list.innerHTML = html;
     }
-    
-    list.innerHTML = html;
-}
 
-function filterRegList() {
-    var search = document.getElementById('regSearchInput').value.toLowerCase();
-    var rows = document.querySelectorAll('.reg-patient-row');
-    
-    for (var i = 0; i < rows.length; i++) {
-        var name = rows[i].dataset.name || '';
-        rows[i].style.display = (name.indexOf(search) !== -1) ? '' : 'none';
+    function filterRegList() {
+        var search = document.getElementById('regSearchInput').value.toLowerCase();
+        var rows = document.querySelectorAll('.reg-patient-row');
+        
+        for (var i = 0; i < rows.length; i++) {
+            var name = rows[i].dataset.name || '';
+            rows[i].style.display = (name.indexOf(search) !== -1) ? '' : 'none';
+        }
     }
-}
 
-function updateDashboardMiniStats() {
-    var ids = Object.keys(ptIdx);
-    var total = ids.length;
-    var newThisMonth = 0;
-    var waiting = 0;
-    var overdue = 0;
-    var now = new Date();
-    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    for (var i = 0; i < ids.length; i++) {
-        var p = ptIdx[ids[i]];
-        var regDate = parseIraqiDate(p.dateAdded);
-        if (regDate >= monthStart.getTime()) newThisMonth++;
-        if (p.isWaiting) waiting++;
-        var days = getDaysSince(p.lastVisit || p.dateAdded);
-        if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdue++;
+    function updateDashboardMiniStats() {
+        var ids = Object.keys(ptIdx);
+        var total = ids.length;
+        var newThisMonth = 0;
+        var waiting = 0;
+        var overdue = 0;
+        var now = new Date();
+        var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        for (var i = 0; i < ids.length; i++) {
+            var p = ptIdx[ids[i]];
+            var regDate = parseIraqiDate(p.dateAdded);
+            if (regDate >= monthStart.getTime()) newThisMonth++;
+            if (p.isWaiting) waiting++;
+            var days = getDaysSince(p.lastVisit || p.dateAdded);
+            if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdue++;
+        }
+        
+        document.getElementById('dashTotalPts').innerText = total;
+        document.getElementById('dashNewThisMonth').innerText = newThisMonth;
+        document.getElementById('dashWaiting').innerText = waiting;
+        document.getElementById('dashOverdue').innerText = overdue;
     }
-    
-    document.getElementById('dashTotalPts').innerText = total;
-    document.getElementById('dashNewThisMonth').innerText = newThisMonth;
-    document.getElementById('dashWaiting').innerText = waiting;
-    document.getElementById('dashOverdue').innerText = overdue;
-}
 
-function getMonthName(monthIndex) {
-    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var idx = ((monthIndex % 12) + 12) % 12; // Handle negative
-    return months[idx];
-}
+    function getMonthName(monthIndex) {
+        var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        var idx = ((monthIndex % 12) + 12) % 12; // Handle negative months
+        return months[idx];
+    }
 
     /* ================================================================
        BOOT - No login, goes straight to app
@@ -2823,91 +2828,8 @@ function getMonthName(monthIndex) {
         initSync();
         genImagingTags();
         setTimeout(initTextProtectionForPatient, 500);
-        <!-- REGISTRY STATS PANEL -->
-<div id="registryOverlay" class="version-overlay" style="display:none;" onclick="closeRegistryPanel()"></div>
-
-<div id="registryPanel" class="version-panel" style="min-width:900px; max-width:95vw;">
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="color:var(--primary); margin:0; font-size:1.6em;">📋 Patient Registry & Statistics</h2>
-        <button onclick="closeRegistryPanel()" style="background:none; border:none; color:var(--text-secondary); font-size:28px; cursor:pointer; line-height:1;">&times;</button>
-    </div>
-
-    <!-- TIME PERIOD FILTERS -->
-    <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:16px; margin-bottom:24px; border:1px solid var(--card-border);">
-        <label style="font-size:11px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-secondary); display:block; margin-bottom:10px;">⏰ Select Time Period</label>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="reg-period-btn active" data-period="all" onclick="selectRegPeriod('all')">All Time</button>
-            <button class="reg-period-btn" data-period="thismonth" onclick="selectRegPeriod('thismonth')">This Month</button>
-            <button class="reg-period-btn" data-period="lastmonth" onclick="selectRegPeriod('lastmonth')">Last Month</button>
-            <button class="reg-period-btn" data-period="3months" onclick="selectRegPeriod('3months')">3 Months</button>
-            <button class="reg-period-btn" data-period="6months" onclick="selectRegPeriod('6months')">6 Months</button>
-        </div>
-        <div id="regPeriodLabel" style="margin-top:10px; font-size:13px; color:var(--text-secondary);"></div>
-    </div>
-
-    <!-- STAT CARDS GRID -->
-    <div id="regStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:16px; margin-bottom:28px;">
-        
-        <div class="reg-stat-card" data-category="total" onclick="showRegCategory('total')">
-            <div class="reg-stat-icon" style="background:var(--primary);">👥</div>
-            <div class="reg-stat-number" id="statTotal">--</div>
-            <div class="reg-stat-label">Total Patients</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="new" onclick="showRegCategory('new')">
-            <div class="reg-stat-icon" style="background:var(--success);">✨</div>
-            <div class="reg-stat-number" id="statNew">--</div>
-            <div class="reg-stat-label">New Registrations</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="returning" onclick="showRegCategory('returning')">
-            <div class="reg-stat-icon" style="background:var(--call);">🔄</div>
-            <div class="reg-stat-number" id="statReturning">--</div>
-            <div class="reg-stat-label">Returning Visits</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="labs" onclick="showRegCategory('labs')">
-            <div class="reg-stat-icon" style="background:var(--lab);">🔬</div>
-            <div class="reg-stat-number" id="statLabs">--</div>
-            <div class="reg-stat-label">Lab Referrals</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="waiting" onclick="showRegCategory('waiting')">
-            <div class="reg-stat-icon" style="background:var(--warning);">⏳</div>
-            <div class="reg-stat-number" id="statWaiting">--</div>
-            <div class="reg-stat-label">Waiting Room</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="overdue" onclick="showRegCategory('overdue')">
-            <div class="reg-stat-icon" style="background:var(--danger);">⚠️</div>
-            <div class="reg-stat-number" id="statOverdue">--</div>
-            <div class="reg-stat-label">Overdue 25+ Days</div>
-        </div>
-
-        <div class="reg-stat-card" data-category="pinned" onclick="showRegCategory('pinned')">
-            <div class="reg-stat-icon" style="background:#FFD60A; color:#000;">⭐</div>
-            <div class="reg-stat-number" id="statPinned">--</div>
-            <div class="reg-stat-label">Pinned Patients</div>
-        </div>
-
-    </div>
-
-    <!-- PATIENT LIST AREA -->
-    <div style="background:rgba(0,0,0,0.15); border-radius:16px; border:1px solid var(--card-border); overflow:hidden;">
-        <div style="padding:16px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid var(--separator); display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <strong id="regListTitle" style="color:var(--primary); font-size:15px;">Select a category above</strong>
-                <span id="regListCount" style="color:var(--text-secondary); font-size:12px; margin-left:10px;"></span>
-            </div>
-            <input type="text" id="regSearchInput" placeholder="Search in results..." oninput="filterRegList()" style="width:220px; padding:8px 14px; border-radius:10px; font-size:13px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-primary);">
-        </div>
-        <div id="regPatientList" style="max-height:400px; overflow-y:auto; padding:12px;">
-            <p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">Click any statistic card above to view the patient list</p>
-        </div>
-    </div>
-
-</div>
+        // Initialize calendar
+        scheduleCalendarRender();
     });
 </script>
 </body>
