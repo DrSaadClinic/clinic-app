@@ -836,17 +836,19 @@
                 </div>
             </div>
 
-            <!-- Operations -->
-            <div class="card"><h3>Operations</h3>
-                <div class="table-responsive">
-                    <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary);">No surgeries scheduled.</div>
-                </div>
-            </div>
+           <!-- Operations -->
+<div class="card">
+    <h3 style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span>Operations Schedule</span>
+        <div style="display:flex; gap:8px;">
+            <button id="opTabUpcoming" class="action-btn" style="background:var(--primary); color:white; padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('upcoming')">Upcoming</button>
+            <button id="opTabHistory" class="action-btn" style="background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('history')">History</button>
         </div>
-
-        <div id="emptyState" class="card">
-            <p style="font-size:1.15em; font-weight:600;">Select a patient file to begin clinical review.</p>
-        </div>
+    </h3>
+    <div class="table-responsive">
+        <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary); min-height:120px;">Loading...</div>
+    </div>
+</div>
 
         <!-- Patient File View -->
         <div id="fileView" class="card" style="display:none;">
@@ -1057,7 +1059,32 @@
         clearTimeout(calendarTimer);
         calendarTimer = setTimeout(renderCalendarFromDB, 300);
     }
+/* ================================================================
+   OPERATIONS TAB SYSTEM
+=============================================================== */
+var currentOpTab = 'upcoming';
 
+function switchOpTab(tab) {
+    currentOpTab = tab;
+    
+    // Update button styles
+    var btnUpcoming = document.getElementById('opTabUpcoming');
+    var btnHistory = document.getElementById('opTabHistory');
+    
+    if (tab === 'upcoming') {
+        btnUpcoming.style.background = 'var(--primary)';
+        btnUpcoming.style.color = 'white';
+        btnHistory.style.background = 'rgba(255,255,255,0.1)';
+        btnHistory.style.color = 'var(--text-primary)';
+    } else {
+        btnHistory.style.background = 'var(--primary)';
+        btnHistory.style.color = 'white';
+        btnUpcoming.style.background = 'rgba(255,255,255,0.1)';
+        btnUpcoming.style.color = 'var(--text-primary)';
+    }
+    
+    renderCalendarFromDB();
+}
     /* ================================================================
        SEARCH DEBOUNCE
     ================================================================ */
@@ -1192,31 +1219,101 @@
        CALENDAR
     ================================================================ */
     function renderCalendarFromDB() {
-        var cal = document.getElementById('opCalendar');
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
-        db.ref('patientDetails').once('value').then(function(snap) {
-            var allDetails = snap.val() || {};
-            var rows = '';
-            var pIds = Object.keys(allDetails);
-            for (var i = 0; i < pIds.length; i++) {
-                var id = pIds[i];
-                var d = allDetails[id];
-                if (d.opD) {
-                    var opDate = new Date(d.opD);
-                    if (opDate >= today) {
-                        var patName = ptIdx[id] ? ptIdx[id].name : (d.name || 'Unknown');
-                        rows += '<tr><td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + d.opD + '</td>' +
-                            '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + id + '\')"><b style="color:var(--primary);">' + patName + '</b></td>' +
-                            '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + (d.opT || '') + '</td></tr>';
+    var cal = document.getElementById('opCalendar');
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    db.ref('patientDetails').once('value').then(function(snap) {
+        var allDetails = snap.val() || {};
+        var rows = '';
+        var pIds = Object.keys(allDetails);
+        
+        // Collect all operations
+        var allOps = [];
+        
+        for (var i = 0; i < pIds.length; i++) {
+            var id = pIds[i];
+            var d = allDetails[id];
+            
+            // Check both scheduled op (opD/opT) AND surgical history
+            if (d.opD && d.opT) {
+                allOps.push({
+                    id: id,
+                    date: d.opD,
+                    procedure: d.opT,
+                    type: 'scheduled'
+                });
+            }
+            
+            // Also check surgicalHistory array
+            if (d.surgicalHistory && Array.isArray(d.surgicalHistory)) {
+                for (var j = 0; j < d.surgicalHistory.length; j++) {
+                    var histOp = d.surgicalHistory[j];
+                    if (histOp.d && histOp.t) {
+                        allOps.push({
+                            id: id,
+                            date: histOp.d,
+                            procedure: histOp.t,
+                            type: 'history'
+                        });
                     }
                 }
             }
-            cal.innerHTML = rows
-                ? '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;"><tr><th style="color:var(--text-secondary); padding:6px 10px;">Date</th><th style="color:var(--text-secondary); padding:6px 10px;">Patient</th><th style="color:var(--text-secondary); padding:6px 10px;">Procedure</th></tr>' + rows + '</table>'
-                : "<p style='color:var(--text-secondary); padding:10px;'>No upcoming surgeries.</p>";
+        }
+        
+        // Sort by date (newest first for history, oldest first for upcoming)
+        allOps.sort(function(a, b) {
+            return new Date(a.date) - new Date(b.date);
         });
-    }
+        
+        // Filter based on current tab
+        var filteredOps = [];
+        for (var k = 0; k < allOps.length; k++) {
+            var opDate = new Date(allOps[k].date);
+            if (currentOpTab === 'upcoming' && opDate >= today) {
+                filteredOps.push(allOps[k]);
+            } else if (currentOpTab === 'history' && opDate < today) {
+                filteredOps.push(allOps[k]);
+            }
+        }
+        
+        // Reverse history to show most recent first
+        if (currentOpTab === 'history') {
+            filteredOps.reverse();
+        }
+        
+        // Generate HTML rows
+        for (var m = 0; m < filteredOps.length; m++) {
+            var op = filteredOps[m];
+            var patName = ptIdx[op.id] ? ptIdx[op.id].name : (allDetails[op.id].name || 'Unknown');
+            var rowClass = op.type === 'scheduled' ? '' : 'style="background:rgba(255,159,10,0.08);"';
+            var typeBadge = op.type === 'history' ? ' <span style="font-size:10px;color:var(--warning);">✓ Done</span>' : '';
+            
+            rows += '<tr ' + rowClass + '>' +
+                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.date + '</td>' +
+                '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + op.id + '\')"><b style="color:var(--primary);">' + patName + '</b>' + typeBadge + '</td>' +
+                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.procedure + '</td></tr>';
+        }
+        
+        // Display results
+        if (filteredOps.length === 0) {
+            var emptyMsg = currentOpTab === 'upcoming' 
+                ? "No upcoming surgeries scheduled." 
+                : "No past operations recorded.";
+            cal.innerHTML = "<p style='color:var(--text-secondary); padding:20px; text-align:center;'>" + emptyMsg + "</p>";
+        } else {
+            var tableTitle = currentOpTab === 'upcoming' ? 'Upcoming Surgeries' : 'Post-Op History';
+            cal.innerHTML = 
+                '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">' +
+                '<tr><th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Date</th>' +
+                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Patient (click to open)</th>' +
+                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Procedure</th></tr>' +
+                rows + '</table>' +
+                '<div style="margin-top:10px; padding:8px; background:rgba(10,132,255,0.08); border-radius:8px; font-size:12px; color:var(--text-secondary);">' +
+                '<strong style="color:var(--primary);">' + filteredOps.length + '</strong> ' + (currentOpTab === 'upcoming' ? 'upcoming' : 'past') + ' operation(s)</div>';
+        }
+    });
+}
 
     /* ================================================================
        LOAD PATIENT
