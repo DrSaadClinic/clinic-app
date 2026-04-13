@@ -495,6 +495,130 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        /* ===== REGISTRY PANEL STYLES ===== */
+.reg-period-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.reg-period-btn:hover { background: rgba(10,132,255,0.15); border-color: var(--primary); }
+.reg-period-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 14px rgba(10,132,255,0.35);
+}
+
+.reg-stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid transparent;
+    border-radius: 18px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+.reg-stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.reg-stat-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+.reg-stat-card:hover::before { opacity: 1; }
+.reg-stat-card.active {
+    border-color: var(--primary);
+    background: rgba(10,132,255,0.1);
+}
+
+.reg-stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 12px;
+}
+
+.reg-stat-number {
+    font-size: 2.2em;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.reg-stat-label {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reg-patient-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--separator);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.02);
+}
+.reg-patient-row:hover {
+    background: var(--item-hover);
+    transform: translateX(4px);
+}
+.reg-patient-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+}
+.reg-patient-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+.reg-open-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.reg-open-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(10,132,255,0.35);
+}
+
+@media (max-width: 768px) {
+    #registryPanel { min-width: auto !important; width: 98vw; padding: 16px; }
+    #regStatsGrid { grid-template-columns: repeat(2, 1fr) !important; }
+    .reg-stat-number { font-size: 1.6em; }
+}
 
         /* ===== TEXT PROTECTION SYSTEM STYLES ===== */
         .undo-toast {
@@ -765,89 +889,68 @@
     <!-- CONTENT -->
     <div class="content">
 
-        <div class="dash-grid">
-            <!-- Patient Flow -->
-            <div class="card" style="border-left: 5px solid var(--call); grid-column: span 1;">
-                <h3 style="color:var(--call); border:none; margin-bottom:10px;">Patient Flow Tracker</h3>
-                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
-                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">TIME PERIOD</label>
-                    <select id="flowFilterType" onchange="document.getElementById('flowCustomDates').style.display = (this.value === 'custom') ? 'grid' : 'none';" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
-                        <option value="all">Total Registry</option>
-                        <option value="month">This Month</option>
-                        <option value="custom">Custom Range</option>
-                    </select>
-                    <div id="flowCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
-                        <input type="date" id="flowStart" style="padding: 5px; font-size: 12px; margin: 0;">
-                        <input type="date" id="flowEnd" style="padding: 5px; font-size: 12px; margin: 0;">
-                    </div>
-                    <button class="action-btn" style="background:var(--call); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculatePatientFlow()">Generate Report</button>
-                </div>
-                <div id="flowSummary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; text-align: center;">
-                    <div style="background: rgba(48, 209, 88, 0.1); padding: 10px; border-radius: 12px;">
-                        <div id="countNew" style="font-size: 1.5em; font-weight: 800; color: var(--success);">0</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">NEW PTs</div>
-                    </div>
-                    <div style="background: rgba(10, 132, 255, 0.1); padding: 10px; border-radius: 12px;">
-                        <div id="countFollow" style="font-size: 1.5em; font-weight: 800; color: var(--primary);">0</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">FOLLOW-UPS</div>
-                    </div>
-                </div>
-                <div id="flowList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
-                    <p style="color:var(--text-secondary); text-align: center; padding: 10px 0;">No report generated.</p>
-                </div>
+        <!-- MINIMAL DASHBOARD -->
+<div class="dash-grid">
+    
+    <!-- Registry Entry Point -->
+    <div class="card" style="grid-column: span 2; background: linear-gradient(135deg, rgba(10,132,255,0.1) 0%, rgba(94,92,230,0.1) 100%); border: 2px solid var(--primary); cursor:pointer; transition:all 0.3s;" onclick="openRegistryPanel()">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0;">
+            <div>
+                <h3 style="color:var(--primary); border:none; margin:0; font-size:1.4em;">📋 Patient Registry</h3>
+                <p style="color:var(--text-secondary); margin:8px 0 0; font-size:14px;">Browse patients • Filter by time period • View statistics</p>
             </div>
-
-            <!-- Lab Stats -->
-            <div class="card" style="border-left: 5px solid var(--lab); grid-column: span 1;">
-                <h3 style="color:var(--lab); border:none; margin-bottom:10px;">Lab Referral Stats</h3>
-                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
-                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">FILTER BY DATE</label>
-                    <select id="labFilterType" onchange="toggleLabDateInputs()" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
-                        <option value="all">All Time</option>
-                        <option value="month">This Month</option>
-                        <option value="custom">Custom Range</option>
-                    </select>
-                    <div id="labCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
-                        <input type="date" id="labStart" style="padding: 5px; font-size: 12px; margin: 0;">
-                        <input type="date" id="labEnd" style="padding: 5px; font-size: 12px; margin: 0;">
-                    </div>
-                    <button class="action-btn" style="background:var(--lab); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculateLabStats()">Load Statistics</button>
-                </div>
-                <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span></div>
-                <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
-                    <p style="color:var(--text-secondary); text-align: center; padding: 20px 0;">Select range and click Load.</p>
-                </div>
+            <div style="background:var(--primary); color:white; width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 6px 20px rgba(10,132,255,0.4);">
+                →
             </div>
-
-            <!-- Reminders -->
-            <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
-
-            <!-- Overdue -->
-            <div class="card">
-                <h3 style="margin-bottom:10px; border:none; display:flex; justify-content:space-between; align-items:center;">
-                    <span>25-Day Overdue</span>
-                    <div style="display:flex; gap:6px;">
-                        <button class="action-btn" style="color:var(--primary); font-size:11px; background:rgba(10,132,255,0.12); padding:4px 10px;" onclick="renderOverdueRadar()">Load</button>
-                        <button class="action-btn" style="font-size:11px; background:rgba(255,255,255,0.08); padding:4px 10px;" onclick="dismissAllOverdue()">Clear</button>
-                    </div>
-                </h3>
-                <div id="overdueList" class="scroll-card">
-                    <p style="color:var(--text-secondary); padding:10px; text-align:center; font-size:13px; margin:0;">Click Load to view overdue patients.</p>
-                </div>
-            </div>
-
-           <!-- Operations -->
-<div class="card">
-    <h3 style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-        <span>Operations Schedule</span>
-        <div style="display:flex; gap:8px;">
-            <button id="opTabUpcoming" class="action-btn" style="background:var(--primary); color:white; padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('upcoming')">Upcoming</button>
-            <button id="opTabHistory" class="action-btn" style="background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('history')">History</button>
         </div>
-    </h3>
-    <div class="table-responsive">
-        <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary); min-height:120px;">Loading...</div>
+        <div style="display:flex; gap:20px; margin-top:18px; flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.08); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                <div id="dashTotalPts" style="font-size:1.8em; font-weight:800; color:var(--primary);">--</div>
+                <div style="font-size:11px; color:var(--text-secondary);">Total Patients</div>
+            </div>
+            <div style="background:rgba(48,209,88,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                <div id="dashNewThisMonth" style="font-size:1.8em; font-weight:800; color:var(--success);">--</div>
+                <div style="font-size:11px; color:var(--text-secondary);">New This Month</div>
+            </div>
+            <div style="background:rgba(255,159,10,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                <div id="dashWaiting" style="font-size:1.8em; font-weight:800; color:var(--warning);">--</div>
+                <div style="font-size:11px; color:var(--text-secondary);">In Waiting</div>
+            </div>
+            <div style="background:rgba(255,69,58,0.1); padding:12px 20px; border-radius:14px; text-align:center; min-width:100px;">
+                <div id="dashOverdue" style="font-size:1.8em; font-weight:800; color:var(--danger);">--</div>
+                <div style="font-size:11px; color:var(--text-secondary);">Overdue 25+ Days</div>
+            </div>
+        </div>
     </div>
+
+    <!-- Reminders -->
+    <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
+
+    <!-- Overdue Quick View -->
+    <div class="card">
+        <h3 style="margin-bottom:10px; border:none; display:flex; justify-content:space-between; align-items:center;">
+            <span>⚠️ Overdue Alerts</span>
+            <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="openRegistryPanel('overdue')">View All →</button>
+        </h3>
+        <div id="overdueList" class="scroll-card">
+            <p style="color:var(--text-secondary); padding:10px; text-align:center; font-size:13px; margin:0;">Click "View All" or open Registry.</p>
+        </div>
+    </div>
+
+    <!-- Operations -->
+    <div class="card">
+        <h3 style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <span>🔪 Operations Schedule</span>
+            <div style="display:flex; gap:8px;">
+                <button id="opTabUpcoming" class="action-btn" style="background:var(--primary); color:white; padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('upcoming')">Upcoming</button>
+                <button id="opTabHistory" class="action-btn" style="background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:10px; font-size:12px;" onclick="switchOpTab('history')">History</button>
+            </div>
+        </h3>
+        <div class="table-responsive">
+            <div id="opCalendar" class="scroll-card" style="color:var(--text-secondary); min-height:120px;">Loading...</div>
+        </div>
+    </div>
+
 </div>
 
         <!-- Patient File View -->
@@ -1046,6 +1149,7 @@
             renderList();
             scheduleCalendarRender();
             document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
+            updateDashboardMiniStats();
         });
 
         db.ref('reminders').on('value', function(snap) {
@@ -2449,6 +2553,361 @@ function switchOpTab(tab) {
     }
 
     /* ================================================================
+   REGISTRY STATS PANEL
+=============================================================== */
+var regCurrentPeriod = 'all';
+var regCurrentCategory = null;
+
+function openRegistryPanel(preselectedCategory) {
+    document.getElementById('registryOverlay').style.display = 'block';
+    document.getElementById('registryPanel').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    if (preselectedCategory) {
+        selectRegPeriod('all');
+        setTimeout(function() { showRegCategory(preselectedCategory); }, 300);
+    } else {
+        selectRegPeriod('all');
+        calculateAllRegStats();
+    }
+}
+
+function closeRegistryPanel() {
+    document.getElementById('registryOverlay').style.display = 'none';
+    document.getElementById('registryPanel').style.display = 'none';
+    document.body.style.overflow = '';
+    regCurrentCategory = null;
+    
+    // Remove active states
+    document.querySelectorAll('.reg-stat-card').forEach(function(el) { el.classList.remove('active'); });
+}
+
+function selectRegPeriod(period) {
+    regCurrentPeriod = period;
+    
+    // Update button styles
+    document.querySelectorAll('.reg-period-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.dataset.period === period) btn.classList.add('active');
+    });
+    
+    // Update label
+    var labels = {
+        'all': 'Showing all records in database',
+        'thismonth': 'Showing: ' + getMonthName(new Date().getMonth()) + ' ' + new Date().getFullYear(),
+        'lastmonth': 'Showing: ' + getMonthName(new Date().getMonth() - 1) + ' ' + (newDate.getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear()),
+        '3months': 'Showing: Last 90 days',
+        '6months': 'Showing: Last 180 days'
+    };
+    document.getElementById('regPeriodLabel').innerText = labels[period] || '';
+    
+    calculateAllRegStats();
+    
+    // Re-render current category if selected
+    if (regCurrentCategory) showRegCategory(regCurrentCategory);
+}
+
+function getDateRangeForPeriod(period) {
+    var now = new Date();
+    var start, end;
+    
+    switch(period) {
+        case 'thismonth':
+            start = new Date(now.getFullYear(), now.getMonth(), 1);
+            end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            break;
+        case 'lastmonth':
+            start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            end = new Date(now.getFullYear(), now.getMonth(), 0);
+            break;
+        case '3months':
+            start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+            end = now;
+            break;
+        case '6months':
+            start = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+            end = now;
+            break;
+        default:
+            return null; // All time
+    }
+    
+    return { start: start, end: end };
+}
+
+function isDateInRange(dateStr, range) {
+    if (!range) return true;
+    var dateVal = parseIraqiDate(dateStr);
+    return dateVal >= range.start.getTime() && dateVal <= range.end.getTime();
+}
+
+function calculateAllRegStats() {
+    var range = getDateRangeForPeriod(regCurrentPeriod);
+    var ids = Object.keys(ptIdx);
+    
+    var total = 0, newCount = 0, returningCount = 0, labsCount = 0;
+    var waitingCount = 0, overdueCount = 0, pinnedCount = 0;
+    
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var p = ptIdx[id];
+        total++;
+        
+        // New registration check
+        if (!range || isDateInRange(p.dateAdded, range)) newCount++;
+        
+        // Returning visit check (visited in period but registered before period)
+        if (range && p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range)) {
+            returningCount++;
+        } else if (!range && p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded)) {
+            returningCount++;
+        }
+        
+        // Waiting room
+        if (p.isWaiting) waitingCount++;
+        
+        // Overdue
+        var days = getDaysSince(p.lastVisit || p.dateAdded);
+        if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdueCount++;
+        
+        // Pinned
+        if (p.pinned) pinnedCount++;
+    }
+    
+    // Update stat cards with animation
+    animateStatNumber('statTotal', total);
+    animateStatNumber('statNew', newCount);
+    animateStatNumber('statReturning', returningCount);
+    animateStatNumber('statWaiting', waitingCount);
+    animateStatNumber('statOverdue', overdueCount);
+    animateStatNumber('statPinned', pinnedCount);
+    
+    // Labs count (needs separate DB query)
+    db.ref('patientDetails').once('value', function(snap) {
+        var allDetails = snap.val() || {};
+        var labEntries = 0;
+        var pIds = Object.keys(allDetails);
+        for (var pi = 0; pi < pIds.length; pi++) {
+            var pd = allDetails[pIds[pi]];
+            if (pd.labs) {
+                var labKeys = Object.keys(pd.labs);
+                for (var li = 0; li < labKeys.length; li++) {
+                    var lab = pd.labs[labKeys[li]];
+                    if (lab.history && lab.history.length > 0) {
+                        for (var hi = 0; hi < lab.history.length; hi++) {
+                            if (!range || isDateInRange(lab.history[hi].dt, range)) labEntries++;
+                        }
+                    } else if (!range) {
+                        labEntries++; // Count pending orders too for "all time"
+                    }
+                }
+            }
+        }
+        animateStatNumber('statLabs', labEntries);
+    });
+    
+    // Also update main dashboard mini-stats
+    updateDashboardMiniStats();
+}
+
+function animateStatNumber(elementId, targetValue) {
+    var el = document.getElementById(elementId);
+    if (!el) return;
+    el.innerText = targetValue;
+    el.style.transform = 'scale(1.2)';
+    setTimeout(function() { el.style.transform = 'scale(1)'; }, 200);
+}
+
+function showRegCategory(category) {
+    regCurrentCategory = category;
+    
+    // Update active state on cards
+    document.querySelectorAll('.reg-stat-card').forEach(function(el) {
+        el.classList.remove('active');
+        if (el.dataset.category === category) el.classList.add('active');
+    });
+    
+    // Update title
+    var titles = {
+        'total': '👥 All Patients',
+        'new': '✨ New Registrations',
+        'returning': '🔄 Returning Patients',
+        'labs': '🔬 Lab Referrals',
+        'waiting': '⏳ Waiting Room',
+        'overdue': '⚠️ Overdue Patients (25+ Days)',
+        'pinned': '⭐ Pinned / Starred Patients'
+    };
+    document.getElementById('regListTitle').innerText = titles[category] || 'Patients';
+    
+    // Build filtered list
+    renderRegPatientList(category);
+}
+
+function renderRegPatientList(category) {
+    var list = document.getElementById('regPatientList');
+    var range = getDateRangeForPeriod(regCurrentPeriod);
+    var ids = Object.keys(ptIdx);
+    var matchedIds = [];
+    
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var p = ptIdx[id];
+        var include = false;
+        
+        switch(category) {
+            case 'total':
+                include = true;
+                break;
+            case 'new':
+                include = !range || isDateInRange(p.dateAdded, range);
+                break;
+            case 'returning':
+                if (range) {
+                    include = p.lastVisit && isDateInRange(p.lastVisit, range) && !isDateInRange(p.dateAdded, range);
+                } else {
+                    include = p.lastVisit && p.dateAdded && parseIraqiDate(p.lastVisit) > parseIraqiDate(p.dateAdded);
+                }
+                break;
+            case 'waiting':
+                include = p.isWaiting === true;
+                break;
+            case 'overdue':
+                var days = getDaysSince(p.lastVisit || p.dateAdded);
+                include = days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded);
+                break;
+            case 'pinned':
+                include = p.pinned === true;
+                break;
+            case 'labs':
+                // Labs need special handling - we'll mark these and query details later
+                include = true; // Will filter after DB query
+                break;
+        }
+        
+        if (include) matchedIds.push(id);
+    }
+    
+    // Special handling for labs category
+    if (category === 'labs') {
+        matchedIds = [];
+        db.ref('patientDetails').once('value', function(snap) {
+            var allDetails = snap.val() || {};
+            var pIds = Object.keys(allDetails);
+            
+            for (var pi = 0; pi < pIds.length; pi++) {
+                var pid = pIds[pi];
+                var pd = allDetails[pid];
+                if (pd.labs) {
+                    var hasLabInPeriod = false;
+                    var labKeys = Object.keys(pd.labs);
+                    for (var li = 0; li < labKeys.length; li++) {
+                        var lab = pd.labs[labKeys[li]];
+                        if (lab.history && lab.history.length > 0) {
+                            for (var hi = 0; hi < lab.history.length; hi++) {
+                                if (!range || isDateInRange(lab.history[hi].dt, range)) {
+                                    hasLabInPeriod = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (hasLabInPeriod) break;
+                    }
+                    if (hasLabInPeriod || (!range && labKeys.length > 0)) {
+                        matchedIds.push(pid);
+                    }
+                }
+            }
+            
+            finishRenderingRegList(matchedIds, category);
+        });
+        return;
+    }
+    
+    finishRenderingRegList(matchedIds, category);
+}
+
+function finishRenderingRegList(matchedIds, category) {
+    var list = document.getElementById('regPatientList');
+    document.getElementById('regListCount').innerText = '(' + matchedIds.length + ' patients)';
+    
+    if (matchedIds.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">No patients found in this category for the selected period.</p>';
+        return;
+    }
+    
+    // Sort by last visit (most recent first)
+    matchedIds.sort(function(a, b) {
+        return parseIraqiDate(ptIdx[b].lastVisit || ptIdx[b].dateAdded) - 
+               parseIraqiDate(ptIdx[a].lastVisit || ptIdx[a].dateAdded);
+    });
+    
+    var html = '';
+    for (var i = 0; i < matchedIds.length; i++) {
+        var id = matchedIds[i];
+        var p = ptIdx[id];
+        var days = getDaysSince(p.lastVisit || p.dateAdded);
+        var overdueBadge = (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) 
+            ? '<span style="color:var(--danger); font-size:12px; margin-left:6px;">⚠️</span>' : '';
+        var waitingBadge = p.isWaiting ? '<span style="background:var(--primary); color:white; padding:2px 8px; border-radius:6px; font-size:10px; margin-left:6px;">WAITING</span>' : '';
+        var pinnedBadge = p.pinned ? '<span style="color:#FFD60A; font-size:12px; margin-left:4px;">⭐</span>' : '';
+        
+        html += '<div class="reg-patient-row" data-name="' + (p.name || '').toLowerCase() + '" onclick="closeRegistryPanel(); setTimeout(function(){loadFullData(\'' + id + '\')},200);">' +
+            '<div>' +
+                '<div class="reg-patient-name">' + (p.name || 'Unknown') + pinnedBadge + waitingBadge + overdueBadge + '</div>' +
+                '<div class="reg-patient-meta">' +
+                    'Registered: ' + (p.dateAdded || '--') + 
+                    ' | Last Visit: ' + (p.lastVisit || '--') +
+                    (p.complaint ? ' | C/O: ' + p.complaint.substring(0, 40) + (p.complaint.length > 40 ? '...' : '') : '') +
+                '</div>' +
+            '</div>' +
+            '<button class="reg-open-btn">Open File →</button>' +
+        '</div>';
+    }
+    
+    list.innerHTML = html;
+}
+
+function filterRegList() {
+    var search = document.getElementById('regSearchInput').value.toLowerCase();
+    var rows = document.querySelectorAll('.reg-patient-row');
+    
+    for (var i = 0; i < rows.length; i++) {
+        var name = rows[i].dataset.name || '';
+        rows[i].style.display = (name.indexOf(search) !== -1) ? '' : 'none';
+    }
+}
+
+function updateDashboardMiniStats() {
+    var ids = Object.keys(ptIdx);
+    var total = ids.length;
+    var newThisMonth = 0;
+    var waiting = 0;
+    var overdue = 0;
+    var now = new Date();
+    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    for (var i = 0; i < ids.length; i++) {
+        var p = ptIdx[ids[i]];
+        var regDate = parseIraqiDate(p.dateAdded);
+        if (regDate >= monthStart.getTime()) newThisMonth++;
+        if (p.isWaiting) waiting++;
+        var days = getDaysSince(p.lastVisit || p.dateAdded);
+        if (days >= 25 && p.dismissedVisit !== (p.lastVisit || p.dateAdded)) overdue++;
+    }
+    
+    document.getElementById('dashTotalPts').innerText = total;
+    document.getElementById('dashNewThisMonth').innerText = newThisMonth;
+    document.getElementById('dashWaiting').innerText = waiting;
+    document.getElementById('dashOverdue').innerText = overdue;
+}
+
+function getMonthName(monthIndex) {
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var idx = ((monthIndex % 12) + 12) % 12; // Handle negative
+    return months[idx];
+}
+
+    /* ================================================================
        BOOT - No login, goes straight to app
     ================================================================ */
     window.addEventListener('DOMContentLoaded', function() {
@@ -2458,6 +2917,91 @@ function switchOpTab(tab) {
         initSync();
         genImagingTags();
         setTimeout(initTextProtectionForPatient, 500);
+        <!-- REGISTRY STATS PANEL -->
+<div id="registryOverlay" class="version-overlay" style="display:none;" onclick="closeRegistryPanel()"></div>
+
+<div id="registryPanel" class="version-panel" style="min-width:900px; max-width:95vw;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="color:var(--primary); margin:0; font-size:1.6em;">📋 Patient Registry & Statistics</h2>
+        <button onclick="closeRegistryPanel()" style="background:none; border:none; color:var(--text-secondary); font-size:28px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+
+    <!-- TIME PERIOD FILTERS -->
+    <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:16px; margin-bottom:24px; border:1px solid var(--card-border);">
+        <label style="font-size:11px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-secondary); display:block; margin-bottom:10px;">⏰ Select Time Period</label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="reg-period-btn active" data-period="all" onclick="selectRegPeriod('all')">All Time</button>
+            <button class="reg-period-btn" data-period="thismonth" onclick="selectRegPeriod('thismonth')">This Month</button>
+            <button class="reg-period-btn" data-period="lastmonth" onclick="selectRegPeriod('lastmonth')">Last Month</button>
+            <button class="reg-period-btn" data-period="3months" onclick="selectRegPeriod('3months')">3 Months</button>
+            <button class="reg-period-btn" data-period="6months" onclick="selectRegPeriod('6months')">6 Months</button>
+        </div>
+        <div id="regPeriodLabel" style="margin-top:10px; font-size:13px; color:var(--text-secondary);"></div>
+    </div>
+
+    <!-- STAT CARDS GRID -->
+    <div id="regStatsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:16px; margin-bottom:28px;">
+        
+        <div class="reg-stat-card" data-category="total" onclick="showRegCategory('total')">
+            <div class="reg-stat-icon" style="background:var(--primary);">👥</div>
+            <div class="reg-stat-number" id="statTotal">--</div>
+            <div class="reg-stat-label">Total Patients</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="new" onclick="showRegCategory('new')">
+            <div class="reg-stat-icon" style="background:var(--success);">✨</div>
+            <div class="reg-stat-number" id="statNew">--</div>
+            <div class="reg-stat-label">New Registrations</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="returning" onclick="showRegCategory('returning')">
+            <div class="reg-stat-icon" style="background:var(--call);">🔄</div>
+            <div class="reg-stat-number" id="statReturning">--</div>
+            <div class="reg-stat-label">Returning Visits</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="labs" onclick="showRegCategory('labs')">
+            <div class="reg-stat-icon" style="background:var(--lab);">🔬</div>
+            <div class="reg-stat-number" id="statLabs">--</div>
+            <div class="reg-stat-label">Lab Referrals</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="waiting" onclick="showRegCategory('waiting')">
+            <div class="reg-stat-icon" style="background:var(--warning);">⏳</div>
+            <div class="reg-stat-number" id="statWaiting">--</div>
+            <div class="reg-stat-label">Waiting Room</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="overdue" onclick="showRegCategory('overdue')">
+            <div class="reg-stat-icon" style="background:var(--danger);">⚠️</div>
+            <div class="reg-stat-number" id="statOverdue">--</div>
+            <div class="reg-stat-label">Overdue 25+ Days</div>
+        </div>
+
+        <div class="reg-stat-card" data-category="pinned" onclick="showRegCategory('pinned')">
+            <div class="reg-stat-icon" style="background:#FFD60A; color:#000;">⭐</div>
+            <div class="reg-stat-number" id="statPinned">--</div>
+            <div class="reg-stat-label">Pinned Patients</div>
+        </div>
+
+    </div>
+
+    <!-- PATIENT LIST AREA -->
+    <div style="background:rgba(0,0,0,0.15); border-radius:16px; border:1px solid var(--card-border); overflow:hidden;">
+        <div style="padding:16px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid var(--separator); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong id="regListTitle" style="color:var(--primary); font-size:15px;">Select a category above</strong>
+                <span id="regListCount" style="color:var(--text-secondary); font-size:12px; margin-left:10px;"></span>
+            </div>
+            <input type="text" id="regSearchInput" placeholder="Search in results..." oninput="filterRegList()" style="width:220px; padding:8px 14px; border-radius:10px; font-size:13px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-primary);">
+        </div>
+        <div id="regPatientList" style="max-height:400px; overflow-y:auto; padding:12px;">
+            <p style="color:var(--text-secondary); text-align:center; padding:40px 20px; font-size:14px;">Click any statistic card above to view the patient list</p>
+        </div>
+    </div>
+
+</div>
     });
 </script>
 </body>
