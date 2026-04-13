@@ -44,7 +44,20 @@
   --letter-spacing-normal: 0.01em;    /* Body text */
   --letter-spacing-wide: 0.05em;      /* Labels/captions */
 }
-        }
+        /* NEW: iOS-style Material/Fill Colors */
+  --color-fill-primary: rgba(120, 120, 128, 0.24);     /* Active text fields */
+  --color-fill-secondary: rgba(118, 118, 128, 0.12);   /* Card backgrounds */
+  --color-fill-tertiary: rgba(116, 116, 128, 0.08);    /* Grouped backgrounds */
+  --color-fill-quaternary: rgba(114, 114, 118, 0.04);  /* Subtle fills */
+  
+  /* NEW: Separator Colors */
+  --color-separator-opaque: rgba(84, 84, 88, 0.65);   /* High contrast borders */
+  --color-separator: rgba(60, 60, 67, 0.36);          /* Standard dividers */
+  
+  /* NEW: Enhanced Blur Effects */
+  --blur-light: blur(20px) saturate(180%);
+  --blur-heavy: blur(40px) saturate(200%);
+}
 
         [data-theme="glass"] {
             --bg-root: #e2e8f0;
@@ -61,7 +74,15 @@
             --item-hover: rgba(255,255,255,0.8);
             --item-active-bg: rgba(10, 132, 255, 0.15);
             --backdrop-blur: blur(20px) saturate(190%);
-        }
+        /* Light mode material colors */
+  --color-fill-primary: rgba(0, 0, 0, 0.08);
+  --color-fill-secondary: rgba(0, 0, 0, 0.048);
+  --color-fill-tertiary: rgba(0, 0, 0, 0.032);
+  --color-fill-quaternary: rgba(0, 0, 0, 0.016);
+  
+  --color-separator-opaque: rgba(60, 60, 67, 0.29);
+  --color-separator: rgba(60, 60, 67, 0.18);
+}
 
         body::before {
             content: '';
@@ -174,16 +195,19 @@
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } }
 
         .card {
-            background: var(--card-bg);
-            backdrop-filter: var(--backdrop-blur);
-            -webkit-backdrop-filter: var(--backdrop-blur);
-            padding: 20px;
-            border-radius: 22px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 18px;
-            border: 1px solid var(--card-border);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
-        }
+    background: var(--color-fill-secondary);
+    backdrop-filter: var(--blur-light);
+    -webkit-backdrop-filter: var(--blur-light);
+    padding: 20px;
+    border-radius: 22px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 18px;
+    border: 0.5px solid var(--color-separator);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background 0.5s ease, 
+                border-color 0.5s ease, 
+                box-shadow 0.5s ease;
+}
         .card:hover { transform: translateY(-2px); }
         @media (max-width: 768px) { .card { padding: 14px; border-radius: 18px; } }
         [data-theme="glass"] .card { box-shadow: var(--card-shadow), 0 1px 0 rgba(255,255,255,0.9) inset; }
@@ -205,23 +229,22 @@
         .scroll-card { max-height: 240px; overflow-y: auto; padding-right: 4px; }
 
         input, textarea {
-            width: 100%;
-            padding: 13px 16px;
-            margin: 7px 0;
-            border: 1px solid var(--input-border);
-            border-radius: 14px;
-            font-size: 15px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
-            font-family: inherit;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
+    width: 100%;
+    padding: 13px 16px;
+    margin: 7px 0;
+    border: none; /* Remove border, use background instead */
+    border-radius: 12px;
+    font-size: 15px;
+    background: var(--color-fill-tertiary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    -webkit-appearance: none; /* Remove default styling */
+}
         input:focus, textarea:focus {
             border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.18);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
             background: var(--input-bg);
         }
         input::placeholder, textarea::placeholder { color: var(--text-secondary); }
