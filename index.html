@@ -743,6 +743,62 @@ button {
   font-size: var(--text-caption) !important;
   font-weight: 600 !important;
 }
+/* ============================================
+   APPLE-STYLE SHADOW SYSTEM
+   ============================================ */
+
+/* Level 1: Standard Cards (subtle elevation) */
+.shadow-level-1 {
+  box-shadow: 
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.04);
+}
+
+/* Level 2: Elevated Cards (modals, popovers) */
+.shadow-level-2 {
+  box-shadow: 
+    0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 32px 64px rgba(0, 0, 0, 0.08);
+}
+
+/* Level 3: Top Layer (toasts, overlays) */
+.shadow-level-3 {
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.10),
+    0 16px 48px rgba(0, 0, 0, 0.20),
+    0 48px 96px rgba(0, 0, 0, 0.12);
+}
+
+/* Apply to existing elements */
+.card {
+  box-shadow: 
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.04) !important;
+}
+
+.version-panel {
+  box-shadow: 
+    0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 32px 64px rgba(0, 0, 0, 0.08) !important;
+}
+
+.toast,
+.undo-toast {
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.10),
+    0 16px 48px rgba(0, 0, 0, 0.20) !important;
+}
+
+.theme-toggle {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}            
     </style>
 </head>
 <body>
