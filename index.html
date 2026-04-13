@@ -31,6 +31,19 @@
             --item-active-bg: rgba(10, 132, 255, 0.18);
             --scrollbar-thumb: rgba(255,255,255,0.18);
             --backdrop-blur: blur(18px);
+            /* NEW: Typography Scale System */
+  --text-display: clamp(2rem, 5vw, 3rem);      /* Main headlines */
+  --text-title: clamp(1.5rem, 4vw, 2rem);        /* Patient names */
+  --text-headline: clamp(1.1rem, 3vw, 1.5rem);   /* Section headers */
+  --text-body: 1rem;                              /* Body text */
+  --text-caption: 0.875rem;                       /* Metadata/dates */
+  --text-footnote: 0.75rem;                       /* Secondary info */
+  
+  /* NEW: Letter spacing for Apple crispness */
+  --letter-spacing-tight: -0.02em;    /* Large headings */
+  --letter-spacing-normal: 0.01em;    /* Body text */
+  --letter-spacing-wide: 0.05em;      /* Labels/captions */
+}
         }
 
         [data-theme="glass"] {
@@ -149,7 +162,12 @@
         }
         .logo-img { height: 38px; width: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--card-border); }
         .logo-large { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 18px; border: 2px solid var(--card-border); object-fit: cover; box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
-        header h2 { font-size: 1.1em; font-weight: 600; letter-spacing: 0.3px; color: var(--text-primary); }
+        header h2 { 
+  font-size: var(--text-title); 
+  font-weight: 600; 
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: 1.2;
+}
 
         .container { max-width: 1540px; margin: auto; padding: 18px; display: grid; grid-template-columns: 360px 1fr; gap: 22px; align-items: start; }
         @media (max-width: 1024px) { .container { grid-template-columns: 310px 1fr; } }
@@ -171,16 +189,17 @@
         [data-theme="glass"] .card { box-shadow: var(--card-shadow), 0 1px 0 rgba(255,255,255,0.9) inset; }
 
         h3 {
-            color: var(--primary);
-            margin: 0 0 14px 0;
-            border-bottom: 1px solid var(--separator);
-            padding-bottom: 10px;
-            font-size: 1.05em;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  color: var(--primary);
+  margin: 0 0 14px 0;
+  border-bottom: 1px solid var(--separator);
+  padding-bottom: 10px;
+  font-size: var(--text-headline);
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  letter-spacing: var(--letter-spacing-normal);
+}
 
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px; align-items: start; }
         .scroll-card { max-height: 240px; overflow-y: auto; padding-right: 4px; }
@@ -272,8 +291,19 @@
         [data-theme="glass"] .pt-item { background: rgba(255,255,255,0.25); border-bottom-color: rgba(0,0,0,0.06); }
         .pt-item:hover { background: var(--item-hover); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
         .pt-item.active { border-left-color: var(--primary); background: var(--item-active-bg) !important; font-weight: bold; box-shadow: inset 0 0 0 1px rgba(10,132,255,0.2); }
-        .pt-item strong { color: var(--text-primary); font-size: 15px; }
-        .pt-meta { font-size: 11.5px; color: var(--text-secondary); display: block; margin-top: 5px; }
+        ..pt-item strong { 
+  color: var(--text-primary); 
+  font-size: var(--text-body); 
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-normal);
+}
+        .pt-meta { 
+  font-size: var(--text-caption); 
+  color: var(--text-secondary); 
+  display: block; 
+  margin-top: 5px;
+  letter-spacing: var(--letter-spacing-wide);
+}
         .pt-controls { position: absolute; right: 10px; top: 14px; display: flex; gap: 10px; }
         .btn-pin-pt { color: var(--text-tertiary); font-size: 15px; cursor: pointer; transition: 0.2s; }
         .btn-pin-pt.pinned { color: var(--warning); text-shadow: 0 0 8px rgba(255, 159, 10, 0.5); }
@@ -655,7 +685,41 @@
         @media (max-width: 768px) {
             .version-panel { min-width: auto; width: 95vw; padding: 20px; }
             .undo-toast { left: 10px; right: 10px; max-width: none; bottom: 80px; }
-        }
+       
+        /* Patient name in file view */
+#viewName {
+  font-size: var(--text-title) !important;
+  font-weight: 700 !important;
+  letter-spacing: var(--letter-spacing-tight) !important;
+  line-height: 1.2 !important;
+}
+
+/* Section labels */
+.section-label {
+  font-size: var(--text-footnote) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08px !important; /* Apple uses very tight tracking for labels */
+  text-transform: uppercase !important;
+}
+
+/* Input fields */
+input, textarea {
+  font-size: var(--text-body) !important;
+  letter-spacing: var(--letter-spacing-normal) !important;
+}
+
+/* Buttons */
+button {
+  font-size: var(--text-body) !important;
+  font-weight: 600 !important;
+  letter-spacing: var(--letter-spacing-normal) !important;
+}
+
+/* Toast notifications */
+.toast {
+  font-size: var(--text-caption) !important;
+  font-weight: 600 !important;
+}
     </style>
 </head>
 <body>
@@ -930,7 +994,7 @@
             </div>
 
             <button onclick="manualSync()" style="background:var(--success); height:58px; font-size:16px; margin-top:8px; box-shadow:0 4px 16px rgba(48,209,88,0.3); border-radius:18px;">Force Cloud Database Sync</button>
-
+           
         </div><!-- /fileView -->
     </div><!-- /content -->
 </div><!-- /container -->
