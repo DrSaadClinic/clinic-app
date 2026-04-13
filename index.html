@@ -1813,7 +1813,7 @@ function switchOpTab(tab) {
             var id = sortedIds[i];
             var p = ptIdx[id];
             var lastVisit = p.lastVisit || p.dateAdded || "N/A";
-            var textMatch = p.name.toLowerCase().indexOf(qText) !== -1 || (p.complaint && p.complaint.toLowerCase().indexOf(qText) !== -1);
+            var textMatch = (p.name || '').toLowerCase().indexOf(qText) !== -1 || (p.complaint && p.complaint.toLowerCase().indexOf(qText) !== -1);
             var dateMatch = dateQuery ? (p.dateAdded.indexOf(dateQuery) !== -1 || (p.lastVisit && p.lastVisit.indexOf(dateQuery) !== -1)) : true;
 
             if (textMatch && dateMatch) {
@@ -1825,7 +1825,7 @@ function switchOpTab(tab) {
                 var isActive = activeId == id ? ' active' : '';
 
                 list.innerHTML += '<div id="pt-' + id + '" class="pt-item' + isActive + '" onclick="loadFullData(\'' + id + '\')">' +
-                    '<strong>' + p.name + '</strong>' +
+                   '<strong>' + (p.name || 'Unnamed Patient') + '</strong>' +
                     (p.isWaiting ? ' <span style="background:var(--primary);color:white;padding:2px 6px;border-radius:8px;font-size:10px;margin-left:4px;">WAITING</span>' : '') +
                     (p.hasPendingLab ? ' &#129514;' : '') + alertBadge +
                     '<span class="pt-meta">Reg: ' + p.dateAdded + ' &nbsp;|&nbsp; Last: ' + lastVisit + '</span>' +
