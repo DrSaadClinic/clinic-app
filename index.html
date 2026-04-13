@@ -766,14 +766,59 @@
     <div class="content">
 
         <div class="dash-grid">
-<!-- Statistics Launcher -->
-<div class="card" style="border-left: 5px solid var(--primary); grid-column: span 1;">
-    <h3 style="color:var(--primary); border:none; margin-bottom:10px;">Statistics</h3>
-    <p style="color:var(--text-secondary); font-size:13px; margin-bottom:18px;">Open Patient Flow reports and Lab Referral statistics in a dedicated window.</p>
-    <div style="display:grid; gap:10px;">
-        <button onclick="openStatsWindow()" style="background:var(--primary); padding:16px; font-size:15px; border-radius:16px;">Open Statistics Window</button>
-    </div>
-</div>
+            <!-- Patient Flow -->
+            <div class="card" style="border-left: 5px solid var(--call); grid-column: span 1;">
+                <h3 style="color:var(--call); border:none; margin-bottom:10px;">Patient Flow Tracker</h3>
+                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">TIME PERIOD</label>
+                    <select id="flowFilterType" onchange="document.getElementById('flowCustomDates').style.display = (this.value === 'custom') ? 'grid' : 'none';" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
+                        <option value="all">Total Registry</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                    <div id="flowCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
+                        <input type="date" id="flowStart" style="padding: 5px; font-size: 12px; margin: 0;">
+                        <input type="date" id="flowEnd" style="padding: 5px; font-size: 12px; margin: 0;">
+                    </div>
+                    <button class="action-btn" style="background:var(--call); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculatePatientFlow()">Generate Report</button>
+                </div>
+                <div id="flowSummary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; text-align: center;">
+                    <div style="background: rgba(48, 209, 88, 0.1); padding: 10px; border-radius: 12px;">
+                        <div id="countNew" style="font-size: 1.5em; font-weight: 800; color: var(--success);">0</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">NEW PTs</div>
+                    </div>
+                    <div style="background: rgba(10, 132, 255, 0.1); padding: 10px; border-radius: 12px;">
+                        <div id="countFollow" style="font-size: 1.5em; font-weight: 800; color: var(--primary);">0</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">FOLLOW-UPS</div>
+                    </div>
+                </div>
+                <div id="flowList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
+                    <p style="color:var(--text-secondary); text-align: center; padding: 10px 0;">No report generated.</p>
+                </div>
+            </div>
+
+            <!-- Lab Stats -->
+            <div class="card" style="border-left: 5px solid var(--lab); grid-column: span 1;">
+                <h3 style="color:var(--lab); border:none; margin-bottom:10px;">Lab Referral Stats</h3>
+                <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 5px;">FILTER BY DATE</label>
+                    <select id="labFilterType" onchange="toggleLabDateInputs()" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--input-border); margin-bottom: 8px;">
+                        <option value="all">All Time</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                    <div id="labCustomDates" style="display: none; gap: 5px; grid-template-columns: 1fr 1fr;">
+                        <input type="date" id="labStart" style="padding: 5px; font-size: 12px; margin: 0;">
+                        <input type="date" id="labEnd" style="padding: 5px; font-size: 12px; margin: 0;">
+                    </div>
+                    <button class="action-btn" style="background:var(--lab); color:white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px;" onclick="calculateLabStats()">Load Statistics</button>
+                </div>
+                <div id="statTotalDisplay" style="font-size: 1.4em; font-weight: 800; color: var(--text-primary); margin-bottom:10px;">-- <span style="font-size:12px; font-weight:400; color:var(--text-secondary);">Tests Found</span></div>
+                <div id="statList" class="scroll-card" style="font-size: 13px; border-top: 1px solid var(--separator); padding-top:10px;">
+                    <p style="color:var(--text-secondary); text-align: center; padding: 20px 0;">Select range and click Load.</p>
+                </div>
+            </div>
+
             <!-- Reminders -->
             <div class="card"><h3>Reminders</h3><div id="remList" class="scroll-card"></div></div>
 
@@ -2402,59 +2447,7 @@ function switchOpTab(tab) {
             initTextProtection(textProtection.protectedFields[i]);
         }
     }
-    function openStatsWindow() {
-    var w = window.open('', '_blank', 'width=900,height=750,scrollbars=yes');
-    w.document.write('<!DOCTYPE html><html lang="en" data-theme="' + document.documentElement.getAttribute('data-theme') + '"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Statistics - Dr. Saad Clinic</title>' +
-    '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"><\/script>' +
-    '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"><\/script>' +
-    '<style>' +
-    ':root,[data-theme="dark"]{--primary:#0A84FF;--success:#30D158;--danger:#FF453A;--warning:#FF9F0A;--call:#5E5CE6;--lab:#64D2FF;--bg-root:#000;--card-bg:rgba(28,28,30,.72);--card-border:rgba(255,255,255,.09);--card-shadow:0 8px 32px rgba(0,0,0,.5);--input-bg:rgba(0,0,0,.35);--input-border:rgba(255,255,255,.1);--text-primary:#F2F2F7;--text-secondary:#8E8E93;--text-tertiary:#636366;--separator:rgba(255,255,255,.06);--item-hover:rgba(255,255,255,.07);--scrollbar-thumb:rgba(255,255,255,.18);--backdrop-blur:blur(18px)}' +
-    '[data-theme="glass"]{--bg-root:#e2e8f0;--card-bg:rgba(255,255,255,.7);--card-border:rgba(255,255,255,.9);--card-shadow:0 8px 32px rgba(31,60,120,.15);--input-bg:rgba(255,255,255,.9);--input-border:#cbd5e1;--text-primary:#0f172a;--text-secondary:#334155;--text-tertiary:#475569;--separator:rgba(0,0,0,.12);--item-hover:rgba(255,255,255,.8);--backdrop-blur:blur(20px) saturate(190%)}' +
-    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:var(--bg-root);color:var(--text-primary);padding:20px;-webkit-font-smoothing:antialiased;transition:background .4s,color .3s}' +
-    'select,input[type="date"]{color-scheme:dark}[data-theme="glass"] select,[data-theme="glass"] input[type="date"]{color-scheme:light}' +
-    '.card{background:var(--card-bg);backdrop-filter:var(--backdrop-blur);-webkit-backdrop-filter:var(--backdrop-blur);padding:22px;border-radius:22px;box-shadow:var(--card-shadow);margin-bottom:22px;border:1px solid var(--card-border);transition:background .4s,border-color .4s}' +
-    'h3{color:var(--primary);margin:0 0 14px;font-size:1.1em;font-weight:600;border-bottom:1px solid var(--separator);padding-bottom:10px}' +
-    '.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:1200px;margin:auto}@media(max-width:768px){.dash-grid{grid-template-columns:1fr}}' +
-    '.scroll-card{max-height:320px;overflow-y:auto;padding-right:4px}' +
-    'input,select{width:100%;padding:10px 14px;margin:6px 0;border:1px solid var(--input-border);border-radius:12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);font-family:inherit}' +
-    'input:focus,select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.18)}' +
-    '.action-btn{background:none;border:none;padding:8px 10px;cursor:pointer;font-weight:600;font-size:13px;border-radius:8px;transition:.2s;color:var(--text-primary)}' +
-    '.action-btn:hover{background:var(--item-hover)}' +
-    '::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:10px}' +
-    '</style></head><body>' +
-    '<h2 style="text-align:center;margin-bottom:24px;font-size:1.3em;">Statistics Dashboard</h2>' +
-    '<div class="dash-grid">' +
-    '<div class="card" style="border-left:5px solid var(--call)">' +
-    '<h3 style="color:var(--call);border:none;margin-bottom:10px;">Patient Flow Tracker</h3>' +
-    '<div style="background:rgba(0,0,0,.05);padding:10px;border-radius:12px;margin-bottom:15px">' +
-    '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">TIME PERIOD</label>' +
-    '<select id="flowFilterType" onchange="document.getElementById(\'flowCustomDates\').style.display=(this.value===\'custom\')?\'grid\':\'none\'" style="margin-bottom:8px"><option value="all">Total Registry</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
-    '<div id="flowCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="flowStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="flowEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
-    '<button class="action-btn" style="background:var(--call);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculatePatientFlow()">Generate Report</button></div>' +
-    '<div id="flowSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;text-align:center">' +
-    '<div style="background:rgba(48,209,88,.1);padding:10px;border-radius:12px"><div id="countNew" style="font-size:1.5em;font-weight:800;color:var(--success)">0</div><div style="font-size:10px;color:var(--text-secondary)">NEW PTs</div></div>' +
-    '<div style="background:rgba(10,132,255,.1);padding:10px;border-radius:12px"><div id="countFollow" style="font-size:1.5em;font-weight:800;color:var(--primary)">0</div><div style="font-size:10px;color:var(--text-secondary)">FOLLOW-UPS</div></div></div>' +
-    '<div id="flowList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:10px 0">No report generated.</p></div></div>' +
-    '<div class="card" style="border-left:5px solid var(--lab)">' +
-    '<h3 style="color:var(--lab);border:none;margin-bottom:10px;">Lab Referral Stats</h3>' +
-    '<div style="background:rgba(0,0,0,.05);padding:10px;border-radius:12px;margin-bottom:15px">' +
-    '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">FILTER BY DATE</label>' +
-    '<select id="labFilterType" onchange="toggleLabDateInputs()" style="margin-bottom:8px"><option value="all">All Time</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
-    '<div id="labCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="labStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="labEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
-    '<button class="action-btn" style="background:var(--lab);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculateLabStats()">Load Statistics</button></div>' +
-    '<div id="statTotalDisplay" style="font-size:1.4em;font-weight:800;margin-bottom:10px">-- <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span></div>' +
-    '<div id="statList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:20px 0">Select range and click Load.</p></div></div>' +
-    '</div>' +
-    '<script>' +
-    'firebase.initializeApp({apiKey:"AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",authDomain:"saad-clinic.firebaseapp.com",databaseURL:"https://saad-clinic-default-rtdb.firebaseio.com",projectId:"saad-clinic",storageBucket:"saad-clinic.firebasestorage.app",messagingSenderId:"216860298716",appId:"1:216860298716:web:6f2e31e3267f8d1487d319",measurementId:"G-3DBY6CC5HD"});' +
-    'var db=firebase.database();' +
-    'function parseIraqiDate(d){if(!d||d==="N/A")return 0;if(d.indexOf("/")!==-1){var p=d.split("/");if(p.length===3)return new Date(+p[2],p[1]-1,+p[0]).getTime()}var v=new Date(d).getTime();return isNaN(v)?0:v}' +
-    'function toggleLabDateInputs(){document.getElementById("labCustomDates").style.display=document.getElementById("labFilterType").value==="custom"?"grid":"none"}' +
-    'function calculatePatientFlow(){var list=document.getElementById("flowList");var fType=document.getElementById("flowFilterType").value;var startVal=document.getElementById("flowStart").value;var endVal=document.getElementById("flowEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Processing Registry...";db.ref("patientIndex").once("value",function(snap){var ptIdx=snap.val()||{};var newPts=[];var followPts=[];var ids=Object.keys(ptIdx);for(var i=0;i<ids.length;i++){var id=ids[i];var p=ptIdx[id];var regDateTs=parseIraqiDate(p.dateAdded);var dObj=new Date(regDateTs);var isNew=false;if(fType==="all")isNew=true;else if(fType==="month")isNew=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(fType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;isNew=regDateTs>=s&&regDateTs<=e}if(isNew){newPts.push({id:id,name:p.name})}else{var lastVTs=parseIraqiDate(p.lastVisit);var lvObj=new Date(lastVTs);var isFollow=false;if(fType==="month")isFollow=lvObj.getMonth()===curM&&lvObj.getFullYear()===curY;else if(fType==="custom"){var s2=startVal?new Date(startVal).getTime():0;var e2=endVal?new Date(endVal).getTime():9999999999999;isFollow=lastVTs>=s2&&lastVTs<=e2}if(isFollow)followPts.push({id:id,name:p.name})}}document.getElementById("countNew").innerText=newPts.length;document.getElementById("countFollow").innerText=followPts.length;var html="<b style=\\"display:block;margin-bottom:8px;color:var(--success)\\">New Registrations ("+newPts.length+"):</b>";for(var n=0;n<newPts.length;n++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+newPts[n].name+"</div>"}if(!newPts.length)html+="None";html+=\'<b style="display:block;margin-top:15px;margin-bottom:8px;color:var(--primary)">Follow-up Visits (\'+followPts.length+"):</b>";for(var f=0;f<followPts.length;f++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+followPts[f].name+"</div>"}if(!followPts.length)html+="None";list.innerHTML=html})}' +
-    'function calculateLabStats(){var list=document.getElementById("statList");var totalDisp=document.getElementById("statTotalDisplay");var filterType=document.getElementById("labFilterType").value;var startVal=document.getElementById("labStart").value;var endVal=document.getElementById("labEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Filtering Records...";db.ref("patientIndex").once("value",function(idxSnap){var ptIdx=idxSnap.val()||{};db.ref("patientDetails").once("value",function(snap){var allDetails=snap.val()||{};var globalCount=0;var testGroups={};var pIds=Object.keys(allDetails);for(var pi=0;pi<pIds.length;pi++){var pid=pIds[pi];var pData=allDetails[pid];var labs=pData.labs||{};var ptName=ptIdx[pid]?ptIdx[pid].name:"Unknown";var labKeys=Object.keys(labs);for(var li=0;li<labKeys.length;li++){var labKey=labKeys[li];var labInfo=labs[labKey];var labName=labInfo.name||labKey;var history=labInfo.history||[];var validEntries=[];if(history.length===0&&filterType==="all"){validEntries.push({id:pid,name:ptName})}for(var hi=0;hi<history.length;hi++){var h=history[hi];var hDate=parseIraqiDate(h.dt);var dObj=new Date(hDate);var include=false;if(filterType==="all")include=true;else if(filterType==="month")include=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(filterType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;include=hDate>=s&&hDate<=e}if(include)validEntries.push({id:pid,name:ptName})}if(validEntries.length>0){if(!testGroups[labName])testGroups[labName]=[];for(var ve=0;ve<validEntries.length;ve++){testGroups[labName].push(validEntries[ve]);globalCount++}}}}if(globalCount===0){list.innerHTML="No tests found for this period.";totalDisp.innerHTML="0 <span style=\\"font-size:12px;font-weight:400;color:var(--text-secondary)\\">Tests Found</span>";return}totalDisp.innerHTML=globalCount+\' <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span>\';var html="";var tgKeys=Object.keys(testGroups).sort(function(a,b){return testGroups[b].length-testGroups[a].length});for(var t=0;t<tgKeys.length;t++){var testName=tgKeys[t];var patients=testGroups[testName];var uniqueMap={};var uniquePts=[];for(var up=0;up<patients.length;up++){if(!uniqueMap[patients[up].id]){uniqueMap[patients[up].id]=true;uniquePts.push(patients[up])}}var ptHtml="";for(var p=0;p<uniquePts.length;p++){ptHtml+=\'<div style="padding:5px 10px;color:var(--primary);border-left:2px solid var(--lab);margin-left:10px;margin-top:4px;font-size:12px;">\'+uniquePts[p].name+"</div>"}html+=\'<div style="margin-bottom:8px;border:1px solid var(--separator);border-radius:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;padding:10px;background:var(--item-hover);cursor:pointer;font-weight:600" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\\\'none\\\'?\\\'block\\\':\\\'none\\\')"><span>\'+testName+"</span><span style=\\"color:var(--lab)\\">"+patients.length+"</span></div><div style=\\"display:none;padding:5px;background:rgba(0,0,0,.02)\\">"+ptHtml+"</div></div>"}list.innerHTML=html})})}' +
-    '<\/script></body></html>');
-    w.document.close();
-}
+
     /* ================================================================
        BOOT - No login, goes straight to app
     ================================================================ */
