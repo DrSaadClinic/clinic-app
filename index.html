@@ -8,6 +8,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
+        /* ============================================
+           DARK THEME (DEFAULT)
+           ============================================ */
         :root, [data-theme="dark"] {
             --primary: #0A84FF;
             --success: #30D158;
@@ -31,59 +34,71 @@
             --item-active-bg: rgba(10, 132, 255, 0.18);
             --scrollbar-thumb: rgba(255,255,255,0.18);
             --backdrop-blur: blur(18px);
-            /* NEW: Typography Scale System */
-  --text-display: clamp(2rem, 5vw, 3rem);      /* Main headlines */
-  --text-title: clamp(1.5rem, 4vw, 2rem);        /* Patient names */
-  --text-headline: clamp(1.1rem, 3vw, 1.5rem);   /* Section headers */
-  --text-body: 1rem;                              /* Body text */
-  --text-caption: 0.875rem;                       /* Metadata/dates */
-  --text-footnote: 0.75rem;                       /* Secondary info */
-  
-  /* NEW: Letter spacing for Apple crispness */
-  --letter-spacing-tight: -0.02em;    /* Large headings */
-  --letter-spacing-normal: 0.01em;    /* Body text */
-  --letter-spacing-wide: 0.05em;      /* Labels/captions */
-}
-        /* NEW: iOS-style Material/Fill Colors */
-  --color-fill-primary: rgba(120, 120, 128, 0.24);     /* Active text fields */
-  --color-fill-secondary: rgba(118, 118, 128, 0.12);   /* Card backgrounds */
-  --color-fill-tertiary: rgba(116, 116, 128, 0.08);    /* Grouped backgrounds */
-  --color-fill-quaternary: rgba(114, 114, 118, 0.04);  /* Subtle fills */
-  
-  /* NEW: Separator Colors */
-  --color-separator-opaque: rgba(84, 84, 88, 0.65);   /* High contrast borders */
-  --color-separator: rgba(60, 60, 67, 0.36);          /* Standard dividers */
-  
-  /* NEW: Enhanced Blur Effects */
-  --blur-light: blur(20px) saturate(180%);
-  --blur-heavy: blur(40px) saturate(200%);
-}
 
+            /* Typography Scale System */
+            --text-display: clamp(2rem, 5vw, 3rem);
+            --text-title: clamp(1.5rem, 4vw, 2rem);
+            --text-headline: clamp(1.1rem, 3vw, 1.5rem);
+            --text-body: 1rem;
+            --text-caption: 0.875rem;
+            --text-footnote: 0.75rem;
+
+            /* Letter spacing for Apple crispness */
+            --letter-spacing-tight: -0.02em;
+            --letter-spacing-normal: 0.01em;
+            --letter-spacing-wide: 0.05em;
+
+            /* iOS-style Material/Fill Colors */
+            --color-fill-primary: rgba(120, 120, 128, 0.24);
+            --color-fill-secondary: rgba(118, 118, 128, 0.12);
+            --color-fill-tertiary: rgba(116, 116, 128, 0.08);
+            --color-fill-quaternary: rgba(114, 114, 118, 0.04);
+
+            /* Separator Colors */
+            --color-separator-opaque: rgba(84, 84, 88, 0.65);
+            --color-separator: rgba(60, 60, 67, 0.36);
+
+            /* Enhanced Blur Effects */
+            --blur-light: blur(20px) saturate(180%);
+            --blur-heavy: blur(40px) saturate(200%);
+        }
+
+        /* ============================================
+           GLASS / LIGHT THEME — TRUE APPLE WHITE
+           ============================================ */
         [data-theme="glass"] {
-            --bg-root: #e2e8f0;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --card-border: rgba(255, 255, 255, 0.9);
-            --card-shadow: 0 8px 32px rgba(31, 60, 120, 0.15);
-            --header-bg: rgba(241, 245, 249, 0.9);
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --input-border: #cbd5e1;
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --text-tertiary: #475569;
-            --separator: rgba(0,0,0,0.12);
-            --item-hover: rgba(255,255,255,0.8);
-            --item-active-bg: rgba(10, 132, 255, 0.15);
-            --backdrop-blur: blur(20px) saturate(190%);
-        /* Light mode material colors */
-  --color-fill-primary: rgba(0, 0, 0, 0.08);
-  --color-fill-secondary: rgba(0, 0, 0, 0.048);
-  --color-fill-tertiary: rgba(0, 0, 0, 0.032);
-  --color-fill-quaternary: rgba(0, 0, 0, 0.016);
-  
-  --color-separator-opaque: rgba(60, 60, 67, 0.29);
-  --color-separator: rgba(60, 60, 67, 0.18);
-}
+            --bg-root: #FFFFFF;
+            --card-bg: rgba(255, 255, 255, 0.72);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --card-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.04),
+                0 2px 8px rgba(0, 0, 0, 0.04),
+                0 8px 24px rgba(0, 0, 0, 0.06);
+            --header-bg: rgba(255, 255, 255, 0.82);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --input-border: rgba(0, 0, 0, 0.12);
+            --text-primary: #1D1D1F;
+            --text-secondary: #6E6E73;
+            --text-tertiary: #86868B;
+            --separator: rgba(0, 0, 0, 0.08);
+            --item-hover: rgba(0, 0, 0, 0.04);
+            --item-active-bg: rgba(10, 132, 255, 0.08);
+            --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+            --backdrop-blur: blur(24px) saturate(180%);
 
+            /* Light mode material colors */
+            --color-fill-primary: rgba(0, 0, 0, 0.08);
+            --color-fill-secondary: rgba(0, 0, 0, 0.035);
+            --color-fill-tertiary: rgba(0, 0, 0, 0.024);
+            --color-fill-quaternary: rgba(0, 0, 0, 0.016);
+
+            --color-separator-opaque: rgba(60, 60, 67, 0.29);
+            --color-separator: rgba(60, 60, 67, 0.12);
+        }
+
+        /* ============================================
+           BACKGROUND LAYERS
+           ============================================ */
         body::before {
             content: '';
             position: fixed;
@@ -93,6 +108,7 @@
             transition: background 0.6s ease;
         }
 
+        /* Dark mode: no aurora */
         body::after {
             content: '';
             position: fixed;
@@ -100,21 +116,25 @@
             z-index: -1;
             opacity: 0;
             transition: opacity 0.6s ease;
+            /* Whisper-soft Apple mesh — designed for WHITE canvas */
             background:
-                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(120, 180, 255, 0.35) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 90% 10%, rgba(180, 120, 255, 0.25) 0%, transparent 55%),
-                radial-gradient(ellipse 70% 40% at 50% 90%, rgba(100, 200, 220, 0.2) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 60% at 80% 70%, rgba(255, 180, 100, 0.15) 0%, transparent 55%);
-            animation: aurora-shift 14s ease-in-out infinite;
+                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0, 122, 255, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 10%, rgba(175, 82, 222, 0.04) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 40% at 50% 90%, rgba(52, 199, 89, 0.03) 0%, transparent 60%);
+            animation: aurora-shift 20s ease-in-out infinite;
         }
 
         [data-theme="glass"] body::after { opacity: 1; }
+
         @keyframes aurora-shift {
             0%, 100% { transform: scale(1) translate(0, 0); }
             33% { transform: scale(1.04) translate(-1%, 1%); }
             66% { transform: scale(0.97) translate(1%, -1%); }
         }
 
+        /* ============================================
+           RESET & BASE
+           ============================================ */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; }
 
@@ -130,6 +150,21 @@
             touch-action: manipulation;
         }
 
+        /* Selection color */
+        ::selection {
+            background: rgba(10, 132, 255, 0.25);
+            color: inherit;
+        }
+        [data-theme="glass"] ::selection {
+            background: rgba(10, 132, 255, 0.15);
+        }
+
+        /* Modern focus ring */
+        :focus-visible {
+            outline: 3px solid rgba(10, 132, 255, 0.5);
+            outline-offset: 2px;
+        }
+
         select, input[type="date"], input[type="number"], input[type="tel"] {
             color-scheme: dark;
         }
@@ -140,6 +175,9 @@
             color-scheme: light;
         }
 
+        /* ============================================
+           THEME TOGGLE
+           ============================================ */
         .theme-toggle {
             position: fixed;
             bottom: 28px;
@@ -157,13 +195,32 @@
             align-items: center;
             justify-content: center;
             font-size: 22px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.08),
+                0 4px 16px rgba(0, 0, 0, 0.12),
+                0 12px 28px rgba(0, 0, 0, 0.08);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: var(--text-primary);
         }
         .theme-toggle:hover { transform: scale(1.12) rotate(10deg); box-shadow: 0 8px 28px rgba(10,132,255,0.3); }
         .theme-toggle:active { transform: scale(0.92); }
 
+        [data-theme="glass"] .theme-toggle {
+            background: rgba(255, 255, 255, 0.82);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                0 0 0 0.5px rgba(0, 0, 0, 0.04);
+        }
+        [data-theme="glass"] .theme-toggle:hover {
+            box-shadow:
+                0 4px 16px rgba(0, 0, 0, 0.12),
+                0 0 0 0.5px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
         header {
             background: var(--header-bg);
             backdrop-filter: var(--backdrop-blur);
@@ -181,66 +238,113 @@
             border-bottom: 1px solid var(--card-border);
             transition: background 0.5s ease, border-color 0.5s ease;
         }
+
+        [data-theme="glass"] header {
+            background: rgba(255, 255, 255, 0.82);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+        }
+
         .logo-img { height: 38px; width: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--card-border); }
         .logo-large { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 18px; border: 2px solid var(--card-border); object-fit: cover; box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
-        header h2 { 
-  font-size: var(--text-title); 
-  font-weight: 600; 
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: 1.2;
-}
 
+        header h2 {
+            font-size: var(--text-title);
+            font-weight: 600;
+            letter-spacing: var(--letter-spacing-tight);
+            line-height: 1.2;
+        }
+
+        /* ============================================
+           LAYOUT
+           ============================================ */
         .container { max-width: 1540px; margin: auto; padding: 18px; display: grid; grid-template-columns: 360px 1fr; gap: 22px; align-items: start; }
         @media (max-width: 1024px) { .container { grid-template-columns: 310px 1fr; } }
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; padding: 10px; } }
 
+        /* ============================================
+           CARDS — with entrance animation
+           ============================================ */
         .card {
-    background: var(--color-fill-secondary);
-    backdrop-filter: var(--blur-light);
-    -webkit-backdrop-filter: var(--blur-light);
-    padding: 20px;
-    border-radius: 22px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 18px;
-    border: 0.5px solid var(--color-separator);
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                background 0.5s ease, 
-                border-color 0.5s ease, 
-                box-shadow 0.5s ease;
-}
+            background: var(--color-fill-secondary);
+            backdrop-filter: var(--blur-light);
+            -webkit-backdrop-filter: var(--blur-light);
+            padding: 20px;
+            border-radius: 22px;
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.04),
+                0 2px 8px rgba(0, 0, 0, 0.06),
+                0 12px 32px rgba(0, 0, 0, 0.04);
+            margin-bottom: 18px;
+            border: 0.5px solid var(--color-separator);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+                        background 0.5s ease,
+                        border-color 0.5s ease,
+                        box-shadow 0.5s ease;
+            animation: cardEnter 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        }
         .card:hover { transform: translateY(-2px); }
         @media (max-width: 768px) { .card { padding: 14px; border-radius: 18px; } }
-        [data-theme="glass"] .card { box-shadow: var(--card-shadow), 0 1px 0 rgba(255,255,255,0.9) inset; }
 
+        /* Card entrance stagger */
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.10s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.20s; }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass card — clean flat Apple sheet, NO inset glow */
+        [data-theme="glass"] .card {
+            background: rgba(255, 255, 255, 0.72);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.03),
+                0 1px 3px rgba(0, 0, 0, 0.04),
+                0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ============================================
+           HEADINGS
+           ============================================ */
         h3 {
-  color: var(--primary);
-  margin: 0 0 14px 0;
-  border-bottom: 1px solid var(--separator);
-  padding-bottom: 10px;
-  font-size: var(--text-headline);
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  letter-spacing: var(--letter-spacing-normal);
-}
+            color: var(--primary);
+            margin: 0 0 14px 0;
+            border-bottom: 1px solid var(--separator);
+            padding-bottom: 10px;
+            font-size: var(--text-headline);
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: var(--letter-spacing-normal);
+        }
 
+        /* ============================================
+           DASHBOARD GRID
+           ============================================ */
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px; align-items: start; }
         .scroll-card { max-height: 240px; overflow-y: auto; padding-right: 4px; }
 
+        /* ============================================
+           INPUTS & TEXTAREAS
+           ============================================ */
         input, textarea {
-    width: 100%;
-    padding: 13px 16px;
-    margin: 7px 0;
-    border: none; /* Remove border, use background instead */
-    border-radius: 12px;
-    font-size: 15px;
-    background: var(--color-fill-tertiary);
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-    font-family: inherit;
-    -webkit-appearance: none; /* Remove default styling */
-}
+            width: 100%;
+            padding: 13px 16px;
+            margin: 7px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--color-fill-tertiary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            font-family: inherit;
+            -webkit-appearance: none;
+            letter-spacing: var(--letter-spacing-normal);
+        }
         input:focus, textarea:focus {
             border-color: var(--primary);
             outline: none;
@@ -250,9 +354,27 @@
         input::placeholder, textarea::placeholder { color: var(--text-secondary); }
         textarea { resize: none; min-height: 95px; line-height: 1.65; overflow-y: hidden; }
 
-        [data-theme="glass"] input, [data-theme="glass"] textarea { color: #1a1a2e; }
-        [data-theme="glass"] input::placeholder, [data-theme="glass"] textarea::placeholder { color: #6b7a99; }
+        /* Glass mode inputs — Apple recessed fields */
+        [data-theme="glass"] input,
+        [data-theme="glass"] textarea {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.10);
+            color: var(--text-primary);
+        }
+        [data-theme="glass"] input:focus,
+        [data-theme="glass"] textarea:focus {
+            background: #FFFFFF;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.12);
+        }
+        [data-theme="glass"] input::placeholder,
+        [data-theme="glass"] textarea::placeholder {
+            color: rgba(0, 0, 0, 0.35);
+        }
 
+        /* ============================================
+           BUTTONS
+           ============================================ */
         button {
             width: 100%;
             padding: 13px;
@@ -260,15 +382,16 @@
             color: white;
             border: none;
             border-radius: 18px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 4px 14px rgba(10, 132, 255, 0.28);
             font-family: inherit;
+            letter-spacing: var(--letter-spacing-normal);
         }
-        button:hover { filter: brightness(1.1); transform: scale(1.01); }
-        button:active { transform: scale(0.97); opacity: 0.85; }
+        button:hover { transform: translateY(-1px) scale(1.01); filter: brightness(1.08); }
+        button:active { transform: translateY(0) scale(0.97); opacity: 0.85; transition-duration: 0.1s; }
 
         .action-btn {
             background: none;
@@ -300,6 +423,9 @@
         }
         .btn-ghost:hover { color: var(--text-primary); }
 
+        /* ============================================
+           PATIENT LIST ITEMS — with slide-in animation
+           ============================================ */
         .pt-item {
             padding: 14px;
             border-bottom: 1px solid var(--separator);
@@ -310,29 +436,50 @@
             border-left: 4px solid transparent;
             transition: all 0.2s ease;
             position: relative;
+            animation: listSlide 0.3s ease both;
         }
-        [data-theme="glass"] .pt-item { background: rgba(255,255,255,0.25); border-bottom-color: rgba(0,0,0,0.06); }
+
+        @keyframes listSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        [data-theme="glass"] .pt-item {
+            background: rgba(0, 0, 0, 0.02);
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
         .pt-item:hover { background: var(--item-hover); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+        [data-theme="glass"] .pt-item:hover { background: rgba(0, 0, 0, 0.04); }
         .pt-item.active { border-left-color: var(--primary); background: var(--item-active-bg) !important; font-weight: bold; box-shadow: inset 0 0 0 1px rgba(10,132,255,0.2); }
-        ..pt-item strong { 
-  color: var(--text-primary); 
-  font-size: var(--text-body); 
-  font-weight: 600;
-  letter-spacing: var(--letter-spacing-normal);
-}
-        .pt-meta { 
-  font-size: var(--text-caption); 
-  color: var(--text-secondary); 
-  display: block; 
-  margin-top: 5px;
-  letter-spacing: var(--letter-spacing-wide);
-}
+        [data-theme="glass"] .pt-item.active {
+            background: rgba(10, 132, 255, 0.06) !important;
+            border-left-color: var(--primary);
+        }
+
+        /* FIXED: was ..pt-item strong (double dot) */
+        .pt-item strong {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: var(--letter-spacing-normal);
+        }
+
+        .pt-meta {
+            font-size: var(--text-caption);
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 5px;
+            letter-spacing: var(--letter-spacing-wide);
+        }
         .pt-controls { position: absolute; right: 10px; top: 14px; display: flex; gap: 10px; }
         .btn-pin-pt { color: var(--text-tertiary); font-size: 15px; cursor: pointer; transition: 0.2s; }
         .btn-pin-pt.pinned { color: var(--warning); text-shadow: 0 0 8px rgba(255, 159, 10, 0.5); }
         .btn-del-pt { color: var(--danger); font-size: 15px; opacity: 0.35; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
 
+        /* ============================================
+           WEB REQUEST ITEMS
+           ============================================ */
         .web-req-item {
             background: rgba(0,0,0,0.15);
             border: 1px solid var(--card-border);
@@ -340,14 +487,23 @@
             border-radius: 14px;
             margin-bottom: 10px;
         }
-        [data-theme="glass"] .web-req-item { background: rgba(255,255,255,0.35); }
+        [data-theme="glass"] .web-req-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
         .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .web-req-actions button { padding: 8px; font-size: 13px; border-radius: 12px; }
 
+        /* ============================================
+           CONTENTEDITABLE
+           ============================================ */
         [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
         [contenteditable="true"]:focus { outline: none; background: rgba(10,132,255,0.06); border-radius: 8px; box-shadow: 0 0 0 2px rgba(10,132,255,0.25); padding: 2px 5px; }
 
+        /* ============================================
+           LAB TAG BOX
+           ============================================ */
         .lab-tag-box {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -359,8 +515,14 @@
             overflow-y: auto;
             border: 1px solid var(--card-border);
         }
-        [data-theme="glass"] .lab-tag-box { background: rgba(255,255,255,0.25); }
+        [data-theme="glass"] .lab-tag-box {
+            background: rgba(0, 0, 0, 0.024);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
 
+        /* ============================================
+           LAB BUTTONS
+           ============================================ */
         .lab-btn {
             background: rgba(0,0,0,0.22);
             border: 1px solid var(--card-border);
@@ -376,9 +538,21 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        [data-theme="glass"] .lab-btn { background: rgba(255,255,255,0.5); color: #1a2340; border-color: rgba(160,190,240,0.5); }
+        [data-theme="glass"] .lab-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+        }
         .lab-btn:hover { background: rgba(100, 210, 255, 0.15); border-color: var(--lab); color: var(--lab); transform: scale(1.02); }
+        [data-theme="glass"] .lab-btn:hover {
+            background: rgba(100, 210, 255, 0.10);
+            border-color: var(--lab);
+            color: #0891b2;
+        }
 
+        /* ============================================
+           IMAGING BUTTONS
+           ============================================ */
         .img-btn {
             background: rgba(0,0,0,0.22);
             border: 1px solid var(--card-border);
@@ -391,11 +565,26 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        [data-theme="glass"] .img-btn { background: rgba(255,255,255,0.5); color: #1a2340; border-color: rgba(160,190,240,0.5); }
+        [data-theme="glass"] .img-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+        }
         .img-btn:hover { background: rgba(191, 90, 242, 0.15); border-color: var(--img); color: var(--img); transform: scale(1.02); }
+        [data-theme="glass"] .img-btn:hover {
+            background: rgba(191, 90, 242, 0.10);
+            border-color: var(--img);
+            color: #9333ea;
+        }
 
+        /* ============================================
+           LAB ACCORDION
+           ============================================ */
         .lab-accordion { background: rgba(0,0,0,0.15); border: 1px solid var(--card-border); border-radius: 15px; margin-bottom: 9px; overflow: hidden; }
-        [data-theme="glass"] .lab-accordion { background: rgba(255,255,255,0.3); }
+        [data-theme="glass"] .lab-accordion {
+            background: rgba(0, 0, 0, 0.02);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
         .lab-header {
             background: rgba(255,255,255,0.04);
             padding: 14px;
@@ -408,19 +597,29 @@
             transition: 0.2s;
             color: var(--text-primary);
         }
-        [data-theme="glass"] .lab-header { background: rgba(255,255,255,0.2); }
+        [data-theme="glass"] .lab-header {
+            background: rgba(0, 0, 0, 0.03);
+        }
         .lab-header:hover { background: rgba(255,255,255,0.08); }
-        [data-theme="glass"] .lab-header:hover { background: rgba(255,255,255,0.35); }
+        [data-theme="glass"] .lab-header:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
         .lab-body { display: none; padding: 14px; border-top: 1px solid var(--separator); }
         .lab-row { display: flex; justify-content: space-between; font-size: 14px; padding: 9px 0; border-bottom: 1px solid var(--separator); align-items: center; color: var(--text-primary); }
         .val-normal { color: var(--success); font-weight: bold; }
         .val-abnormal { color: var(--danger); font-weight: bold; text-shadow: 0 0 8px rgba(255, 69, 58, 0.35); }
 
+        /* ============================================
+           SPARKLINE
+           ============================================ */
         .sparkline-container { display: flex; align-items: flex-end; gap: 4px; height: 34px; margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--separator); justify-content: flex-start; }
         .spark-bar { width: 13px; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 4px; opacity: 0.75; transition: 0.3s; }
         .spark-bar:hover { opacity: 1; transform: scaleY(1.1); }
         .spark-bar.red { background: var(--danger); }
 
+        /* ============================================
+           REMINDERS
+           ============================================ */
         .rem-item {
             background: rgba(255, 159, 10, 0.12);
             border-left: 5px solid var(--warning);
@@ -434,9 +633,15 @@
             color: var(--text-primary);
             border: 1px solid rgba(255, 159, 10, 0.25);
         }
-        [data-theme="glass"] .rem-item { background: rgba(255, 159, 10, 0.08); }
+        [data-theme="glass"] .rem-item {
+            background: rgba(255, 159, 10, 0.06);
+            border: 1px solid rgba(255, 159, 10, 0.15);
+        }
         .rem-item:active { transform: scale(0.98); }
 
+        /* ============================================
+           OVERDUE
+           ============================================ */
         .overdue-item {
             background: rgba(255, 69, 58, 0.1);
             border-left: 5px solid var(--danger);
@@ -451,9 +656,14 @@
             transition: 0.2s;
             color: var(--text-primary);
         }
-        [data-theme="glass"] .overdue-item { background: rgba(255, 69, 58, 0.07); }
+        [data-theme="glass"] .overdue-item {
+            background: rgba(255, 69, 58, 0.05);
+        }
         .overdue-item:hover { background: rgba(255, 69, 58, 0.2); }
 
+        /* ============================================
+           AI BOX
+           ============================================ */
         .ai-box {
             background: rgba(0,0,0,0.25);
             border: 1px solid var(--card-border);
@@ -465,8 +675,15 @@
             color: var(--text-primary);
             line-height: 1.5;
         }
-        [data-theme="glass"] .ai-box { background: rgba(255,255,255,0.4); color: #1a1a2e; }
+        [data-theme="glass"] .ai-box {
+            background: rgba(0, 0, 0, 0.03);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+        }
 
+        /* ============================================
+           TOAST
+           ============================================ */
         .toast {
             position: fixed; top: -100px; right: 20px;
             background: var(--card-bg);
@@ -475,17 +692,32 @@
             color: var(--text-primary);
             padding: 14px 20px;
             border-radius: 15px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.10),
+                0 16px 48px rgba(0, 0, 0, 0.20);
             border-left: 4px solid var(--primary);
             border: 1px solid var(--card-border);
             font-weight: 600;
             z-index: 9999;
             transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            font-size: 14px;
+            font-size: var(--text-caption);
         }
         .toast.show { top: 18px; }
+
+        [data-theme="glass"] .toast {
+            background: rgba(255, 255, 255, 0.88);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 0 0 0.5px rgba(0, 0, 0, 0.04);
+        }
+
         @media (max-width: 768px) { .toast { left: 10px; right: 10px; text-align: center; } }
 
+        /* ============================================
+           SYNC INDICATOR
+           ============================================ */
         #syncIndicator {
             font-size: 11px; color: var(--success); font-weight: bold; display: none;
             padding: 5px 12px; white-space: nowrap;
@@ -494,6 +726,9 @@
             border: 1px solid rgba(48, 209, 88, 0.28);
         }
 
+        /* ============================================
+           SECTION BLOCKS
+           ============================================ */
         .section-block {
             background: rgba(0,0,0,0.15);
             padding: 18px;
@@ -502,12 +737,19 @@
             border: 1px solid var(--card-border);
             transition: background 0.5s ease, border-color 0.5s ease;
         }
-        [data-theme="glass"] .section-block { background: rgba(255,255,255,0.25); }
+        [data-theme="glass"] .section-block {
+            background: rgba(0, 0, 0, 0.024);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
+
         .section-label {
-            font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
             text-transform: uppercase; display: block; margin-bottom: 9px;
         }
 
+        /* ============================================
+           VITAL ROWS
+           ============================================ */
         .vital-row {
             display: flex; justify-content: space-between; align-items: center;
             font-size: 14px; background: rgba(255,255,255,0.04);
@@ -515,18 +757,46 @@
             padding: 11px 14px; margin-bottom: 7px;
             border-radius: 12px; color: var(--text-primary);
         }
-        [data-theme="glass"] .vital-row { background: rgba(255,255,255,0.4); }
+        [data-theme="glass"] .vital-row {
+            background: rgba(0, 0, 0, 0.02);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
 
-        [data-theme="glass"] .section-lab { border-left-color: var(--lab) !important; background: rgba(100,210,255,0.05) !important; }
-        [data-theme="glass"] .section-img { border-left-color: var(--img) !important; background: rgba(191,90,242,0.05) !important; }
-        [data-theme="glass"] .section-ops { border-left-color: var(--danger) !important; background: rgba(255,69,58,0.04) !important; }
-        [data-theme="glass"] .section-vitals { border-left-color: #8E8E93 !important; background: rgba(255,255,255,0.2) !important; }
+        /* ============================================
+           GLASS MODE — SECTION COLOR TINTS
+           ============================================ */
+        [data-theme="glass"] .section-lab {
+            border-left-color: var(--lab) !important;
+            background: rgba(100, 210, 255, 0.06) !important;
+            border-color: rgba(100, 210, 255, 0.15) !important;
+        }
+        [data-theme="glass"] .section-img {
+            border-left-color: var(--img) !important;
+            background: rgba(191, 90, 242, 0.06) !important;
+            border-color: rgba(191, 90, 242, 0.15) !important;
+        }
+        [data-theme="glass"] .section-ops {
+            border-left-color: var(--danger) !important;
+            background: rgba(255, 69, 58, 0.04) !important;
+            border-color: rgba(255, 69, 58, 0.12) !important;
+        }
+        [data-theme="glass"] .section-vitals {
+            border-left-color: #86868B !important;
+            background: rgba(0, 0, 0, 0.02) !important;
+            border-color: rgba(0, 0, 0, 0.06) !important;
+        }
 
+        /* ============================================
+           EMPTY STATE
+           ============================================ */
         #emptyState {
             text-align: center; padding: 90px 20px; color: var(--text-secondary);
             border: 2px dashed var(--separator); background: transparent !important;
         }
 
+        /* ============================================
+           THEME TRANSITION OVERLAY
+           ============================================ */
         .theme-transition-overlay {
             position: fixed; inset: 0; z-index: 4999; pointer-events: none;
             opacity: 0; background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 70%);
@@ -534,6 +804,9 @@
         }
         .theme-transition-overlay.flash { opacity: 1; }
 
+        /* ============================================
+           SCROLLBARS
+           ============================================ */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
@@ -549,7 +822,9 @@
             }
         }
 
-        /* ===== TEXT PROTECTION SYSTEM STYLES ===== */
+        /* ============================================
+           TEXT PROTECTION SYSTEM STYLES
+           ============================================ */
         .undo-toast {
             position: fixed;
             bottom: 90px;
@@ -558,7 +833,9 @@
             color: white;
             padding: 16px 24px;
             border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(255, 69, 58, 0.4);
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.10),
+                0 16px 48px rgba(0, 0, 0, 0.20);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -598,6 +875,9 @@
         }
         .undo-dismiss:hover { background: rgba(255,255,255,0.3); }
 
+        /* ============================================
+           VERSION PANEL
+           ============================================ */
         .version-panel {
             position: fixed;
             top: 50%;
@@ -610,7 +890,10 @@
             border-radius: 22px;
             padding: 28px;
             z-index: 10000;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.12),
+                0 32px 64px rgba(0, 0, 0, 0.08);
             min-width: 480px;
             max-width: 90vw;
             max-height: 70vh;
@@ -627,6 +910,14 @@
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px);
             z-index: 9999;
+        }
+        [data-theme="glass"] .version-overlay {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+        [data-theme="glass"] .version-panel {
+            background: rgba(255, 255, 255, 0.88);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
         }
         .version-item {
             background: rgba(255,255,255,0.05);
@@ -675,6 +966,9 @@
             padding: 3px 8px;
             border-radius: 6px;
         }
+        [data-theme="glass"] .version-chars {
+            background: rgba(0, 0, 0, 0.06);
+        }
         .empty-warning {
             text-align: center;
             padding: 40px 20px;
@@ -705,100 +999,56 @@
             background: rgba(255, 69, 58, 0.25);
             transform: scale(1.02);
         }
+
+        /* ============================================
+           MOBILE RESPONSIVE — FIXED: Properly closed
+           ============================================ */
         @media (max-width: 768px) {
             .version-panel { min-width: auto; width: 95vw; padding: 20px; }
             .undo-toast { left: 10px; right: 10px; max-width: none; bottom: 80px; }
-       
+        }
+
+        /* ============================================
+           TYPOGRAPHY OVERRIDES (Global, not mobile-only)
+           FIXED: These were trapped inside an unclosed @media query
+           ============================================ */
+
         /* Patient name in file view */
-#viewName {
-  font-size: var(--text-title) !important;
-  font-weight: 700 !important;
-  letter-spacing: var(--letter-spacing-tight) !important;
-  line-height: 1.2 !important;
-}
+        #viewName {
+            font-size: var(--text-title) !important;
+            font-weight: 700 !important;
+            letter-spacing: var(--letter-spacing-tight) !important;
+            line-height: 1.2 !important;
+        }
 
-/* Section labels */
-.section-label {
-  font-size: var(--text-footnote) !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.08px !important; /* Apple uses very tight tracking for labels */
-  text-transform: uppercase !important;
-}
+        /* ============================================
+           APPLE-STYLE SHADOW SYSTEM (Global, not mobile-only)
+           FIXED: Was trapped inside unclosed @media query
+           ============================================ */
 
-/* Input fields */
-input, textarea {
-  font-size: var(--text-body) !important;
-  letter-spacing: var(--letter-spacing-normal) !important;
-}
+        /* Level 1: Standard Cards (subtle elevation) */
+        .shadow-level-1 {
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.04),
+                0 2px 8px rgba(0, 0, 0, 0.06),
+                0 12px 32px rgba(0, 0, 0, 0.04);
+        }
 
-/* Buttons */
-button {
-  font-size: var(--text-body) !important;
-  font-weight: 600 !important;
-  letter-spacing: var(--letter-spacing-normal) !important;
-}
+        /* Level 2: Elevated Cards (modals, popovers) */
+        .shadow-level-2 {
+            box-shadow:
+                0 0 0 0.5px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.12),
+                0 32px 64px rgba(0, 0, 0, 0.08);
+        }
 
-/* Toast notifications */
-.toast {
-  font-size: var(--text-caption) !important;
-  font-weight: 600 !important;
-}
-/* ============================================
-   APPLE-STYLE SHADOW SYSTEM
-   ============================================ */
-
-/* Level 1: Standard Cards (subtle elevation) */
-.shadow-level-1 {
-  box-shadow: 
-    0 0 0 0.5px rgba(0, 0, 0, 0.04),
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 12px 32px rgba(0, 0, 0, 0.04);
-}
-
-/* Level 2: Elevated Cards (modals, popovers) */
-.shadow-level-2 {
-  box-shadow: 
-    0 0 0 0.5px rgba(0, 0, 0, 0.08),
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    0 32px 64px rgba(0, 0, 0, 0.08);
-}
-
-/* Level 3: Top Layer (toasts, overlays) */
-.shadow-level-3 {
-  box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.10),
-    0 16px 48px rgba(0, 0, 0, 0.20),
-    0 48px 96px rgba(0, 0, 0, 0.12);
-}
-
-/* Apply to existing elements */
-.card {
-  box-shadow: 
-    0 0 0 0.5px rgba(0, 0, 0, 0.04),
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 12px 32px rgba(0, 0, 0, 0.04) !important;
-}
-
-.version-panel {
-  box-shadow: 
-    0 0 0 0.5px rgba(0, 0, 0, 0.08),
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    0 32px 64px rgba(0, 0, 0, 0.08) !important;
-}
-
-.toast,
-.undo-toast {
-  box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.10),
-    0 16px 48px rgba(0, 0, 0, 0.20) !important;
-}
-
-.theme-toggle {
-  box-shadow:
-    0 0 0 0.5px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.12),
-    0 12px 28px rgba(0, 0, 0, 0.08) !important;
-}            
+        /* Level 3: Top Layer (toasts, overlays) */
+        .shadow-level-3 {
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.10),
+                0 16px 48px rgba(0, 0, 0, 0.20),
+                0 48px 96px rgba(0, 0, 0, 0.12);
+        }
     </style>
 </head>
 <body>
@@ -881,7 +1131,7 @@ button {
             </h3>
             <input type="text" id="searchBox" placeholder="Search Name or C/O..." oninput="onSearch()" style="margin-bottom:8px;">
             <div style="display:grid; grid-template-columns: 1.5fr 1fr auto; gap:6px; align-items:center;">
-                <select id="filterMonth" style="margin:0; padding:10px; border-radius:12px; background:rgba(255,255,255,0.05); font-size:13px; color:var(--text-primary);">
+                <select id="filterMonth" style="margin:0; padding:10px; border-radius:12px; background:var(--color-fill-tertiary); font-size:13px; color:var(--text-primary); border:1px solid var(--color-separator);">
                     <option value="">All Months</option>
                     <option value="01">January (01)</option>
                     <option value="02">February (02)</option>
@@ -1073,7 +1323,7 @@ button {
             </div>
 
             <button onclick="manualSync()" style="background:var(--success); height:58px; font-size:16px; margin-top:8px; box-shadow:0 4px 16px rgba(48,209,88,0.3); border-radius:18px;">Force Cloud Database Sync</button>
-           
+
         </div><!-- /fileView -->
     </div><!-- /content -->
 </div><!-- /container -->
@@ -1164,32 +1414,30 @@ button {
         clearTimeout(calendarTimer);
         calendarTimer = setTimeout(renderCalendarFromDB, 300);
     }
-/* ================================================================
-   OPERATIONS TAB SYSTEM
-=============================================================== */
-var currentOpTab = 'upcoming';
 
-function switchOpTab(tab) {
-    currentOpTab = tab;
-    
-    // Update button styles
-    var btnUpcoming = document.getElementById('opTabUpcoming');
-    var btnHistory = document.getElementById('opTabHistory');
-    
-    if (tab === 'upcoming') {
-        btnUpcoming.style.background = 'var(--primary)';
-        btnUpcoming.style.color = 'white';
-        btnHistory.style.background = 'rgba(255,255,255,0.1)';
-        btnHistory.style.color = 'var(--text-primary)';
-    } else {
-        btnHistory.style.background = 'var(--primary)';
-        btnHistory.style.color = 'white';
-        btnUpcoming.style.background = 'rgba(255,255,255,0.1)';
-        btnUpcoming.style.color = 'var(--text-primary)';
+    /* ================================================================
+       OPERATIONS TAB SYSTEM
+    ================================================================ */
+    var currentOpTab = 'upcoming';
+
+    function switchOpTab(tab) {
+        currentOpTab = tab;
+        var btnUpcoming = document.getElementById('opTabUpcoming');
+        var btnHistory = document.getElementById('opTabHistory');
+        if (tab === 'upcoming') {
+            btnUpcoming.style.background = 'var(--primary)';
+            btnUpcoming.style.color = 'white';
+            btnHistory.style.background = 'rgba(255,255,255,0.1)';
+            btnHistory.style.color = 'var(--text-primary)';
+        } else {
+            btnHistory.style.background = 'var(--primary)';
+            btnHistory.style.color = 'white';
+            btnUpcoming.style.background = 'rgba(255,255,255,0.1)';
+            btnUpcoming.style.color = 'var(--text-primary)';
+        }
+        renderCalendarFromDB();
     }
-    
-    renderCalendarFromDB();
-}
+
     /* ================================================================
        SEARCH DEBOUNCE
     ================================================================ */
@@ -1324,101 +1572,69 @@ function switchOpTab(tab) {
        CALENDAR
     ================================================================ */
     function renderCalendarFromDB() {
-    var cal = document.getElementById('opCalendar');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    db.ref('patientDetails').once('value').then(function(snap) {
-        var allDetails = snap.val() || {};
-        var rows = '';
-        var pIds = Object.keys(allDetails);
-        
-        // Collect all operations
-        var allOps = [];
-        
-        for (var i = 0; i < pIds.length; i++) {
-            var id = pIds[i];
-            var d = allDetails[id];
-            
-            // Check both scheduled op (opD/opT) AND surgical history
-            if (d.opD && d.opT) {
-                allOps.push({
-                    id: id,
-                    date: d.opD,
-                    procedure: d.opT,
-                    type: 'scheduled'
-                });
-            }
-            
-            // Also check surgicalHistory array
-            if (d.surgicalHistory && Array.isArray(d.surgicalHistory)) {
-                for (var j = 0; j < d.surgicalHistory.length; j++) {
-                    var histOp = d.surgicalHistory[j];
-                    if (histOp.d && histOp.t) {
-                        allOps.push({
-                            id: id,
-                            date: histOp.d,
-                            procedure: histOp.t,
-                            type: 'history'
-                        });
+        var cal = document.getElementById('opCalendar');
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        db.ref('patientDetails').once('value').then(function(snap) {
+            var allDetails = snap.val() || {};
+            var rows = '';
+            var pIds = Object.keys(allDetails);
+            var allOps = [];
+
+            for (var i = 0; i < pIds.length; i++) {
+                var id = pIds[i];
+                var d = allDetails[id];
+                if (d.opD && d.opT) {
+                    allOps.push({ id: id, date: d.opD, procedure: d.opT, type: 'scheduled' });
+                }
+                if (d.surgicalHistory && Array.isArray(d.surgicalHistory)) {
+                    for (var j = 0; j < d.surgicalHistory.length; j++) {
+                        var histOp = d.surgicalHistory[j];
+                        if (histOp.d && histOp.t) {
+                            allOps.push({ id: id, date: histOp.d, procedure: histOp.t, type: 'history' });
+                        }
                     }
                 }
             }
-        }
-        
-        // Sort by date (newest first for history, oldest first for upcoming)
-        allOps.sort(function(a, b) {
-            return new Date(a.date) - new Date(b.date);
-        });
-        
-        // Filter based on current tab
-        var filteredOps = [];
-        for (var k = 0; k < allOps.length; k++) {
-            var opDate = new Date(allOps[k].date);
-            if (currentOpTab === 'upcoming' && opDate >= today) {
-                filteredOps.push(allOps[k]);
-            } else if (currentOpTab === 'history' && opDate < today) {
-                filteredOps.push(allOps[k]);
+
+            allOps.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+
+            var filteredOps = [];
+            for (var k = 0; k < allOps.length; k++) {
+                var opDate = new Date(allOps[k].date);
+                if (currentOpTab === 'upcoming' && opDate >= today) filteredOps.push(allOps[k]);
+                else if (currentOpTab === 'history' && opDate < today) filteredOps.push(allOps[k]);
             }
-        }
-        
-        // Reverse history to show most recent first
-        if (currentOpTab === 'history') {
-            filteredOps.reverse();
-        }
-        
-        // Generate HTML rows
-        for (var m = 0; m < filteredOps.length; m++) {
-            var op = filteredOps[m];
-            var patName = ptIdx[op.id] ? ptIdx[op.id].name : (allDetails[op.id].name || 'Unknown');
-            var rowClass = op.type === 'scheduled' ? '' : 'style="background:rgba(255,159,10,0.08);"';
-            var typeBadge = op.type === 'history' ? ' <span style="font-size:10px;color:var(--warning);">✓ Done</span>' : '';
-            
-            rows += '<tr ' + rowClass + '>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.date + '</td>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + op.id + '\')"><b style="color:var(--primary);">' + patName + '</b>' + typeBadge + '</td>' +
-                '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.procedure + '</td></tr>';
-        }
-        
-        // Display results
-        if (filteredOps.length === 0) {
-            var emptyMsg = currentOpTab === 'upcoming' 
-                ? "No upcoming surgeries scheduled." 
-                : "No past operations recorded.";
-            cal.innerHTML = "<p style='color:var(--text-secondary); padding:20px; text-align:center;'>" + emptyMsg + "</p>";
-        } else {
-            var tableTitle = currentOpTab === 'upcoming' ? 'Upcoming Surgeries' : 'Post-Op History';
-            cal.innerHTML = 
-                '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">' +
-                '<tr><th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Date</th>' +
-                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Patient (click to open)</th>' +
-                '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Procedure</th></tr>' +
-                rows + '</table>' +
-                '<div style="margin-top:10px; padding:8px; background:rgba(10,132,255,0.08); border-radius:8px; font-size:12px; color:var(--text-secondary);">' +
-                '<strong style="color:var(--primary);">' + filteredOps.length + '</strong> ' + (currentOpTab === 'upcoming' ? 'upcoming' : 'past') + ' operation(s)</div>';
-        }
-    });
-}
+
+            if (currentOpTab === 'history') filteredOps.reverse();
+
+            for (var m = 0; m < filteredOps.length; m++) {
+                var op = filteredOps[m];
+                var patName = ptIdx[op.id] ? ptIdx[op.id].name : (allDetails[op.id].name || 'Unknown');
+                var rowClass = op.type === 'scheduled' ? '' : 'style="background:rgba(255,159,10,0.08);"';
+                var typeBadge = op.type === 'history' ? ' <span style="font-size:10px;color:var(--warning);">✓ Done</span>' : '';
+                rows += '<tr ' + rowClass + '>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.date + '</td>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); cursor:pointer;" onclick="loadFullData(\'' + op.id + '\')"><b style="color:var(--primary);">' + patName + '</b>' + typeBadge + '</td>' +
+                    '<td style="padding:10px; border-bottom:1px solid var(--separator); color:var(--text-primary);">' + op.procedure + '</td></tr>';
+            }
+
+            if (filteredOps.length === 0) {
+                var emptyMsg = currentOpTab === 'upcoming' ? "No upcoming surgeries scheduled." : "No past operations recorded.";
+                cal.innerHTML = "<p style='color:var(--text-secondary); padding:20px; text-align:center;'>" + emptyMsg + "</p>";
+            } else {
+                cal.innerHTML =
+                    '<table style="width:100%; font-size:14px; text-align:left; border-collapse:collapse;">' +
+                    '<tr><th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Date</th>' +
+                    '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Patient (click to open)</th>' +
+                    '<th style="color:var(--text-secondary); padding:8px 10px; background:rgba(255,255,255,0.03);">Procedure</th></tr>' +
+                    rows + '</table>' +
+                    '<div style="margin-top:10px; padding:8px; background:rgba(10,132,255,0.08); border-radius:8px; font-size:12px; color:var(--text-secondary);">' +
+                    '<strong style="color:var(--primary);">' + filteredOps.length + '</strong> ' + (currentOpTab === 'upcoming' ? 'upcoming' : 'past') + ' operation(s)</div>';
+            }
+        });
+    }
 
     /* ================================================================
        LOAD PATIENT
@@ -2552,66 +2768,68 @@ function switchOpTab(tab) {
             initTextProtection(textProtection.protectedFields[i]);
         }
     }
+
     function openStatsWindow() {
-    var w = window.open('', '_blank', 'width=900,height=750,scrollbars=yes');
-    w.document.write('<!DOCTYPE html><html lang="en" data-theme="' + document.documentElement.getAttribute('data-theme') + '"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Statistics - Dr. Saad Clinic</title>' +
-    '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"><\/script>' +
-    '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"><\/script>' +
-    '<style>' +
-    ':root,[data-theme="dark"]{--primary:#0A84FF;--success:#30D158;--danger:#FF453A;--warning:#FF9F0A;--call:#5E5CE6;--lab:#64D2FF;--bg-root:#000;--card-bg:rgba(28,28,30,.72);--card-border:rgba(255,255,255,.09);--card-shadow:0 8px 32px rgba(0,0,0,.5);--input-bg:rgba(0,0,0,.35);--input-border:rgba(255,255,255,.1);--text-primary:#F2F2F7;--text-secondary:#8E8E93;--text-tertiary:#636366;--separator:rgba(255,255,255,.06);--item-hover:rgba(255,255,255,.07);--scrollbar-thumb:rgba(255,255,255,.18);--backdrop-blur:blur(18px)}' +
-    '[data-theme="glass"]{--bg-root:#e2e8f0;--card-bg:rgba(255,255,255,.7);--card-border:rgba(255,255,255,.9);--card-shadow:0 8px 32px rgba(31,60,120,.15);--input-bg:rgba(255,255,255,.9);--input-border:#cbd5e1;--text-primary:#0f172a;--text-secondary:#334155;--text-tertiary:#475569;--separator:rgba(0,0,0,.12);--item-hover:rgba(255,255,255,.8);--backdrop-blur:blur(20px) saturate(190%)}' +
-    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:var(--bg-root);color:var(--text-primary);padding:20px;-webkit-font-smoothing:antialiased;transition:background .4s,color .3s}' +
-    'select,input[type="date"]{color-scheme:dark}[data-theme="glass"] select,[data-theme="glass"] input[type="date"]{color-scheme:light}' +
-    '.card{background:var(--card-bg);backdrop-filter:var(--backdrop-blur);-webkit-backdrop-filter:var(--backdrop-blur);padding:22px;border-radius:22px;box-shadow:var(--card-shadow);margin-bottom:22px;border:1px solid var(--card-border);transition:background .4s,border-color .4s}' +
-    'h3{color:var(--primary);margin:0 0 14px;font-size:1.1em;font-weight:600;border-bottom:1px solid var(--separator);padding-bottom:10px}' +
-    '.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:1200px;margin:auto}@media(max-width:768px){.dash-grid{grid-template-columns:1fr}}' +
-    '.scroll-card{max-height:320px;overflow-y:auto;padding-right:4px}' +
-    'input,select{width:100%;padding:10px 14px;margin:6px 0;border:1px solid var(--input-border);border-radius:12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);font-family:inherit}' +
-    'input:focus,select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.18)}' +
-    '.action-btn{background:none;border:none;padding:8px 10px;cursor:pointer;font-weight:600;font-size:13px;border-radius:8px;transition:.2s;color:var(--text-primary)}' +
-    '.action-btn:hover{background:var(--item-hover)}' +
-    '::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:10px}' +
-    '</style></head><body>' +
-    '<h2 style="text-align:center;margin-bottom:24px;font-size:1.3em;">Statistics Dashboard</h2>' +
-    '<div class="dash-grid">' +
-    '<div class="card" style="border-left:5px solid var(--call)">' +
-    '<h3 style="color:var(--call);border:none;margin-bottom:10px;">Patient Flow Tracker</h3>' +
-    '<div style="background:rgba(0,0,0,.05);padding:10px;border-radius:12px;margin-bottom:15px">' +
-    '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">TIME PERIOD</label>' +
-    '<select id="flowFilterType" onchange="document.getElementById(\'flowCustomDates\').style.display=(this.value===\'custom\')?\'grid\':\'none\'" style="margin-bottom:8px"><option value="all">Total Registry</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
-    '<div id="flowCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="flowStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="flowEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
-    '<button class="action-btn" style="background:var(--call);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculatePatientFlow()">Generate Report</button></div>' +
-    '<div id="flowSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;text-align:center">' +
-    '<div style="background:rgba(48,209,88,.1);padding:10px;border-radius:12px"><div id="countNew" style="font-size:1.5em;font-weight:800;color:var(--success)">0</div><div style="font-size:10px;color:var(--text-secondary)">NEW PTs</div></div>' +
-    '<div style="background:rgba(10,132,255,.1);padding:10px;border-radius:12px"><div id="countFollow" style="font-size:1.5em;font-weight:800;color:var(--primary)">0</div><div style="font-size:10px;color:var(--text-secondary)">FOLLOW-UPS</div></div></div>' +
-    '<div id="flowList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:10px 0">No report generated.</p></div></div>' +
-    '<div class="card" style="border-left:5px solid var(--lab)">' +
-    '<h3 style="color:var(--lab);border:none;margin-bottom:10px;">Lab Referral Stats</h3>' +
-    '<div style="background:rgba(0,0,0,.05);padding:10px;border-radius:12px;margin-bottom:15px">' +
-    '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">FILTER BY DATE</label>' +
-    '<select id="labFilterType" onchange="toggleLabDateInputs()" style="margin-bottom:8px"><option value="all">All Time</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
-    '<div id="labCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="labStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="labEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
-    '<button class="action-btn" style="background:var(--lab);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculateLabStats()">Load Statistics</button></div>' +
-    '<div id="statTotalDisplay" style="font-size:1.4em;font-weight:800;margin-bottom:10px">-- <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span></div>' +
-    '<div id="statList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:20px 0">Select range and click Load.</p></div></div>' +
-    '</div>' +
-    '<script>' +
-    'firebase.initializeApp({apiKey:"AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",authDomain:"saad-clinic.firebaseapp.com",databaseURL:"https://saad-clinic-default-rtdb.firebaseio.com",projectId:"saad-clinic",storageBucket:"saad-clinic.firebasestorage.app",messagingSenderId:"216860298716",appId:"1:216860298716:web:6f2e31e3267f8d1487d319",measurementId:"G-3DBY6CC5HD"});' +
-    'var db=firebase.database();' +
-    'function parseIraqiDate(d){if(!d||d==="N/A")return 0;if(d.indexOf("/")!==-1){var p=d.split("/");if(p.length===3)return new Date(+p[2],p[1]-1,+p[0]).getTime()}var v=new Date(d).getTime();return isNaN(v)?0:v}' +
-    'function toggleLabDateInputs(){document.getElementById("labCustomDates").style.display=document.getElementById("labFilterType").value==="custom"?"grid":"none"}' +
-    'function calculatePatientFlow(){var list=document.getElementById("flowList");var fType=document.getElementById("flowFilterType").value;var startVal=document.getElementById("flowStart").value;var endVal=document.getElementById("flowEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Processing Registry...";db.ref("patientIndex").once("value",function(snap){var ptIdx=snap.val()||{};var newPts=[];var followPts=[];var ids=Object.keys(ptIdx);for(var i=0;i<ids.length;i++){var id=ids[i];var p=ptIdx[id];var regDateTs=parseIraqiDate(p.dateAdded);var dObj=new Date(regDateTs);var isNew=false;if(fType==="all")isNew=true;else if(fType==="month")isNew=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(fType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;isNew=regDateTs>=s&&regDateTs<=e}if(isNew){newPts.push({id:id,name:p.name})}else{var lastVTs=parseIraqiDate(p.lastVisit);var lvObj=new Date(lastVTs);var isFollow=false;if(fType==="month")isFollow=lvObj.getMonth()===curM&&lvObj.getFullYear()===curY;else if(fType==="custom"){var s2=startVal?new Date(startVal).getTime():0;var e2=endVal?new Date(endVal).getTime():9999999999999;isFollow=lastVTs>=s2&&lastVTs<=e2}if(isFollow)followPts.push({id:id,name:p.name})}}document.getElementById("countNew").innerText=newPts.length;document.getElementById("countFollow").innerText=followPts.length;var html="<b style=\\"display:block;margin-bottom:8px;color:var(--success)\\">New Registrations ("+newPts.length+"):</b>";for(var n=0;n<newPts.length;n++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+newPts[n].name+"</div>"}if(!newPts.length)html+="None";html+=\'<b style="display:block;margin-top:15px;margin-bottom:8px;color:var(--primary)">Follow-up Visits (\'+followPts.length+"):</b>";for(var f=0;f<followPts.length;f++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+followPts[f].name+"</div>"}if(!followPts.length)html+="None";list.innerHTML=html})}' +
-    'function calculateLabStats(){var list=document.getElementById("statList");var totalDisp=document.getElementById("statTotalDisplay");var filterType=document.getElementById("labFilterType").value;var startVal=document.getElementById("labStart").value;var endVal=document.getElementById("labEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Filtering Records...";db.ref("patientIndex").once("value",function(idxSnap){var ptIdx=idxSnap.val()||{};db.ref("patientDetails").once("value",function(snap){var allDetails=snap.val()||{};var globalCount=0;var testGroups={};var pIds=Object.keys(allDetails);for(var pi=0;pi<pIds.length;pi++){var pid=pIds[pi];var pData=allDetails[pid];var labs=pData.labs||{};var ptName=ptIdx[pid]?ptIdx[pid].name:"Unknown";var labKeys=Object.keys(labs);for(var li=0;li<labKeys.length;li++){var labKey=labKeys[li];var labInfo=labs[labKey];var labName=labInfo.name||labKey;var history=labInfo.history||[];var validEntries=[];if(history.length===0&&filterType==="all"){validEntries.push({id:pid,name:ptName})}for(var hi=0;hi<history.length;hi++){var h=history[hi];var hDate=parseIraqiDate(h.dt);var dObj=new Date(hDate);var include=false;if(filterType==="all")include=true;else if(filterType==="month")include=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(filterType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;include=hDate>=s&&hDate<=e}if(include)validEntries.push({id:pid,name:ptName})}if(validEntries.length>0){if(!testGroups[labName])testGroups[labName]=[];for(var ve=0;ve<validEntries.length;ve++){testGroups[labName].push(validEntries[ve]);globalCount++}}}}if(globalCount===0){list.innerHTML="No tests found for this period.";totalDisp.innerHTML="0 <span style=\\"font-size:12px;font-weight:400;color:var(--text-secondary)\\">Tests Found</span>";return}totalDisp.innerHTML=globalCount+\' <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span>\';var html="";var tgKeys=Object.keys(testGroups).sort(function(a,b){return testGroups[b].length-testGroups[a].length});for(var t=0;t<tgKeys.length;t++){var testName=tgKeys[t];var patients=testGroups[testName];var uniqueMap={};var uniquePts=[];for(var up=0;up<patients.length;up++){if(!uniqueMap[patients[up].id]){uniqueMap[patients[up].id]=true;uniquePts.push(patients[up])}}var ptHtml="";for(var p=0;p<uniquePts.length;p++){ptHtml+=\'<div style="padding:5px 10px;color:var(--primary);border-left:2px solid var(--lab);margin-left:10px;margin-top:4px;font-size:12px;">\'+uniquePts[p].name+"</div>"}html+=\'<div style="margin-bottom:8px;border:1px solid var(--separator);border-radius:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;padding:10px;background:var(--item-hover);cursor:pointer;font-weight:600" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\\\'none\\\'?\\\'block\\\':\\\'none\\\')"><span>\'+testName+"</span><span style=\\"color:var(--lab)\\">"+patients.length+"</span></div><div style=\\"display:none;padding:5px;background:rgba(0,0,0,.02)\\">"+ptHtml+"</div></div>"}list.innerHTML=html})})}' +
-    '<\/script></body></html>');
-    w.document.close();
-}
+        var w = window.open('', '_blank', 'width=900,height=750,scrollbars=yes');
+        w.document.write('<!DOCTYPE html><html lang="en" data-theme="' + document.documentElement.getAttribute('data-theme') + '"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Statistics - Dr. Saad Clinic</title>' +
+        '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"><\/script>' +
+        '<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"><\/script>' +
+        '<style>' +
+        ':root,[data-theme="dark"]{--primary:#0A84FF;--success:#30D158;--danger:#FF453A;--warning:#FF9F0A;--call:#5E5CE6;--lab:#64D2FF;--bg-root:#000;--card-bg:rgba(28,28,30,.72);--card-border:rgba(255,255,255,.09);--card-shadow:0 8px 32px rgba(0,0,0,.5);--input-bg:rgba(0,0,0,.35);--input-border:rgba(255,255,255,.1);--text-primary:#F2F2F7;--text-secondary:#8E8E93;--text-tertiary:#636366;--separator:rgba(255,255,255,.06);--item-hover:rgba(255,255,255,.07);--scrollbar-thumb:rgba(255,255,255,.18);--backdrop-blur:blur(18px);--color-fill-tertiary:rgba(116,116,128,.08);--color-separator:rgba(60,60,67,.36)}' +
+        '[data-theme="glass"]{--bg-root:#FFFFFF;--card-bg:rgba(255,255,255,.72);--card-border:rgba(0,0,0,.06);--card-shadow:0 0 0 0.5px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);--input-bg:rgba(0,0,0,.03);--input-border:rgba(0,0,0,.12);--text-primary:#1D1D1F;--text-secondary:#6E6E73;--text-tertiary:#86868B;--separator:rgba(0,0,0,.08);--item-hover:rgba(0,0,0,.04);--backdrop-blur:blur(24px) saturate(180%);--color-fill-tertiary:rgba(0,0,0,.024);--color-separator:rgba(60,60,67,.12)}' +
+        '*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:var(--bg-root);color:var(--text-primary);padding:20px;-webkit-font-smoothing:antialiased;transition:background .4s,color .3s}' +
+        'select,input[type="date"]{color-scheme:dark}[data-theme="glass"] select,[data-theme="glass"] input[type="date"]{color-scheme:light}' +
+        '.card{background:var(--card-bg);backdrop-filter:var(--backdrop-blur);-webkit-backdrop-filter:var(--backdrop-blur);padding:22px;border-radius:22px;box-shadow:var(--card-shadow);margin-bottom:22px;border:1px solid var(--card-border);transition:background .4s,border-color .4s}' +
+        'h3{color:var(--primary);margin:0 0 14px;font-size:1.1em;font-weight:600;border-bottom:1px solid var(--separator);padding-bottom:10px}' +
+        '.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:1200px;margin:auto}@media(max-width:768px){.dash-grid{grid-template-columns:1fr}}' +
+        '.scroll-card{max-height:320px;overflow-y:auto;padding-right:4px}' +
+        'input,select{width:100%;padding:10px 14px;margin:6px 0;border:1px solid var(--input-border);border-radius:12px;font-size:14px;background:var(--color-fill-tertiary);color:var(--text-primary);font-family:inherit}' +
+        '[data-theme="glass"] input,[data-theme="glass"] select{background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.10);color:var(--text-primary)}' +
+        'input:focus,select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.18)}' +
+        '.action-btn{background:none;border:none;padding:8px 10px;cursor:pointer;font-weight:600;font-size:13px;border-radius:8px;transition:.2s;color:var(--text-primary)}' +
+        '.action-btn:hover{background:var(--item-hover)}' +
+        '::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:10px}' +
+        '</style></head><body>' +
+        '<h2 style="text-align:center;margin-bottom:24px;font-size:1.3em;">Statistics Dashboard</h2>' +
+        '<div class="dash-grid">' +
+        '<div class="card" style="border-left:5px solid var(--call)">' +
+        '<h3 style="color:var(--call);border:none;margin-bottom:10px;">Patient Flow Tracker</h3>' +
+        '<div style="background:var(--color-fill-tertiary);padding:10px;border-radius:12px;margin-bottom:15px">' +
+        '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">TIME PERIOD</label>' +
+        '<select id="flowFilterType" onchange="document.getElementById(\'flowCustomDates\').style.display=(this.value===\'custom\')?\'grid\':\'none\'" style="margin-bottom:8px"><option value="all">Total Registry</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
+        '<div id="flowCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="flowStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="flowEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
+        '<button class="action-btn" style="background:var(--call);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculatePatientFlow()">Generate Report</button></div>' +
+        '<div id="flowSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;text-align:center">' +
+        '<div style="background:rgba(48,209,88,.1);padding:10px;border-radius:12px"><div id="countNew" style="font-size:1.5em;font-weight:800;color:var(--success)">0</div><div style="font-size:10px;color:var(--text-secondary)">NEW PTs</div></div>' +
+        '<div style="background:rgba(10,132,255,.1);padding:10px;border-radius:12px"><div id="countFollow" style="font-size:1.5em;font-weight:800;color:var(--primary)">0</div><div style="font-size:10px;color:var(--text-secondary)">FOLLOW-UPS</div></div></div>' +
+        '<div id="flowList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:10px 0">No report generated.</p></div></div>' +
+        '<div class="card" style="border-left:5px solid var(--lab)">' +
+        '<h3 style="color:var(--lab);border:none;margin-bottom:10px;">Lab Referral Stats</h3>' +
+        '<div style="background:var(--color-fill-tertiary);padding:10px;border-radius:12px;margin-bottom:15px">' +
+        '<label style="font-size:11px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:5px">FILTER BY DATE</label>' +
+        '<select id="labFilterType" onchange="toggleLabDateInputs()" style="margin-bottom:8px"><option value="all">All Time</option><option value="month">This Month</option><option value="custom">Custom Range</option></select>' +
+        '<div id="labCustomDates" style="display:none;gap:5px;grid-template-columns:1fr 1fr"><input type="date" id="labStart" style="padding:5px;font-size:12px;margin:0"><input type="date" id="labEnd" style="padding:5px;font-size:12px;margin:0"></div>' +
+        '<button class="action-btn" style="background:var(--lab);color:white;width:100%;padding:10px;margin-top:8px;border-radius:10px" onclick="calculateLabStats()">Load Statistics</button></div>' +
+        '<div id="statTotalDisplay" style="font-size:1.4em;font-weight:800;margin-bottom:10px">-- <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span></div>' +
+        '<div id="statList" class="scroll-card" style="font-size:13px;border-top:1px solid var(--separator);padding-top:10px"><p style="color:var(--text-secondary);text-align:center;padding:20px 0">Select range and click Load.</p></div></div>' +
+        '</div>' +
+        '<script>' +
+        'firebase.initializeApp({apiKey:"AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",authDomain:"saad-clinic.firebaseapp.com",databaseURL:"https://saad-clinic-default-rtdb.firebaseio.com",projectId:"saad-clinic",storageBucket:"saad-clinic.firebasestorage.app",messagingSenderId:"216860298716",appId:"1:216860298716:web:6f2e31e3267f8d1487d319",measurementId:"G-3DBY6CC5HD"});' +
+        'var db=firebase.database();' +
+        'function parseIraqiDate(d){if(!d||d==="N/A")return 0;if(d.indexOf("/")!==-1){var p=d.split("/");if(p.length===3)return new Date(+p[2],p[1]-1,+p[0]).getTime()}var v=new Date(d).getTime();return isNaN(v)?0:v}' +
+        'function toggleLabDateInputs(){document.getElementById("labCustomDates").style.display=document.getElementById("labFilterType").value==="custom"?"grid":"none"}' +
+        'function calculatePatientFlow(){var list=document.getElementById("flowList");var fType=document.getElementById("flowFilterType").value;var startVal=document.getElementById("flowStart").value;var endVal=document.getElementById("flowEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Processing Registry...";db.ref("patientIndex").once("value",function(snap){var ptIdx=snap.val()||{};var newPts=[];var followPts=[];var ids=Object.keys(ptIdx);for(var i=0;i<ids.length;i++){var id=ids[i];var p=ptIdx[id];var regDateTs=parseIraqiDate(p.dateAdded);var dObj=new Date(regDateTs);var isNew=false;if(fType==="all")isNew=true;else if(fType==="month")isNew=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(fType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;isNew=regDateTs>=s&&regDateTs<=e}if(isNew){newPts.push({id:id,name:p.name})}else{var lastVTs=parseIraqiDate(p.lastVisit);var lvObj=new Date(lastVTs);var isFollow=false;if(fType==="month")isFollow=lvObj.getMonth()===curM&&lvObj.getFullYear()===curY;else if(fType==="custom"){var s2=startVal?new Date(startVal).getTime():0;var e2=endVal?new Date(endVal).getTime():9999999999999;isFollow=lastVTs>=s2&&lastVTs<=e2}if(isFollow)followPts.push({id:id,name:p.name})}}document.getElementById("countNew").innerText=newPts.length;document.getElementById("countFollow").innerText=followPts.length;var html="<b style=\\"display:block;margin-bottom:8px;color:var(--success)\\">New Registrations ("+newPts.length+"):</b>";for(var n=0;n<newPts.length;n++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+newPts[n].name+"</div>"}if(!newPts.length)html+="None";html+=\'<b style="display:block;margin-top:15px;margin-bottom:8px;color:var(--primary)">Follow-up Visits (\'+followPts.length+"):</b>";for(var f=0;f<followPts.length;f++){html+=\'<div style="padding:4px 0;color:var(--text-primary)">\'+followPts[f].name+"</div>"}if(!followPts.length)html+="None";list.innerHTML=html})}' +
+        'function calculateLabStats(){var list=document.getElementById("statList");var totalDisp=document.getElementById("statTotalDisplay");var filterType=document.getElementById("labFilterType").value;var startVal=document.getElementById("labStart").value;var endVal=document.getElementById("labEnd").value;var now=new Date();var curM=now.getMonth();var curY=now.getFullYear();list.innerHTML="Filtering Records...";db.ref("patientIndex").once("value",function(idxSnap){var ptIdx=idxSnap.val()||{};db.ref("patientDetails").once("value",function(snap){var allDetails=snap.val()||{};var globalCount=0;var testGroups={};var pIds=Object.keys(allDetails);for(var pi=0;pi<pIds.length;pi++){var pid=pIds[pi];var pData=allDetails[pid];var labs=pData.labs||{};var ptName=ptIdx[pid]?ptIdx[pid].name:"Unknown";var labKeys=Object.keys(labs);for(var li=0;li<labKeys.length;li++){var labKey=labKeys[li];var labInfo=labs[labKey];var labName=labInfo.name||labKey;var history=labInfo.history||[];var validEntries=[];if(history.length===0&&filterType==="all"){validEntries.push({id:pid,name:ptName})}for(var hi=0;hi<history.length;hi++){var h=history[hi];var hDate=parseIraqiDate(h.dt);var dObj=new Date(hDate);var include=false;if(filterType==="all")include=true;else if(filterType==="month")include=dObj.getMonth()===curM&&dObj.getFullYear()===curY;else if(filterType==="custom"){var s=startVal?new Date(startVal).getTime():0;var e=endVal?new Date(endVal).getTime():9999999999999;include=hDate>=s&&hDate<=e}if(include)validEntries.push({id:pid,name:ptName})}if(validEntries.length>0){if(!testGroups[labName])testGroups[labName]=[];for(var ve=0;ve<validEntries.length;ve++){testGroups[labName].push(validEntries[ve]);globalCount++}}}}if(globalCount===0){list.innerHTML="No tests found for this period.";totalDisp.innerHTML="0 <span style=\\"font-size:12px;font-weight:400;color:var(--text-secondary)\\">Tests Found</span>";return}totalDisp.innerHTML=globalCount+\' <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">Tests Found</span>\';var html="";var tgKeys=Object.keys(testGroups).sort(function(a,b){return testGroups[b].length-testGroups[a].length});for(var t=0;t<tgKeys.length;t++){var testName=tgKeys[t];var patients=testGroups[testName];var uniqueMap={};var uniquePts=[];for(var up=0;up<patients.length;up++){if(!uniqueMap[patients[up].id]){uniqueMap[patients[up].id]=true;uniquePts.push(patients[up])}}var ptHtml="";for(var p=0;p<uniquePts.length;p++){ptHtml+=\'<div style="padding:5px 10px;color:var(--primary);border-left:2px solid var(--lab);margin-left:10px;margin-top:4px;font-size:12px;">\'+uniquePts[p].name+"</div>"}html+=\'<div style="margin-bottom:8px;border:1px solid var(--separator);border-radius:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;padding:10px;background:var(--item-hover);cursor:pointer;font-weight:600" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\\\'none\\\'?\\\'block\\\':\\\'none\\\')"><span>\'+testName+"</span><span style=\\"color:var(--lab)\\">"+patients.length+"</span></div><div style=\\"display:none;padding:5px;background:rgba(0,0,0,.02)\\">"+ptHtml+"</div></div>"}list.innerHTML=html})})}' +
+        '<\/script></body></html>');
+        w.document.close();
+    }
+
     /* ================================================================
-       BOOT - No login, goes straight to app
+       BOOT
     ================================================================ */
     window.addEventListener('DOMContentLoaded', function() {
         applyStoredTheme();
         document.getElementById('filterYear').value = new Date().getFullYear();
-        // Go directly to the app - no password check
         initSync();
         genImagingTags();
         setTimeout(initTextProtectionForPatient, 500);
