@@ -1049,6 +1049,138 @@
                 0 16px 48px rgba(0, 0, 0, 0.20),
                 0 48px 96px rgba(0, 0, 0, 0.12);
         }
+
+        /* ============================================
+           REGISTRATION TABS & FOLLOW-UP CHECK-IN
+           ============================================ */
+        .reg-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            background: var(--color-fill-tertiary);
+            border-radius: 12px;
+            padding: 3px;
+        }
+        .reg-tab {
+            flex: 1;
+            padding: 10px 8px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            box-shadow: none;
+            width: auto;
+        }
+        .reg-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+        }
+        .reg-tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: var(--color-fill-quaternary);
+        }
+        [data-theme="glass"] .reg-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .checkin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--separator);
+            border-radius: 14px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            animation: listSlide 0.3s ease both;
+            gap: 10px;
+        }
+        [data-theme="glass"] .checkin-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
+        .checkin-item:hover {
+            background: var(--item-hover);
+            transform: translateX(3px);
+        }
+        .checkin-btn {
+            background: var(--success) !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 12px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            cursor: pointer;
+            border: none !important;
+            box-shadow: 0 2px 8px rgba(48, 209, 88, 0.3) !important;
+            width: auto !important;
+            white-space: nowrap;
+            transition: all 0.2s !important;
+            min-width: 80px;
+        }
+        .checkin-btn:hover {
+            transform: scale(1.05) !important;
+            filter: brightness(1.1) !important;
+        }
+        .checkin-btn.already-waiting {
+            background: rgba(10, 132, 255, 0.15) !important;
+            color: var(--primary) !important;
+            box-shadow: none !important;
+        }
+        .followup-section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 16px 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--separator);
+        }
+        .followup-section-label:first-child { margin-top: 0; }
+        .checkin-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .checkin-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+        .no-results-msg {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .checkin-item.today-apt {
+            border-left: 4px solid var(--warning);
+            background: rgba(255, 159, 10, 0.06);
+        }
+        [data-theme="glass"] .checkin-item.today-apt {
+            background: rgba(255, 159, 10, 0.04);
+        }
+        .checkin-item.is-waiting {
+            border-left: 4px solid var(--primary);
+            background: rgba(10, 132, 255, 0.06);
+        }
+        [data-theme="glass"] .checkin-item.is-waiting {
+            background: rgba(10, 132, 255, 0.04);
+        }
     </style>
 </head>
 <body>
@@ -1098,16 +1230,29 @@
             <div id="webReqList" style="max-height:280px; overflow-y:auto; padding-right:4px;"></div>
         </div>
 
-        <!-- New Registration -->
+        <!-- Registration & Check-in (TABBED) -->
         <div class="card">
-            <h3>New Registration</h3>
-            <input type="text" id="newName" placeholder="Full Name">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <input type="number" id="newAge" placeholder="Age">
-                <input type="tel" id="newPhone" placeholder="Mobile">
+            <div class="reg-tabs">
+                <button class="reg-tab active" id="tabNewPt" onclick="switchRegTab('new')">🆕 New Patient</button>
+                <button class="reg-tab" id="tabFollowUp" onclick="switchRegTab('followup')">🔄 Follow-up</button>
             </div>
-            <input type="text" id="newComp" placeholder="Chief Complaint">
-            <button onclick="addPatient()">Add to Registry</button>
+
+            <!-- New Patient Panel -->
+            <div id="panelNewPt">
+                <input type="text" id="newName" placeholder="Full Name">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <input type="number" id="newAge" placeholder="Age">
+                    <input type="tel" id="newPhone" placeholder="Mobile">
+                </div>
+                <input type="text" id="newComp" placeholder="Chief Complaint">
+                <button onclick="addPatient()">Add to Registry</button>
+            </div>
+
+            <!-- Follow-up / Check-in Panel -->
+            <div id="panelFollowUp" style="display:none;">
+                <input type="text" id="followUpSearch" placeholder="🔍 Type patient name to find..." oninput="onFollowUpSearch()" style="margin-bottom:4px;">
+                <div id="followUpResults" style="max-height: 420px; overflow-y: auto; margin-top: 6px; padding-right: 4px;"></div>
+            </div>
         </div>
 
         <!-- BMI -->
@@ -1357,6 +1502,7 @@
     var activeListener = null;
     var searchTimer = null;
     var calendarTimer = null;
+    var currentRegTab = 'new';
 
     /* ================================================================
        THEME
@@ -1401,18 +1547,233 @@
             renderList();
             scheduleCalendarRender();
             document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
+            if (currentRegTab === 'followup') renderFollowUpPanel();
         });
 
         db.ref('reminders').on('value', function(snap) {
             allReminders = snap.val() || {};
             renderRems();
             checkActiveReminderBanner();
+            if (currentRegTab === 'followup') renderFollowUpPanel();
         });
     }
 
     function scheduleCalendarRender() {
         clearTimeout(calendarTimer);
         calendarTimer = setTimeout(renderCalendarFromDB, 300);
+    }
+
+    /* ================================================================
+       HELPER UTILITIES
+    ================================================================ */
+    function getDaysSince(dateStr) {
+        if (!dateStr) return -1;
+        try {
+            var parts;
+            // Try dd/mm/yyyy
+            parts = dateStr.split('/');
+            var d;
+            if (parts.length === 3 && parts[0].length <= 2) {
+                d = new Date(parts[2], parts[1] - 1, parts[0]);
+            } else {
+                d = new Date(dateStr); // Try ISO
+            }
+            if (isNaN(d.getTime())) return -1;
+            var now = new Date();
+            now.setHours(0,0,0,0);
+            d.setHours(0,0,0,0);
+            return Math.round((now - d) / 86400000);
+        } catch(e) { return -1; }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    /* ================================================================
+       REGISTRATION TAB SYSTEM & FOLLOW-UP CHECK-IN
+    ================================================================ */
+    function switchRegTab(tab) {
+        currentRegTab = tab;
+        var tabNew = document.getElementById('tabNewPt');
+        var tabFollow = document.getElementById('tabFollowUp');
+        var panelNew = document.getElementById('panelNewPt');
+        var panelFollow = document.getElementById('panelFollowUp');
+
+        if (tab === 'new') {
+            tabNew.classList.add('active');
+            tabFollow.classList.remove('active');
+            panelNew.style.display = 'block';
+            panelFollow.style.display = 'none';
+        } else {
+            tabFollow.classList.add('active');
+            tabNew.classList.remove('active');
+            panelNew.style.display = 'none';
+            panelFollow.style.display = 'block';
+            renderFollowUpPanel();
+        }
+    }
+
+    function renderFollowUpPanel() {
+        var container = document.getElementById('followUpResults');
+        if (!container) return;
+        var searchVal = (document.getElementById('followUpSearch').value || '').toLowerCase().trim();
+        var html = '';
+
+        var today = new Date();
+        var todayStr = today.toLocaleDateString('en-GB');
+        var todayISO = today.toISOString().split('T')[0];
+
+        if (!searchVal) {
+            // === Section 1: Today's Scheduled Appointments ===
+            var todayAppointments = [];
+            var remIds = Object.keys(allReminders);
+            for (var i = 0; i < remIds.length; i++) {
+                var r = allReminders[remIds[i]];
+                if (r.status !== 'pending') continue;
+                var targetId = r.ptId || r.patientId;
+                if (!targetId || !ptIdx[targetId]) continue;
+                var remDate = r.date || '';
+                var isToday = (remDate === todayStr || remDate === todayISO);
+                if (!isToday) {
+                    var tParts = todayStr.split('/');
+                    if (tParts.length === 3) {
+                        var isoFromGB = tParts[2] + '-' + tParts[1] + '-' + tParts[0];
+                        isToday = (remDate === isoFromGB);
+                    }
+                }
+                if (isToday) {
+                    todayAppointments.push({
+                        id: targetId,
+                        name: ptIdx[targetId].name,
+                        complaint: ptIdx[targetId].complaint || '',
+                        reminderText: r.text || ''
+                    });
+                }
+            }
+
+            if (todayAppointments.length > 0) {
+                html += '<div class="followup-section-label">\uD83D\uDCCB Today\'s Appointments (' + todayAppointments.length + ')</div>';
+                for (var t = 0; t < todayAppointments.length; t++) {
+                    var apt = todayAppointments[t];
+                    var isWaiting = ptIdx[apt.id] && ptIdx[apt.id].isWaiting;
+                    html += buildCheckInItem(apt.id, apt.name, apt.complaint, apt.reminderText, isWaiting, 'today-apt');
+                }
+            }
+
+            // === Section 2: Currently Waiting Patients ===
+            var waitingPts = [];
+            var allIds = Object.keys(ptIdx);
+            for (var w = 0; w < allIds.length; w++) {
+                if (ptIdx[allIds[w]].isWaiting) {
+                    var alreadyShown = false;
+                    for (var ta = 0; ta < todayAppointments.length; ta++) {
+                        if (todayAppointments[ta].id === allIds[w]) { alreadyShown = true; break; }
+                    }
+                    if (!alreadyShown) {
+                        waitingPts.push({ id: allIds[w], name: ptIdx[allIds[w]].name, complaint: ptIdx[allIds[w]].complaint || '' });
+                    }
+                }
+            }
+
+            if (waitingPts.length > 0) {
+                html += '<div class="followup-section-label">\u23F3 Currently Waiting (' + waitingPts.length + ')</div>';
+                for (var cw = 0; cw < waitingPts.length; cw++) {
+                    html += buildCheckInItem(waitingPts[cw].id, waitingPts[cw].name, waitingPts[cw].complaint, '', true, 'is-waiting');
+                }
+            }
+
+            // === Section 3: Recent Patients (last 14 days) ===
+            var recentPts = [];
+            for (var r2 = 0; r2 < allIds.length; r2++) {
+                var p = ptIdx[allIds[r2]];
+                if (p.isWaiting) continue;
+                var lastV = p.lastVisit || p.dateAdded;
+                var days = getDaysSince(lastV);
+                if (days >= 0 && days <= 14) {
+                    recentPts.push({ id: allIds[r2], name: p.name, complaint: p.complaint || '', days: days, lastVisit: lastV });
+                }
+            }
+            recentPts.sort(function(a, b) { return a.days - b.days; });
+
+            if (recentPts.length > 0) {
+                html += '<div class="followup-section-label">\uD83D\uDD50 Recent Patients (' + recentPts.length + ')</div>';
+                var maxShow = Math.min(recentPts.length, 25);
+                for (var rc = 0; rc < maxShow; rc++) {
+                    var daysLabel = recentPts[rc].days === 0 ? 'Today' : recentPts[rc].days + 'd ago';
+                    html += buildCheckInItem(recentPts[rc].id, recentPts[rc].name, recentPts[rc].complaint, daysLabel + ' \u00B7 ' + recentPts[rc].lastVisit, false, '');
+                }
+            }
+
+            if (!html) {
+                html = '<div class="no-results-msg"><div style="font-size:48px; margin-bottom:14px;">\uD83D\uDCCB</div><p style="font-weight:600; margin-bottom:6px;">No appointments or recent visits</p><p style="font-size:12px;">Type a name above to search all patients</p></div>';
+            }
+        } else {
+            // === Search Mode ===
+            var results = [];
+            var sIds = Object.keys(ptIdx);
+            for (var s = 0; s < sIds.length; s++) {
+                var sp = ptIdx[sIds[s]];
+                var nameMatch = (sp.name || '').toLowerCase().indexOf(searchVal) !== -1;
+                var phoneMatch = (sp.phone || '').indexOf(searchVal) !== -1;
+                var complaintMatch = (sp.complaint || '').toLowerCase().indexOf(searchVal) !== -1;
+                if (nameMatch || phoneMatch || complaintMatch) {
+                    results.push({ id: sIds[s], name: sp.name, complaint: sp.complaint || '', lastVisit: sp.lastVisit || sp.dateAdded || 'N/A', isWaiting: sp.isWaiting || false });
+                }
+            }
+
+            if (results.length > 0) {
+                html += '<div class="followup-section-label">\uD83D\uDD0D Found (' + results.length + ')</div>';
+                for (var sr = 0; sr < results.length; sr++) {
+                    var extraClass = results[sr].isWaiting ? 'is-waiting' : '';
+                    html += buildCheckInItem(results[sr].id, results[sr].name, results[sr].complaint, 'Last: ' + results[sr].lastVisit, results[sr].isWaiting, extraClass);
+                }
+            } else {
+                html = '<div class="no-results-msg"><div style="font-size:48px; margin-bottom:14px;">\uD83D\uDD0D</div><p style="font-weight:600;">No patient found</p><p style="font-size:12px; margin-top:6px;">Try a different name or switch to \"New Patient\" to register</p></div>';
+            }
+        }
+
+        container.innerHTML = html;
+    }
+
+    function buildCheckInItem(id, name, complaint, meta, isWaiting, extraClass) {
+        var btnLabel = isWaiting ? '\u2713 Waiting' : '\u27A1 Check In';
+        var btnClass = isWaiting ? 'checkin-btn already-waiting' : 'checkin-btn';
+        return '<div class="checkin-item ' + (extraClass || '') + '">' +
+            '<div onclick="loadFullData(\'' + id + '\')" style="cursor:pointer; flex:1; min-width:0;">' +
+            '<div class="checkin-name">' + escapeHtml(name) + '</div>' +
+            (complaint ? '<div class="checkin-meta" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(complaint) + '</div>' : '') +
+            (meta ? '<div class="checkin-meta" style="color:var(--text-tertiary);">' + escapeHtml(meta) + '</div>' : '') +
+            '</div>' +
+            '<button class="' + btnClass + '" onclick="event.stopPropagation(); checkInPatient(\'' + id + '\')">' + btnLabel + '</button>' +
+            '</div>';
+    }
+
+    function checkInPatient(id) {
+        if (!ptIdx[id]) return;
+        var isCurrentlyWaiting = ptIdx[id].isWaiting;
+
+        if (isCurrentlyWaiting) {
+            loadFullData(id);
+            showToast(ptIdx[id].name + ' \u2014 file opened.');
+        } else {
+            db.ref('patientIndex/' + id).update({ isWaiting: true });
+            loadFullData(id);
+            showToast('\u2705 ' + ptIdx[id].name + ' checked in!');
+        }
+
+        setTimeout(function() {
+            if (currentRegTab === 'followup') renderFollowUpPanel();
+        }, 600);
+    }
+
+    var followUpSearchTimer = null;
+    function onFollowUpSearch() {
+        clearTimeout(followUpSearchTimer);
+        followUpSearchTimer = setTimeout(renderFollowUpPanel, 150);
     }
 
     /* ================================================================
