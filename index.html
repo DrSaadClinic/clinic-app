@@ -1505,30 +1505,19 @@
         }
     }
 
-   function handleFirstInput(textareaId) {
-    var box = document.getElementById(textareaId);
-    if (!box || !activeId || box.dataset.activated === 'true') return;
-    box.dataset.activated = 'true';
-    var today = new Date().toLocaleDateString('en-GB');
-    var stamp = '--- Visit: ' + today + ' ---\n';
-    // Don't insert if stamp already exists
-    if (box.value.indexOf(stamp) !== -1) return;
-    // Get current cursor position (user just typed a character here)
-    var cursorPos = box.selectionStart;
-    var before = box.value.substring(0, cursorPos);
-    var after = box.value.substring(cursorPos);
-    // Find the start of the current line to insert stamp ABOVE it
-    var lineStart = before.lastIndexOf('\n') + 1;
-    var beforeLine = box.value.substring(0, lineStart);
-    var fromLine = box.value.substring(lineStart);
-    // Insert stamp above the line where user is typing
-    box.value = beforeLine + stamp + fromLine;
-    // Put cursor back where it was, shifted by stamp length
-    var newPos = cursorPos + stamp.length;
-    box.setSelectionRange(newPos, newPos);
-    autoExpand(box);
-    autoSyncTrigger();
-}
+    function handleFirstInput(textareaId) {
+        var box = document.getElementById(textareaId);
+        if (!box || !activeId || box.dataset.activated === 'true') return;
+        box.dataset.activated = 'true';
+        var today = new Date().toLocaleDateString('en-GB');
+        var stamp = '\n--- Visit: ' + today + ' ---\n';
+        if (box.value.indexOf(stamp) === -1) {
+            box.value = box.value + stamp;
+            autoExpand(box);
+            box.setSelectionRange(box.value.length, box.value.length);
+            autoSyncTrigger();
+        }
+    }
 
     /* ================================================================
        WEB REQUESTS
@@ -1660,13 +1649,7 @@
         var ptEl = document.getElementById('pt-' + id);
         if (ptEl) ptEl.classList.add('active');
         checkActiveReminderBanner();
-        setTimeout(function() {
-    var fileView = document.getElementById('fileView');
-    if (fileView) {
-        fileView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}, 150);
-
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         activeListener = db.ref('patientDetails/' + id);
         activeListener.on('value', function(snap) {
