@@ -464,6 +464,48 @@
         .btn-pin-pt.pinned { color: var(--warning); text-shadow: 0 0 8px rgba(255, 159, 10, 0.5); }
         .btn-del-pt { color: var(--danger); font-size: 15px; opacity: 0.35; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
+                /* PREMIUM PATIENT HEADER */
+        .premium-patient-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 22px;
+            border: 1px solid var(--separator);
+            position: relative;
+        }
+        [data-theme="glass"] .premium-patient-header {
+            background: var(--color-fill-secondary);
+        }
+        .avatar-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--call));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .patient-details h2 {
+            font-size: 26px;
+            margin: 0 0 4px 0;
+            border-radius: 8px;
+            padding: 0 5px;
+            margin-left: -5px;
+        }
+        .patient-meta-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
 
         /* ============================================
            WEB REQUEST ITEMS
@@ -1160,13 +1202,17 @@
 
         <!-- Patient File View -->
         <div id="fileView" class="card" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div style="width:100%;">
-                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:8px; font-size:1.5em;"></h2>
-                    <div id="waArea" style="margin-top:8px;"></div>
+                        <!-- PREMIUM PATIENT HEADER -->
+            <div class="premium-patient-header">
+                <div class="avatar-circle" id="patientAvatar">--</div>
+                <div class="patient-details">
+                    <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)"></h2>
+                    <div class="patient-meta-info" id="viewContact"></div>
+                    <div id="waArea" style="display:flex; gap:8px;"></div>
                 </div>
-                <div id="syncIndicator" style="display:none; padding:5px 12px;">SAVING</div>
+                <div id="syncIndicator" style="display:none; position:absolute; top:20px; right:20px;">SAVING</div>
             </div>
+
 
             <div id="activeReminderBanner" style="display:none; background:rgba(255,159,10,0.12); border-left:5px solid var(--warning); padding:14px; border-radius:14px; margin-top:14px; color:var(--text-primary); font-weight:600; font-size:14px; border:1px solid rgba(255,159,10,0.3);"></div>
 
@@ -1571,7 +1617,8 @@
             showToast(ptIdx[id].name + ' \u2014 file opened.');
         } else {
             var today = new Date().toLocaleDateString('en-GB');
-            db.ref('patientIndex/' + id).update({ isWaiting: true, lastVisit: today }).catch(handleFirebaseError);
+            db.ref('patientIndex/' + id).update({ isWaiting: true, lastVisit: today, queueTime: Date.now() }).catch(handleFirebaseError);
+
             db.ref('patientDetails/' + id).once('value', function(snap) {
                 var d = snap.val() || {};
                 var dates = d.visitDates || [];
@@ -1828,9 +1875,19 @@
             var alertBtn = document.getElementById('dismissOverdueBtn');
             alertBtn.style.display = (days >= 25 && b.dismissedVisit !== (b.lastVisit || b.dateAdded)) ? 'block' : 'none';
 
-            document.getElementById('viewName').innerText = b.name || "Unknown";
+                        let pName = b.name || "Unknown";
+            document.getElementById('viewName').innerText = pName;
             document.getElementById('viewComplaint').innerText = b.complaint || "Routine evaluation";
-            document.getElementById('viewContact').innerHTML = 'Age: ' + escapeHtml(b.age || '--') + ' | Mobile: ' + escapeHtml(b.phone || '--');
+            
+            // Format unified Contact Info
+            document.getElementById('viewContact').innerHTML = 'Age: <b>' + escapeHtml(b.age || '--') + '</b> &bull; Mobile: <b>' + escapeHtml(b.phone || '--') + '</b> &bull; Reg: ' + (b.dateAdded || '--');
+            
+            // Set Avatar Initials & Apple Music Style Dynamic Color
+            let initials = pName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            document.getElementById('patientAvatar').innerText = initials || "--";
+            let hue = (pName.charCodeAt(0) || 0) * 20 % 360;
+            document.getElementById('patientAvatar').style.background = `linear-gradient(135deg, hsl(${hue}, 80%, 55%), hsl(${(hue+40)%360}, 80%, 45%))`;
+
             document.getElementById('viewRegDate').innerText = b.dateAdded || '--';
 
             var waNum = b.phone ? b.phone.replace(/\D/g, '') : '';
@@ -2767,6 +2824,57 @@
         showToast('Version history cleared');
         closeVersionPanel();
     }
+        function initCollapsibleSections() {
+        document.querySelectorAll('.section-block').forEach(block => {
+            let label = block.querySelector('.section-label');
+            if (!label) return;
+
+            // Create clickable header
+            let header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.cursor = 'pointer';
+            header.style.marginBottom = '12px';
+            header.innerHTML = `<span>${label.innerHTML}</span> <span class="acc-arrow" style="transition:0.3s; color:var(--text-secondary);">▼</span>`;
+            
+            // Create content wrapper
+            let wrapper = document.createElement('div');
+            wrapper.style.display = 'none'; // Collapsed by default
+            
+            // If the block itself uses grid (like Vitals/Procedures), transfer the grid props to the wrapper
+            if(window.getComputedStyle(block).display === 'grid') {
+                wrapper.className = block.className; 
+                block.className = 'section-block'; // Strip grid from parent
+            }
+
+            // Move elements into wrapper
+            block.insertBefore(header, block.firstChild);
+            while (header.nextSibling) {
+                wrapper.appendChild(header.nextSibling);
+            }
+            block.appendChild(wrapper);
+            label.remove(); // Remove old label
+
+                        // Click to toggle
+            header.onclick = () => {
+                let isHidden = wrapper.style.display === 'none';
+                wrapper.style.display = isHidden ? (wrapper.classList.contains('mobile-stack') ? 'grid' : 'block') : 'none';
+                header.querySelector('.acc-arrow').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                header.style.marginBottom = isHidden ? '12px' : '0px';
+                
+                // [FIX ADDED]: Force text areas to auto-expand instantly when the accordion opens
+                if (isHidden) {
+                    setTimeout(() => {
+                        wrapper.querySelectorAll('textarea').forEach(ta => autoExpand(ta));
+                    }, 50);
+                }
+            };
+
+        });
+    }
+
+    // Run this function immediately when the page loads
+    window.addEventListener('DOMContentLoaded', initCollapsibleSections);
 
     /* IMPROVED: escapeHtml — now used throughout all render functions */
     function escapeHtml(text) {
