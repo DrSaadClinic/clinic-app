@@ -2912,6 +2912,18 @@
         applyStoredTheme();
         document.getElementById('filterYear').value = new Date().getFullYear();
         initSync();
+                /* ================================================================
+           DEEP LINKING (iPad Click-to-Open Integration)
+        ================================================================ */
+        const urlParams = new URLSearchParams(window.location.search);
+        const pid = urlParams.get('patientId');
+        if (pid) {
+            // Give Firebase a fast 800ms to load before auto-opening the file
+            setTimeout(function() {
+                loadFullData(pid);
+            }, 800);
+        }
+
         genImagingTags();
         setTimeout(initTextProtectionForPatient, 500);
     });
