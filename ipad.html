@@ -258,6 +258,135 @@
         let newName = currentName.replace(/🧪/g, '').trim();
         db.ref('patientIndex/' + patientId).update({ name: newName });
     }
+        firebase.initializeApp({
+        apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
+        authDomain: "saad-clinic.firebaseapp.com",
+        databaseURL: "https://saad-clinic-default-rtdb.firebaseio.com",
+        projectId: "saad-clinic"
+    });
+    const db = firebase.database();
+
+    function parseDate(d) {
+        if(!d || d==="N/A") return 0;
+        if(d.includes('/')){
+            var p = d.split('/');
+            if(p.length === 3) return new Date(+p[2], p[1]-1, +p[0]).getTime();
+        }
+        var v = new Date(d).getTime();
+        return isNaN(v) ? 0 : v;
+    }
+
+    let completeQueue = [];
+    let labQueue = [];
+    let lastSeenQueue = []; // Memory buffer for iPad
+    let previousPatientName = "None";
+    let currentlySpeakingId = null;
+    let isProcessing = false;
+
+    // Background Auth hook
+    if(firebase.auth) { firebase.auth().signInAnonymously().catch(e => console.log('Auth pass.')); }
+
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }, 1000);
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    db.ref('patientIndex').on('value', (snap) => {
+        let pts = snap.val() || {};
+        let q = [];
+        let lQueue = [];
+        let now = Date.now();
+        
+        for (let id in pts) {
+            let pName = pts[id].name || "";
+            let pTime = pts[id].queueTime || 0;
+            
+            // Check for lab emoji (Filtered to ensure they visited today to prevent old ghost patients)
+            let dtTs = Math.max(parseDate(pts[id].dateAdded), parseDate(pts[id].lastVisit));
+            let isRecent = (now - dtTs) < (1000 * 60 * 60 * 24); // Within 24 hours
+
+            if (pName.includes('🧪') && isRecent) {
+                lQueue.push({ id: id, name: pName, time: pTime });
+            } 
+            // Normal waitlist
+            else if (pts[id].isWaiting && !pName.includes('🧪')) {
+                q.push({ id: id, name: pName, time: pTime });
+            }
+        }
+        
+        q.sort((a, b) => a.time - b.time);
+        lQueue.sort((a, b) => a.time - b.time); 
+        
+        // 🔹 UNIVERSAL "PREVIOUS PATIENT" FIX
+        // Automatically detect if the #1 person drops out of the waiting list from the main computer
+        if (lastSeenQueue.length > 0 && q.length > 0) {
+            if (lastSeenQueue[0].id !== q[0].id) {
+                if (!pts[lastSeenQueue[0].id] || !pts[lastSeenQueue[0].id].isWaiting) {
+                     previousPatientName = lastSeenQueue[0].name;
+                }
+            }
+        } else if (lastSeenQueue.length > 0 && q.length === 0) {
+             previousPatientName = lastSeenQueue[0].name;
+        }
+
+        lastSeenQueue = q;
+        completeQueue = q;
+        labQueue = lQueue;
+        updateScreen();
+    });
+
+    function updateScreen() {
+        // --- DOCTOR QUEUE UPDATE ---
+        document.getElementById('prevPatientName').innerText = previousPatientName;
+
+        if (completeQueue.length > 0) {
+            let currentPt = completeQueue[0];
+            currentlySpeakingId = currentPt.id;
+            
+            document.getElementById('currentPatientContainer').innerHTML = `<a href="index.html?patientId=${currentPt.id}" target="_blank" class="clickable-name">${currentPt.name}</a>`;
+            document.getElementById('statusPrompt').innerText = "Doctor is ready for";
+            document.getElementById('actionBtn').style.display = 'inline-flex';
+
+            if (completeQueue.length > 1) {
+                document.getElementById('upcomingBox').style.visibility = 'visible';
+                document.getElementById('upcomingPatientName').innerHTML = `<a href="index.html?patientId=${completeQueue[1].id}" target="_blank" class="clickable-upcoming">${completeQueue[1].name}</a>`;
+                let extra = completeQueue.length - 2;
+                document.getElementById('qCountText').style.display = (extra > 0) ? 'block' : 'none';
+                document.getElementById('qCountText').innerText = "+ " + extra + " more in lobby";
+            } else { document.getElementById('upcomingBox').style.visibility = 'hidden'; }
+        } else {
+            currentlySpeakingId = null;
+            document.getElementById('currentPatientContainer').innerText = "Clinic Empty";
+            document.getElementById('statusPrompt').innerText = "No patients are waiting";
+            document.getElementById('actionBtn').style.display = 'none';
+            document.getElementById('upcomingBox').style.visibility = 'hidden';
+        }
+
+        // --- LAB QUEUE UPDATE (PURE NAMES AS REQUESTED) ---
+        document.getElementById('labCount').innerText = labQueue.length;
+        let labHtml = '';
+        if(labQueue.length === 0) {
+            labHtml = '<p style="color:rgba(255,255,255,0.4); text-align:center; margin-top:40px; font-weight:500;">No labs currently tracking.</p>';
+        } else {
+            labQueue.forEach(lab => {
+                labHtml += `
+                    <div class="lab-item" style="justify-content: center; text-align: center; padding: 24px;">
+                        <a href="index.html?patientId=${lab.id}" target="_blank" class="lab-name" style="margin: 0; font-size: 20px; display: block; width: 100%;">${lab.name}</a>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('labList').innerHTML = labHtml;
+    }
+
+    function callNext() {
+        if (!currentlySpeakingId || isProcessing) return;
+        isProcessing = true;
+        previousPatientName = completeQueue[0].name;
+        db.ref('patientIndex/' + currentlySpeakingId).update({ isWaiting: false }).then(() => {
+            setTimeout(() => { isProcessing = false; }, 600); 
+        });
+    }
 
 </script>
 </body>
