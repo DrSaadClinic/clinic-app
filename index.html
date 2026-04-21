@@ -760,7 +760,7 @@
         [data-theme="glass"] .section-ops { border-left-color: var(--danger) !important; background: rgba(255,69,58,0.04) !important; }
         [data-theme="glass"] .section-vitals { border-left-color: #86868B !important; background: rgba(0,0,0,0.02) !important; }
 
-        #emptyState {
+        #emptye {
             text-align: center; padding: 90px 20px; color: var(--text-secondary);
             border: 2px dashed var(--separator); background: transparent !important;
         }
@@ -1158,6 +1158,8 @@
                 <p style="color:var(--text-secondary); font-size:13px; margin-bottom:18px;">Open Patient Flow reports and Lab Referral statistics in a dedicated window.</p>
                 <div style="display:grid; gap:10px;">
                     <button onclick="openStatsWindow()" style="background:var(--primary); padding:16px; font-size:15px; border-radius:16px;">Open Statistics Window</button>
+                    <!-- ADD THIS NEW BUTTON -->
+                    <button onclick="window.open('ipad.html', '_blank', 'width=1024,height=768')" style="background:var(--call); padding:16px; font-size:15px; border-radius:16px; box-shadow: 0 4px 14px rgba(94, 92, 230, 0.3);">Launch iPad Display Room</button>
                 </div>
             </div>
 
