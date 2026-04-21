@@ -9,13 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <style>
-        body {
-            margin: 0; overflow: hidden;
-            background: #05050A;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            display: flex; align-items: center; justify-content: center; height: 100vh;
-        }
+        body { margin: 0; overflow: hidden; background: #05050A; color: white; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
 
         .liquid-bg { position: fixed; inset: 0; z-index: -1; filter: blur(90px); overflow: hidden; }
         .blob { position: absolute; border-radius: 50%; mix-blend-mode: hard-light; }
@@ -28,7 +22,7 @@
         @keyframes float3 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-10vw, 20vh) scale(0.9); } }
 
         .glass-container {
-            width: 94vw; height: 90vh;
+            width: 96vw; height: 94vh;
             background: rgba(20, 20, 25, 0.35); border: 1px solid rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%);
             box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15);
@@ -36,66 +30,41 @@
             overflow: hidden;
         }
 
-        /* MAIN DOCTOR QUEUE PANEL */
-        .main-panel {
-            flex: 1; padding: 50px 60px; display: flex; flex-direction: column; justify-content: space-between;
-            border-right: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* RIGHT LAB QUEUE PANEL */
-        .lab-panel {
-            width: 360px; padding: 50px 30px; display: flex; flex-direction: column;
-            background: rgba(0,0,0,0.1);
-        }
+        /* 3-COLUMN LAYOUT */
+        .side-panel-left { width: 280px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-right: 1px solid rgba(255,255,255,0.1); }
+        .main-panel { flex: 1; padding: 50px 60px; display: flex; flex-direction: column; justify-content: space-between; }
+        .side-panel-right { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.1); }
 
         .header-row, .footer-row { display: flex; justify-content: space-between; align-items: flex-start; }
         .footer-row { align-items: flex-end; }
 
-        .badge {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px 24px; border-radius: 24px; display: inline-flex; flex-direction: column;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); align-items: flex-start;
-        }
+        .badge { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px 24px; border-radius: 24px; display: inline-flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.1); align-items: flex-start; }
         .badge-label { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 0.15em; margin-bottom: 6px; }
         .badge-value { font-size: 26px; font-weight: 600; color: white; letter-spacing: -0.02em; }
 
-        .clock { font-size: 32px; font-weight: 500; padding: 12px 28px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .clock { font-size: 32px; font-weight: 500; padding: 12px 28px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); margin-left: auto; }
 
         .prompt-text { font-size: 1.6vw; color: #0A84FF; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 800; margin-bottom: 12px; text-shadow: 0 4px 12px rgba(10,132,255,0.4); text-align: center; }
-        .current-patient { font-size: min(8vw, 110px); font-weight: 800; line-height: 1.1; margin: auto; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw; transition: opacity 0.3s ease; }
+        .current-patient { font-size: min(8vw, 110px); font-weight: 800; line-height: 1.1; margin: auto; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50vw; transition: opacity 0.3s ease; }
         
-        /* Links style */
         a.clickable-name { color: white; text-decoration: none; display:block; background: linear-gradient(135deg, #FFF 0%, #A0A0A5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transition: filter 0.2s; }
         a.clickable-name:hover { filter: drop-shadow(0 12px 24px rgba(10,132,255,0.6)); cursor: pointer;}
         a.clickable-upcoming { color: white; text-decoration: none; }
         a.clickable-upcoming:hover { color: #0A84FF; text-decoration: underline; }
 
-        .glass-btn {
-            background: linear-gradient(135deg, rgba(10, 132, 255, 0.3), rgba(94, 92, 230, 0.3)); border: 1px solid rgba(10, 132, 255, 0.4);
-            color: white; font-size: 24px; font-weight: 700; padding: 24px 44px; border-radius: 50px; cursor: pointer;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.3s;
-            display: inline-flex; align-items: center; gap: 16px;
-        }
+        .glass-btn { background: linear-gradient(135deg, rgba(10, 132, 255, 0.3), rgba(94, 92, 230, 0.3)); border: 1px solid rgba(10, 132, 255, 0.4); color: white; font-size: 24px; font-weight: 700; padding: 24px 44px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.3s; display: inline-flex; align-items: center; gap: 16px; margin-left: auto; }
         .glass-btn:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(10, 132, 255, 0.4); background: linear-gradient(135deg, rgba(10, 132, 255, 0.45), rgba(94, 92, 230, 0.45)); }
         
-        /* LAB STYLES */
-        .lab-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; overflow: hidden; }
-        .lab-item:hover { background: rgba(100,210,255,0.15); border-color: #64D2FF; transform: scale(1.02); }
-        .lab-name { font-size: 18px; font-weight: 600; color: white; text-decoration: none; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 15px; }
-        .lab-name:hover { color: #64D2FF; }
-        
-        .lab-done-btn {
-            background: rgba(48,209,88,0.2); border: 1px solid #30D158; color: #30D158;
-            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 20px; transition: all 0.2s;
-        }
-        .lab-done-btn:hover { transform: scale(1.15); background: #30D158; color: white; box-shadow: 0 5px 15px rgba(48,209,88,0.4);}
-        
-        /* Custom Scrollbar for Labs */
-        #labList { overflow-y: auto; padding-right: 5px; height: 100%; margin-top:20px; }
-        #labList::-webkit-scrollbar { width: 6px; }
-        #labList::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px;}
-        #labList::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        /* SCROLL LISTS */
+        .scroll-list { overflow-y: auto; padding-right: 5px; height: 100%; margin-top:20px; }
+        .scroll-list::-webkit-scrollbar { width: 6px; }
+        .scroll-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px;}
+        .scroll-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .list-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 12px; margin-bottom: 12px; text-align: center; transition: all 0.2s; }
+        .list-item:hover { background: rgba(255,255,255,0.1); transform: scale(1.03); }
+        .list-name { font-size: 17px; font-weight: 600; color: rgba(255,255,255,0.85); text-decoration: none; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px; }
+        .list-name:hover { color: white; }
     </style>
 </head>
 <body>
@@ -105,14 +74,16 @@
     </div>
 
     <div class="glass-container">
+
+        <!-- 1. LEFT PANEL: SEEN TODAY -->
+        <div class="side-panel-left">
+            <h3 style="margin: 0; color: #30D158; letter-spacing: 2px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 20px; text-transform: uppercase; text-align: center;">✅ Seen Today (<span id="seenCount">0</span>)</h3>
+            <div id="seenList" class="scroll-list"></div>
+        </div>
         
-        <!-- LEFT PANEL: DOCTOR QUEUE -->
+        <!-- 2. CENTER PANEL: DOCTOR QUEUE -->
         <div class="main-panel">
-            <div class="header-row">
-                <div class="badge">
-                    <span class="badge-label">PREVIOUS</span>
-                    <span class="badge-value" id="prevPatientName">None</span>
-                </div>
+            <div class="header-row" style="justify-content: flex-end;">
                 <div class="clock" id="clock">--:--</div>
             </div>
 
@@ -133,12 +104,10 @@
             </div>
         </div>
 
-        <!-- RIGHT PANEL: LAB QUEUE -->
-        <div class="lab-panel">
-            <h3 style="margin: 0; color: #64D2FF; letter-spacing: 2px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 24px; text-transform: uppercase;">🧪 Labs Waiting (<span id="labCount">0</span>)</h3>
-            <div id="labList">
-                <!-- Javascript Injection -->
-            </div>
+        <!-- 3. RIGHT PANEL: LAB QUEUE -->
+        <div class="side-panel-right">
+            <h3 style="margin: 0; color: #64D2FF; letter-spacing: 2px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 20px; text-transform: uppercase; text-align: center;">🧪 Labs Waiting (<span id="labCount">0</span>)</h3>
+            <div id="labList" class="scroll-list"></div>
         </div>
 
     </div>
@@ -152,123 +121,9 @@
     });
     const db = firebase.database();
 
-    let completeQueue = [];
-    let labQueue = [];
-    let previousPatientName = "None";
-    let currentlySpeakingId = null;
-    let isProcessing = false;
-
-    // Background Auth (in case it's needed)
-    if(firebase.auth) { firebase.auth().signInAnonymously().catch(e => console.log('Auth check bypass.')); }
-
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }, 1000);
-    document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-    db.ref('patientIndex').on('value', (snap) => {
-        let pts = snap.val() || {};
-        let q = [];
-        let lQueue = [];
-        
-        for (let id in pts) {
-            let pName = pts[id].name || "";
-            let pTime = pts[id].queueTime || 0;
-            
-            // Check for the lab emoji
-            if (pName.includes('🧪')) {
-                lQueue.push({ id: id, name: pName, time: pTime });
-            } 
-            // Normal waitlist 
-            else if (pts[id].isWaiting) {
-                q.push({ id: id, name: pName, time: pTime });
-            }
-        }
-        
-        q.sort((a, b) => a.time - b.time);
-        lQueue.sort((a, b) => a.time - b.time); // Oldest labs first
-        
-        completeQueue = q;
-        labQueue = lQueue;
-        updateScreen();
-    });
-
-    function updateScreen() {
-        // --- DOCTOR QUEUE UPDATE ---
-        document.getElementById('prevPatientName').innerText = previousPatientName;
-
-        if (completeQueue.length > 0) {
-            let currentPt = completeQueue[0];
-            currentlySpeakingId = currentPt.id;
-
-            // Make the massive name a clickable deep-link!
-            document.getElementById('currentPatientContainer').innerHTML = `<a href="index.html?patientId=${currentPt.id}" target="_blank" class="clickable-name">${currentPt.name}</a>`;
-            
-            document.getElementById('statusPrompt').innerText = "Doctor is ready for";
-            document.getElementById('actionBtn').style.display = 'inline-flex';
-
-            if (completeQueue.length > 1) {
-                document.getElementById('upcomingBox').style.visibility = 'visible';
-                // Make upcoming name a clickable deep-link too!
-                document.getElementById('upcomingPatientName').innerHTML = `<a href="index.html?patientId=${completeQueue[1].id}" target="_blank" class="clickable-upcoming">${completeQueue[1].name}</a>`;
-                
-                let extra = completeQueue.length - 2;
-                document.getElementById('qCountText').style.display = (extra > 0) ? 'block' : 'none';
-                document.getElementById('qCountText').innerText = "+ " + extra + " more in lobby";
-            } else {
-                document.getElementById('upcomingBox').style.visibility = 'hidden';
-            }
-        } else {
-            currentlySpeakingId = null;
-            document.getElementById('currentPatientContainer').innerText = "Clinic Empty";
-            document.getElementById('statusPrompt').innerText = "No patients are waiting";
-            document.getElementById('actionBtn').style.display = 'none';
-            document.getElementById('upcomingBox').style.visibility = 'hidden';
-        }
-
-        // --- LAB QUEUE UPDATE ---
-        document.getElementById('labCount').innerText = labQueue.length;
-        let labHtml = '';
-        if(labQueue.length === 0) {
-            labHtml = '<p style="color:rgba(255,255,255,0.4); text-align:center; margin-top:40px; font-weight:500;">No labs currently tracking.</p>';
-        } else {
-            labQueue.forEach(lab => {
-                labHtml += `
-                    <div class="lab-item">
-                        <a href="index.html?patientId=${lab.id}" target="_blank" class="lab-name">${lab.name}</a>
-                        <button class="lab-done-btn" onclick="markLabDone('${lab.id}', '${lab.name.replace(/'/g, "\\'")}')" title="Mark Done">✓</button>
-                    </div>
-                `;
-            });
-        }
-        document.getElementById('labList').innerHTML = labHtml;
-    }
-
-    function callNext() {
-        if (!currentlySpeakingId || isProcessing) return;
-        isProcessing = true;
-        previousPatientName = completeQueue[0].name;
-        db.ref('patientIndex/' + currentlySpeakingId).update({ isWaiting: false }).then(() => {
-            setTimeout(() => { isProcessing = false; }, 600); 
-        });
-    }
-
-    function markLabDone(patientId, currentName) {
-        // Strip out the exact lab emoji when the checkmark is pressed!
-        let newName = currentName.replace(/🧪/g, '').trim();
-        db.ref('patientIndex/' + patientId).update({ name: newName });
-    }
-        firebase.initializeApp({
-        apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
-        authDomain: "saad-clinic.firebaseapp.com",
-        databaseURL: "https://saad-clinic-default-rtdb.firebaseio.com",
-        projectId: "saad-clinic"
-    });
-    const db = firebase.database();
-
     function parseDate(d) {
         if(!d || d==="N/A") return 0;
-        if(d.includes('/')){
+        if(typeof d === 'string' && d.includes('/')){
             var p = d.split('/');
             if(p.length === 3) return new Date(+p[2], p[1]-1, +p[0]).getTime();
         }
@@ -278,12 +133,10 @@
 
     let completeQueue = [];
     let labQueue = [];
-    let lastSeenQueue = []; // Memory buffer for iPad
-    let previousPatientName = "None";
+    let seenQueue = [];
     let currentlySpeakingId = null;
     let isProcessing = false;
 
-    // Background Auth hook
     if(firebase.auth) { firebase.auth().signInAnonymously().catch(e => console.log('Auth pass.')); }
 
     setInterval(() => {
@@ -295,54 +148,55 @@
         let pts = snap.val() || {};
         let q = [];
         let lQueue = [];
-        let now = Date.now();
+        let sQueue = [];
         
+        // Find 12:00 AM this morning so we can capture everyone seen today
+        let todayStart = new Date();
+        todayStart.setHours(0,0,0,0);
+        let todayTs = todayStart.getTime();
+
         for (let id in pts) {
             let pName = pts[id].name || "";
             let pTime = pts[id].queueTime || 0;
             
-            // Check for lab emoji (Filtered to ensure they visited today to prevent old ghost patients)
-            let dtTs = Math.max(parseDate(pts[id].dateAdded), parseDate(pts[id].lastVisit));
-            let isRecent = (now - dtTs) < (1000 * 60 * 60 * 24); // Within 24 hours
-
-            if (pName.includes('🧪') && isRecent) {
+            // 1. LAB QUEUE
+            // I removed the strict date limit. If they have the Emoji, they WILL show up!
+            if (pName.includes('🧪')) {
                 lQueue.push({ id: id, name: pName, time: pTime });
             } 
-            // Normal waitlist
-            else if (pts[id].isWaiting && !pName.includes('🧪')) {
+            // 2. NORMAL DOCTOR QUEUE
+            else if (pts[id].isWaiting) {
                 q.push({ id: id, name: pName, time: pTime });
+            }
+            // 3. SEEN TODAY
+            // Automatically drops them in if they aren't waiting, but they visited the clinic today!
+            else {
+                let lvTs = parseDate(pts[id].lastVisit);
+                let dateAddTs = parseDate(pts[id].dateAdded);
+                if (lvTs >= todayTs || dateAddTs >= todayTs) {
+                    sQueue.push({ id: id, name: pName, time: lvTs });
+                }
             }
         }
         
         q.sort((a, b) => a.time - b.time);
         lQueue.sort((a, b) => a.time - b.time); 
+        sQueue.sort((a, b) => b.time - a.time); // Newest finished patients at the top
         
-        // 🔹 UNIVERSAL "PREVIOUS PATIENT" FIX
-        // Automatically detect if the #1 person drops out of the waiting list from the main computer
-        if (lastSeenQueue.length > 0 && q.length > 0) {
-            if (lastSeenQueue[0].id !== q[0].id) {
-                if (!pts[lastSeenQueue[0].id] || !pts[lastSeenQueue[0].id].isWaiting) {
-                     previousPatientName = lastSeenQueue[0].name;
-                }
-            }
-        } else if (lastSeenQueue.length > 0 && q.length === 0) {
-             previousPatientName = lastSeenQueue[0].name;
-        }
-
-        lastSeenQueue = q;
         completeQueue = q;
         labQueue = lQueue;
+        seenQueue = sQueue;
+        
         updateScreen();
     });
 
     function updateScreen() {
-        // --- DOCTOR QUEUE UPDATE ---
-        document.getElementById('prevPatientName').innerText = previousPatientName;
-
+        // --- 1. DOCTOR QUEUE (CENTER) ---
         if (completeQueue.length > 0) {
             let currentPt = completeQueue[0];
             currentlySpeakingId = currentPt.id;
             
+            // Name acts as deep-link into index.html
             document.getElementById('currentPatientContainer').innerHTML = `<a href="index.html?patientId=${currentPt.id}" target="_blank" class="clickable-name">${currentPt.name}</a>`;
             document.getElementById('statusPrompt').innerText = "Doctor is ready for";
             document.getElementById('actionBtn').style.display = 'inline-flex';
@@ -356,33 +210,49 @@
             } else { document.getElementById('upcomingBox').style.visibility = 'hidden'; }
         } else {
             currentlySpeakingId = null;
-            document.getElementById('currentPatientContainer').innerText = "Clinic Empty";
+            document.getElementById('currentPatientContainer').innerText = "";
             document.getElementById('statusPrompt').innerText = "No patients are waiting";
             document.getElementById('actionBtn').style.display = 'none';
             document.getElementById('upcomingBox').style.visibility = 'hidden';
         }
 
-        // --- LAB QUEUE UPDATE (PURE NAMES AS REQUESTED) ---
+        // --- 2. LAB QUEUE (RIGHT SIDE) ---
         document.getElementById('labCount').innerText = labQueue.length;
         let labHtml = '';
-        if(labQueue.length === 0) {
-            labHtml = '<p style="color:rgba(255,255,255,0.4); text-align:center; margin-top:40px; font-weight:500;">No labs currently tracking.</p>';
+        if (labQueue.length === 0) {
+            labHtml = '<p style="color:rgba(255,255,255,0.3); text-align:center; padding-top:40px;">No tests requested.</p>';
         } else {
             labQueue.forEach(lab => {
                 labHtml += `
-                    <div class="lab-item" style="justify-content: center; text-align: center; padding: 24px;">
-                        <a href="index.html?patientId=${lab.id}" target="_blank" class="lab-name" style="margin: 0; font-size: 20px; display: block; width: 100%;">${lab.name}</a>
+                    <div class="list-item" style="border-color: rgba(100,210,255,0.4); background: rgba(100,210,255,0.06);">
+                        <a href="index.html?patientId=${lab.id}" target="_blank" class="list-name" style="color: #64D2FF; font-size:20px;">${lab.name}</a>
                     </div>
                 `;
             });
         }
         document.getElementById('labList').innerHTML = labHtml;
+
+        // --- 3. SEEN TODAY (LEFT SIDE) ---
+        document.getElementById('seenCount').innerText = seenQueue.length;
+        let seenHtml = '';
+        if (seenQueue.length === 0) {
+            seenHtml = '<p style="color:rgba(255,255,255,0.3); text-align:center; padding-top:40px;">No patients finished today.</p>';
+        } else {
+            seenQueue.forEach(pt => {
+                seenHtml += `
+                    <div class="list-item">
+                        <a href="index.html?patientId=${pt.id}" target="_blank" class="list-name" style="font-size:18px;">${pt.name}</a>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('seenList').innerHTML = seenHtml;
     }
 
     function callNext() {
         if (!currentlySpeakingId || isProcessing) return;
         isProcessing = true;
-        previousPatientName = completeQueue[0].name;
+        // Drops patient out of waiting list, instantly firing the Firebase Database 'Seen Today' hook
         db.ref('patientIndex/' + currentlySpeakingId).update({ isWaiting: false }).then(() => {
             setTimeout(() => { isProcessing = false; }, 600); 
         });
