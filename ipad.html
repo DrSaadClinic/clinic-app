@@ -1,73 +1,183 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Next Patient</title>
-    <!-- Use your same firebase scripts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VisionOS Patient Display</title>
+
+    <!-- Firebase Connection -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
     <style>
+        /* =========================================
+           VISION-OS LIQUID BACKGROUND SYSTEM
+           ========================================= */
         body {
-            background: #000;
-            color: #fff;
+            margin: 0; overflow: hidden;
+            background: #05050A;
+            color: white;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            margin: 0;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            height: 100vh;
+        }
+
+        .liquid-bg {
+            position: fixed; inset: 0; z-index: -1;
+            filter: blur(90px);
             overflow: hidden;
-            background: radial-gradient(ellipse at center, #1c1c1e 0%, #000 100%);
         }
-        .container {
-            padding: 40px;
-            animation: fadeIn 1s ease;
+        .blob { position: absolute; border-radius: 50%; mix-blend-mode: hard-light; }
+        .blob-1 {
+            width: 70vw; height: 70vw; background: rgba(10, 132, 255, 0.6);
+            top: -10%; left: -10%;
+            animation: float1 25s infinite alternate ease-in-out;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        
-        .label {
-            font-size: 32px;
-            color: #A0A0A5;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 20px;
-            font-weight: 600;
+        .blob-2 {
+            width: 60vw; height: 60vw; background: rgba(94, 92, 230, 0.5);
+            bottom: -20%; right: -10%;
+            animation: float2 30s infinite alternate ease-in-out;
         }
-        .patient-name {
-            font-size: 8vw;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #0A84FF, #5E5CE6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-            line-height: 1.1;
+        .blob-3 {
+            width: 50vw; height: 50vw; background: rgba(50, 215, 75, 0.3);
+            top: 40%; left: 30%;
+            animation: float3 20s infinite alternate ease-in-out;
         }
-        .waiting-count {
-            margin-top: 40px;
-            font-size: 24px;
-            color: #636366;
-            background: rgba(255,255,255,0.05);
-            padding: 12px 24px;
-            border-radius: 50px;
-            display: inline-block;
+
+        @keyframes float1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(20vw, 20vh) scale(1.1); } }
+        @keyframes float2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-20vw, -15vh) scale(1.2); } }
+        @keyframes float3 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-10vw, 20vh) scale(0.9); } }
+
+        /* =========================================
+           PREMIUM GLASS CONTAINER
+           ========================================= */
+        .glass-container {
+            width: 90vw; height: 86vh;
+            background: rgba(20, 20, 25, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15);
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px 60px;
+            box-sizing: border-box;
         }
+
+        /* HEADER & BADGES */
+        .header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 28px;
+            border-radius: 24px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .badge-label {
+            font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.5);
+            letter-spacing: 0.15em; margin-bottom: 6px;
+        }
+        .badge-value { font-size: 26px; font-weight: 600; color: white; letter-spacing: -0.02em; }
+
+        .clock {
+            font-size: 32px; font-weight: 500; color: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 28px; border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* TYPOGRAPHY CENTER */
+        .main-center { text-align: center; }
+        .prompt-text {
+            font-size: 1.8vw; color: #0A84FF; text-transform: uppercase;
+            letter-spacing: 0.25em; font-weight: 800; margin-bottom: 12px;
+            text-shadow: 0 4px 12px rgba(10,132,255,0.4);
+        }
+        .current-patient {
+            font-size: min(8vw, 120px); font-weight: 800; line-height: 1.1; margin: 0;
+            background: linear-gradient(135deg, #FFF 0%, #A0A0A5 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80vw; margin: auto;
+        }
+
+        /* GIGANTIC INTERACTIVE CALL BUTTON */
+        .glass-btn {
+            appearance: none;
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.3), rgba(94, 92, 230, 0.3));
+            border: 1px solid rgba(10, 132, 255, 0.4);
+            color: white; font-size: 24px; font-weight: 700;
+            padding: 24px 48px; border-radius: 50px;
+            cursor: pointer;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 30px rgba(10, 132, 255, 0.3);
+            display: inline-flex; align-items: center; gap: 16px; letter-spacing: 0.02em;
+        }
+        .glass-btn:hover {
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.45), rgba(94, 92, 230, 0.45));
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(10, 132, 255, 0.4);
+            border-color: rgba(10, 132, 255, 0.6);
+        }
+        .glass-btn:active { transform: translateY(2px) scale(0.98); }
     </style>
 </head>
 <body>
 
-    <div class="container" id="displayBox">
-        <div class="label">Please Proceed To The Doctor</div>
-        <h1 class="patient-name" id="nextName">Loading...</h1>
-        <div class="waiting-count">
-            <span id="queueCount">0</span> people waiting
+    <!-- LIQUID AURORA BACKGROUND -->
+    <div class="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="glass-container">
+        <!-- TOP ROW -->
+        <div class="header-row">
+            <div class="badge">
+                <span class="badge-label">PREVIOUS PATIENT</span>
+                <span class="badge-value" id="prevPatientName">None</span>
+            </div>
+            <div class="clock" id="clock">--:--</div>
+        </div>
+
+        <!-- CENTER DISPLAY -->
+        <div class="main-center">
+            <h2 class="prompt-text" id="statusPrompt">Please proceed to Doctor</h2>
+            <h1 class="current-patient" id="currentPatientName">Loading...</h1>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="footer-row">
+            
+            <!-- UPCOMING PATIENT -->
+            <div class="badge" id="upcomingBox" style="opacity: 0.8; visibility: hidden;">
+                <span class="badge-label">UPCOMING NEXT</span>
+                <span class="badge-value" id="upcomingPatientName">--</span>
+                <span style="font-size:14px; color:rgba(255,255,255,0.6); margin-top:8px; font-weight: 500;" id="qCountText">+ 0 more waiting</span>
+            </div>
+
+            <!-- INTERACTIVE CALL BUTTON -->
+            <button id="actionBtn" class="glass-btn" onclick="callNext()">
+                <span style="font-size:32px; transform: translateY(-2px);">➜</span> Finish & Call Next
+            </button>
         </div>
     </div>
 
 <script>
-    // 1. Paste Your Firebase Config Here
+    // 1. FIREBASE CONNECTION
     firebase.initializeApp({
         apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
         authDomain: "saad-clinic.firebaseapp.com",
@@ -76,40 +186,100 @@
     });
     const db = firebase.database();
 
-    // 2. Real-time Listener
+    // 2. STATE MANAGER
+    let completeQueue = [];
+    let previousPatientName = "None";
+    let currentlySpeakingId = null;
+    let isProcessing = false; // Prevents double-clicking the button
+
+    // 3. LIVE CLOCK
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }, 1000);
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    // 4. DATABASE LISTENER (Listens for queue updates in real-time)
     db.ref('patientIndex').on('value', (snap) => {
         let pts = snap.val() || {};
-        let waitingQueue = [];
-
-        // Extract waiting patients
+        let q = [];
         for (let id in pts) {
+            // Find anyone marked as waiting
             if (pts[id].isWaiting) {
-                // If they lack a queueTime, use 0 so they fall to the bottom safely
-                waitingQueue.push({ 
-                    name: pts[id].name, 
-                    time: pts[id].queueTime || 0 
-                });
+                q.push({ id: id, name: pts[id].name, time: pts[id].queueTime || 0 });
             }
         }
-
-        // Sort ascending by time (the person who waited the LONGEST gets called next)
-        waitingQueue.sort((a, b) => a.time - b.time);
-
-        // Update the iPad Interface
-        if(waitingQueue.length > 0) {
-            let nextPt = waitingQueue[0];
-            document.getElementById('nextName').innerText = nextPt.name;
-            document.getElementById('queueCount').innerText = waitingQueue.length - 1; // Others waiting
-            
-            // Optional: Bounce animation when name changes
-            document.getElementById('displayBox').style.animation = 'none';
-            setTimeout(() => document.getElementById('displayBox').style.animation = 'fadeIn 1s ease', 50);
-        } else {
-            document.getElementById('nextName').innerText = "Clinic is Empty";
-            document.getElementById('nextName').style.background = "#fff";
-            document.getElementById('queueCount').innerText = "0";
-        }
+        // Sort strictly by the exact time they were added to the waiting list!
+        q.sort((a, b) => a.time - b.time);
+        completeQueue = q;
+        updateScreen();
     });
+
+    // 5. UPDATE THE GLASS UI
+    function updateScreen() {
+        document.getElementById('prevPatientName').innerText = previousPatientName;
+
+        if (completeQueue.length > 0) {
+            // WE HAVE A CURRENT PATIENT
+            let currentPt = completeQueue[0];
+            currentlySpeakingId = currentPt.id;
+
+            // Animate text entry smoothly
+            let nameEl = document.getElementById('currentPatientName');
+            if(nameEl.innerText !== currentPt.name) {
+                nameEl.style.opacity = '0';
+                nameEl.style.transform = 'translateY(15px)';
+                setTimeout(() => {
+                    nameEl.innerText = currentPt.name;
+                    nameEl.style.opacity = '1';
+                    nameEl.style.transform = 'translateY(0)';
+                }, 200);
+            }
+            
+            document.getElementById('statusPrompt').innerText = "Doctor is ready for";
+            document.getElementById('actionBtn').style.display = 'inline-flex';
+
+            // HANDLE UPCOMING PATIENTS
+            if (completeQueue.length > 1) {
+                document.getElementById('upcomingBox').style.visibility = 'visible';
+                document.getElementById('upcomingPatientName').innerText = completeQueue[1].name;
+                
+                let extra = completeQueue.length - 2;
+                if(extra > 0) {
+                    document.getElementById('qCountText').innerText = "+ " + extra + " more in lobby";
+                    document.getElementById('qCountText').style.display = 'block';
+                } else {
+                    document.getElementById('qCountText').style.display = 'none';
+                }
+            } else {
+                // Nobody upcoming
+                document.getElementById('upcomingBox').style.visibility = 'hidden';
+            }
+
+        } else {
+            // QUEUE IS TOTALLY EMPTY
+            currentlySpeakingId = null;
+            document.getElementById('currentPatientName').innerText = "Clinic Empty";
+            document.getElementById('statusPrompt').innerText = "No patients are waiting";
+            document.getElementById('actionBtn').style.display = 'none';
+            document.getElementById('upcomingBox').style.visibility = 'hidden';
+        }
+    }
+
+    // 6. ACTION: DOCTOR/CLERK PRESSES "CALL NEXT"
+    function callNext() {
+        if (!currentlySpeakingId || isProcessing) return;
+        isProcessing = true; // Block spam-clicking
+
+        // 1. Move current directly to memory as the new "Previous"
+        previousPatientName = completeQueue[0].name;
+
+        // 2. Fire update to Cloud Database to remove them from waiting status instantly
+        db.ref('patientIndex/' + currentlySpeakingId).update({ isWaiting: false }).then(() => {
+            // The database update will automatically trigger `updateScreen()` and refresh the iPad safely!
+            setTimeout(() => { isProcessing = false; }, 600); 
+        });
+    }
+
 </script>
 </body>
 </html>
