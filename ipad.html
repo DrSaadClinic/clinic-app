@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Patient</title>
+    <!-- Use your same firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #1c1c1e 0%, #000 100%);
+        }
+        .container {
+            padding: 40px;
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .label {
+            font-size: 32px;
+            color: #A0A0A5;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .patient-name {
+            font-size: 8vw;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #0A84FF, #5E5CE6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            line-height: 1.1;
+        }
+        .waiting-count {
+            margin-top: 40px;
+            font-size: 24px;
+            color: #636366;
+            background: rgba(255,255,255,0.05);
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="displayBox">
+        <div class="label">Please Proceed To The Doctor</div>
+        <h1 class="patient-name" id="nextName">Loading...</h1>
+        <div class="waiting-count">
+            <span id="queueCount">0</span> people waiting
+        </div>
+    </div>
+
+<script>
+    // 1. Paste Your Firebase Config Here
+    firebase.initializeApp({
+        apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
+        authDomain: "saad-clinic.firebaseapp.com",
+        databaseURL: "https://saad-clinic-default-rtdb.firebaseio.com",
+        projectId: "saad-clinic"
+    });
+    const db = firebase.database();
+
+    // 2. Real-time Listener
+    db.ref('patientIndex').on('value', (snap) => {
+        let pts = snap.val() || {};
+        let waitingQueue = [];
+
+        // Extract waiting patients
+        for (let id in pts) {
+            if (pts[id].isWaiting) {
+                // If they lack a queueTime, use 0 so they fall to the bottom safely
+                waitingQueue.push({ 
+                    name: pts[id].name, 
+                    time: pts[id].queueTime || 0 
+                });
+            }
+        }
+
+        // Sort ascending by time (the person who waited the LONGEST gets called next)
+        waitingQueue.sort((a, b) => a.time - b.time);
+
+        // Update the iPad Interface
+        if(waitingQueue.length > 0) {
+            let nextPt = waitingQueue[0];
+            document.getElementById('nextName').innerText = nextPt.name;
+            document.getElementById('queueCount').innerText = waitingQueue.length - 1; // Others waiting
+            
+            // Optional: Bounce animation when name changes
+            document.getElementById('displayBox').style.animation = 'none';
+            setTimeout(() => document.getElementById('displayBox').style.animation = 'fadeIn 1s ease', 50);
+        } else {
+            document.getElementById('nextName').innerText = "Clinic is Empty";
+            document.getElementById('nextName').style.background = "#fff";
+            document.getElementById('queueCount').innerText = "0";
+        }
+    });
+</script>
+</body>
+</html>
