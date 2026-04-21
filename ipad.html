@@ -113,7 +113,7 @@
     </div>
 
 <script>
-    firebase.initializeApp({
+        firebase.initializeApp({
         apiKey: "AIzaSyBmQlAnDbaVeZOz1lZbRsH-NyJ7TgTfBPU",
         authDomain: "saad-clinic.firebaseapp.com",
         databaseURL: "https://saad-clinic-default-rtdb.firebaseio.com",
@@ -150,7 +150,6 @@
         let lQueue = [];
         let sQueue = [];
         
-        // Find 12:00 AM this morning so we can capture everyone seen today
         let todayStart = new Date();
         todayStart.setHours(0,0,0,0);
         let todayTs = todayStart.getTime();
@@ -159,9 +158,8 @@
             let pName = pts[id].name || "";
             let pTime = pts[id].queueTime || 0;
             
-            // 1. LAB QUEUE
-            // I removed the strict date limit. If they have the Emoji, they WILL show up!
-            if (pName.includes('🧪')) {
+            // 1. LAB QUEUE - Perfectly synced with your hasPendingLab logic!
+            if (pts[id].hasPendingLab === true) {
                 lQueue.push({ id: id, name: pName, time: pTime });
             } 
             // 2. NORMAL DOCTOR QUEUE
@@ -169,7 +167,6 @@
                 q.push({ id: id, name: pName, time: pTime });
             }
             // 3. SEEN TODAY
-            // Automatically drops them in if they aren't waiting, but they visited the clinic today!
             else {
                 let lvTs = parseDate(pts[id].lastVisit);
                 let dateAddTs = parseDate(pts[id].dateAdded);
@@ -181,7 +178,7 @@
         
         q.sort((a, b) => a.time - b.time);
         lQueue.sort((a, b) => a.time - b.time); 
-        sQueue.sort((a, b) => b.time - a.time); // Newest finished patients at the top
+        sQueue.sort((a, b) => b.time - a.time); 
         
         completeQueue = q;
         labQueue = lQueue;
@@ -196,7 +193,6 @@
             let currentPt = completeQueue[0];
             currentlySpeakingId = currentPt.id;
             
-            // Name acts as deep-link into index.html
             document.getElementById('currentPatientContainer').innerHTML = `<a href="index.html?patientId=${currentPt.id}" target="_blank" class="clickable-name">${currentPt.name}</a>`;
             document.getElementById('statusPrompt').innerText = "Doctor is ready for";
             document.getElementById('actionBtn').style.display = 'inline-flex';
@@ -252,7 +248,6 @@
     function callNext() {
         if (!currentlySpeakingId || isProcessing) return;
         isProcessing = true;
-        // Drops patient out of waiting list, instantly firing the Firebase Database 'Seen Today' hook
         db.ref('patientIndex/' + currentlySpeakingId).update({ isWaiting: false }).then(() => {
             setTimeout(() => { isProcessing = false; }, 600); 
         });
