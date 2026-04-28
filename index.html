@@ -538,6 +538,79 @@
         .pt-info-chip span { color: var(--text-primary); font-weight: 600; }
         .pt-info-chip.clickable { cursor: pointer; transition: 0.2s; }
         .pt-info-chip.clickable:hover { border-color: var(--primary); color: var(--primary); }
+            /* ================================================================
+       VISIONOS DISPLAY STYLES (Scoped to #waitingPanel)
+    ================================================================ */
+    #waitingPanel.active-display {
+        position: fixed !important; inset: 0 !important; z-index: 200 !important;
+        background: #05050A !important; padding: 0 !important; margin: 0 !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+        max-width: none !important; width: 100vw !important; height: 100vh !important;
+        animation: none !important;
+    }
+    .vos-liquid-bg { position: absolute; inset: 0; z-index: 0; filter: blur(90px); overflow: hidden; pointer-events: none; }
+    .vos-blob { position: absolute; border-radius: 50%; mix-blend-mode: hard-light; }
+    .vos-blob-1 { width: 70vw; height: 70vw; background: rgba(10,132,255,0.6); top: -10%; left: -10%; animation: vos-float1 25s infinite alternate ease-in-out; }
+    .vos-blob-2 { width: 60vw; height: 60vw; background: rgba(94,92,230,0.5); bottom: -20%; right: -10%; animation: vos-float2 30s infinite alternate ease-in-out; }
+    .vos-blob-3 { width: 50vw; height: 50vw; background: rgba(50,215,75,0.3); top: 40%; left: 30%; animation: vos-float3 20s infinite alternate ease-in-out; }
+    @keyframes vos-float1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(20vw,20vh) scale(1.1)} }
+    @keyframes vos-float2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-20vw,-15vh) scale(1.2)} }
+    @keyframes vos-float3 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-10vw,20vh) scale(0.9)} }
+
+    .vos-glass {
+        position: relative; z-index: 1;
+        width: 96vw; height: 94vh;
+        background: rgba(20,20,25,0.35); border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15);
+        border-radius: 44px; display: flex; flex-direction: row; box-sizing: border-box; overflow: hidden;
+    }
+    .vos-side-left { width: 280px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-right: 1px solid rgba(255,255,255,0.1); }
+    .vos-main { flex: 1; padding: 50px 60px; display: flex; flex-direction: column; justify-content: space-between; }
+    .vos-side-right { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.1); }
+
+    .vos-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .vos-footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
+
+    .vos-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 16px 24px; border-radius: 24px; display: inline-flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.1); align-items: flex-start; }
+    .vos-badge-label { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 0.15em; margin-bottom: 6px; }
+    .vos-badge-value { font-size: 26px; font-weight: 600; color: white; letter-spacing: -0.02em; }
+
+    .vos-clock { font-size: 32px; font-weight: 500; padding: 12px 28px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); margin-left: auto; }
+
+    .vos-prompt { font-size: 1.6vw; color: #0A84FF; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 800; margin-bottom: 12px; text-shadow: 0 4px 12px rgba(10,132,255,0.4); text-align: center; }
+    .vos-current-name { font-size: min(8vw, 110px); font-weight: 800; line-height: 1.1; margin: auto; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50vw; transition: opacity 0.3s ease; }
+
+    .vos-name-link { color: white; text-decoration: none; display: block; background: linear-gradient(135deg, #FFF 0%, #A0A0A5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transition: filter 0.2s; cursor: pointer; }
+    .vos-name-link:hover { filter: drop-shadow(0 12px 24px rgba(10,132,255,0.6)); }
+    .vos-upcoming-link { color: white; text-decoration: none; cursor: pointer; }
+    .vos-upcoming-link:hover { color: #0A84FF; text-decoration: underline; }
+
+    .vos-btn-finish { background: linear-gradient(135deg, rgba(10,132,255,0.3), rgba(94,92,230,0.3)); border: 1px solid rgba(10,132,255,0.4); color: white; font-size: 24px; font-weight: 700; padding: 24px 44px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.3s; display: inline-flex; align-items: center; gap: 16px; margin-left: auto; box-shadow: none; width: auto; font-family: inherit; }
+    .vos-btn-finish:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(10,132,255,0.4); background: linear-gradient(135deg, rgba(10,132,255,0.45), rgba(94,92,230,0.45)); }
+    .vos-btn-finish:active { transform: translateY(0) scale(0.97); }
+
+    .vos-scroll { overflow-y: auto; padding-right: 5px; height: 100%; margin-top: 20px; }
+    .vos-scroll::-webkit-scrollbar { width: 6px; }
+    .vos-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+    .vos-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+    .vos-list-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 12px; margin-bottom: 12px; text-align: center; transition: all 0.2s; }
+    .vos-list-item:hover { background: rgba(255,255,255,0.1); transform: scale(1.03); }
+    .vos-list-name { font-size: 17px; font-weight: 600; color: rgba(255,255,255,0.85); text-decoration: none; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px; cursor: pointer; }
+    .vos-list-name:hover { color: white; }
+
+    .vos-exit-btn { position: fixed; top: 20px; left: 24px; z-index: 300; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.6); padding: 10px 20px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.2s; display: none; font-family: inherit; box-shadow: none; width: auto; }
+    .vos-exit-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+
+    @media (max-width: 900px) {
+        .vos-glass { flex-direction: column; border-radius: 0; width: 100vw; height: 100vh; }
+        .vos-side-left, .vos-side-right { width: 100%; max-height: 25vh; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .vos-main { padding: 20px; }
+        .vos-current-name { font-size: 10vw; max-width: 90vw; }
+        .vos-prompt { font-size: 4vw; }
+        .vos-btn-finish { font-size: 18px; padding: 16px 28px; }
+    }
     </style>
 </head>
 <body>
@@ -924,13 +997,46 @@
         </div>
     </div><!-- /dashboardPanel -->
 
-    <!-- WAITING ROOM TAB PANEL -->
+        <!-- VISIONOS DISPLAY TAB PANEL -->
     <div id="waitingPanel" style="display:none; grid-column:1/-1;">
-        <div class="card" style="text-align:center; margin-bottom:18px; padding:24px;">
-            <h3 style="border:none; justify-content:center; font-size:1.3em;">📺 Waiting Room Display</h3>
-            <p style="color:var(--text-secondary); font-size:14px; margin-top:6px;">Live queue — patients are shown in check-in order</p>
+        <button class="vos-exit-btn" id="vosExitBtn" onclick="switchMainTab('home')">&#9664; Exit Display</button>
+        <div class="vos-liquid-bg">
+            <div class="vos-blob vos-blob-1"></div>
+            <div class="vos-blob vos-blob-2"></div>
+            <div class="vos-blob vos-blob-3"></div>
         </div>
-        <div id="waitingRoomContent" class="waiting-room-grid"></div>
+        <div class="vos-glass">
+            <!-- LEFT: SEEN TODAY -->
+            <div class="vos-side-left">
+                <h3 style="margin:0;color:#30D158;letter-spacing:2px;font-weight:800;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:20px;text-transform:uppercase;text-align:center;font-size:15px;">&#9989; Seen Today (<span id="vosSeenCount">0</span>)</h3>
+                <div id="vosSeenList" class="vos-scroll"></div>
+            </div>
+            <!-- CENTER: DOCTOR QUEUE -->
+            <div class="vos-main">
+                <div class="vos-header-row" style="justify-content:flex-end;">
+                    <div class="vos-clock" id="vosClock">--:--</div>
+                </div>
+                <div style="text-align:center;">
+                    <h2 class="vos-prompt" id="vosStatusPrompt">Please proceed to Doctor</h2>
+                    <h1 class="vos-current-name" id="vosCurrentName">Loading...</h1>
+                </div>
+                <div class="vos-footer-row">
+                    <div class="vos-badge" id="vosUpcomingBox" style="opacity:0.8;visibility:hidden;">
+                        <span class="vos-badge-label">UPCOMING</span>
+                        <span class="vos-badge-value" id="vosUpcomingName">--</span>
+                        <span style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:8px;font-weight:500;" id="vosQCount">+ 0 more waiting</span>
+                    </div>
+                    <button class="vos-btn-finish" id="vosFinishBtn" onclick="vosCallNext()">
+                        <span style="font-size:32px;transform:translateY(-2px);">&#10148;</span> Finish &amp; Call
+                    </button>
+                </div>
+            </div>
+            <!-- RIGHT: LAB QUEUE -->
+            <div class="vos-side-right">
+                <h3 style="margin:0;color:#64D2FF;letter-spacing:2px;font-weight:800;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:20px;text-transform:uppercase;text-align:center;font-size:15px;">&#129514; Labs Waiting (<span id="vosLabCount">0</span>)</h3>
+                <div id="vosLabList" class="vos-scroll"></div>
+            </div>
+        </div>
     </div>
 
 </div><!-- /container -->
@@ -2443,7 +2549,7 @@
         }
     }
 
-    function switchMainTab(tab) {
+        function switchMainTab(tab) {
         currentMainTab = tab;
         var tabMap = { home: 'mtHome', patient: 'mtPatient', dashboard: 'mtDashboard', waiting: 'mtWaiting' };
         Object.keys(tabMap).forEach(function(t) {
@@ -2456,29 +2562,43 @@
         var dashboard = document.getElementById('dashboardPanel');
         var waiting = document.getElementById('waitingPanel');
         var container = document.getElementById('mainContent');
+        var appHeader = document.querySelector('header');
+        var tabBar = document.getElementById('mainTabBar');
+        var exitBtn = document.getElementById('vosExitBtn');
 
+        /* Reset everything */
         sidebar.style.display = 'none';
         content.style.display = 'none';
         dashboard.style.display = 'none';
         waiting.style.display = 'none';
+        waiting.classList.remove('active-display');
+        appHeader.style.display = 'flex';
+        tabBar.style.display = 'flex';
+        if (exitBtn) exitBtn.style.display = 'none';
+        document.body.style.overflow = '';
+        container.style.gridTemplateColumns = '1fr';
+        stopVosClock();
 
         if (tab === 'home') {
-            container.style.gridTemplateColumns = '1fr';
             sidebar.style.display = 'block';
             sidebar.style.maxWidth = '700px';
             sidebar.style.margin = '0 auto';
         } else if (tab === 'patient') {
-            container.style.gridTemplateColumns = '1fr';
             content.style.display = 'block';
         } else if (tab === 'dashboard') {
-            container.style.gridTemplateColumns = '1fr';
             dashboard.style.display = 'block';
             renderDashboardReminders();
             renderCalendarFromDB();
         } else if (tab === 'waiting') {
-            container.style.gridTemplateColumns = '1fr';
+            /* FULL-SCREEN DISPLAY MODE */
+            appHeader.style.display = 'none';
+            tabBar.style.display = 'none';
+            if (exitBtn) exitBtn.style.display = 'block';
+            document.body.style.overflow = 'hidden';
             waiting.style.display = 'block';
-            renderWaitingRoom();
+            waiting.classList.add('active-display');
+            startVosClock();
+            renderVisionOSDisplay();
         }
     }
 
@@ -2863,7 +2983,119 @@
         if (body.classList.contains('collapsed')) { body.classList.remove('collapsed'); if (chevron) chevron.classList.remove('collapsed'); }
         else { body.classList.add('collapsed'); if (chevron) chevron.classList.add('collapsed'); }
     }
+        /* ================================================================
+       VISIONOS DISPLAY ENGINE
+    ================================================================ */
+    var vosCurrentId = null;
+    var vosProcessing = false;
+    var vosClockInterval = null;
 
+    function startVosClock() {
+        clearInterval(vosClockInterval);
+        var el = document.getElementById('vosClock');
+        if (el) el.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        vosClockInterval = setInterval(function() {
+            var el = document.getElementById('vosClock');
+            if (el) el.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
+    }
+
+    function stopVosClock() {
+        clearInterval(vosClockInterval);
+    }
+
+    function renderVisionOSDisplay() {
+        if (currentMainTab !== 'waiting') return;
+
+        var todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        var todayTs = todayStart.getTime();
+
+        var qQueue = [], lQueue = [], sQueue = [];
+        var ids = Object.keys(ptIdx);
+
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var p = ptIdx[id];
+            var pName = p.name || '';
+            var pTime = p.queueTime || 0;
+
+            if (p.hasPendingLab === true) {
+                lQueue.push({ id: id, name: pName, time: pTime });
+            } else if (p.isWaiting) {
+                qQueue.push({ id: id, name: pName, time: pTime });
+            } else {
+                var lvTs = parseIraqiDate(p.lastVisit);
+                var daTs = parseIraqiDate(p.dateAdded);
+                if (lvTs >= todayTs || daTs >= todayTs) {
+                    sQueue.push({ id: id, name: pName, time: lvTs });
+                }
+            }
+        }
+
+        qQueue.sort(function(a, b) { return a.time - b.time; });
+        lQueue.sort(function(a, b) { return a.time - b.time; });
+        sQueue.sort(function(a, b) { return b.time - a.time; });
+
+        /* --- CENTER: Doctor Queue --- */
+        if (qQueue.length > 0) {
+            var cur = qQueue[0];
+            vosCurrentId = cur.id;
+            document.getElementById('vosCurrentName').innerHTML = '<span class="vos-name-link" onclick="loadFullData(\'' + cur.id + '\');switchMainTab(\'patient\');">' + escapeHtml(cur.name) + '</span>';
+            document.getElementById('vosStatusPrompt').innerText = 'Doctor is ready for';
+            document.getElementById('vosFinishBtn').style.display = 'inline-flex';
+
+            if (qQueue.length > 1) {
+                document.getElementById('vosUpcomingBox').style.visibility = 'visible';
+                document.getElementById('vosUpcomingName').innerHTML = '<span class="vos-upcoming-link" onclick="loadFullData(\'' + qQueue[1].id + '\');switchMainTab(\'patient\');">' + escapeHtml(qQueue[1].name) + '</span>';
+                var extra = qQueue.length - 2;
+                document.getElementById('vosQCount').style.display = (extra > 0) ? 'block' : 'none';
+                document.getElementById('vosQCount').innerText = '+ ' + extra + ' more in lobby';
+            } else {
+                document.getElementById('vosUpcomingBox').style.visibility = 'hidden';
+            }
+        } else {
+            vosCurrentId = null;
+            document.getElementById('vosCurrentName').innerText = '';
+            document.getElementById('vosStatusPrompt').innerText = 'No patients are waiting';
+            document.getElementById('vosFinishBtn').style.display = 'none';
+            document.getElementById('vosUpcomingBox').style.visibility = 'hidden';
+        }
+
+        /* --- RIGHT: Lab Queue --- */
+        document.getElementById('vosLabCount').innerText = lQueue.length;
+        var labHtml = '';
+        if (lQueue.length === 0) {
+            labHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No tests requested.</p>';
+        } else {
+            for (var l = 0; l < lQueue.length; l++) {
+                labHtml += '<div class="vos-list-item" style="border-color:rgba(100,210,255,0.4);background:rgba(100,210,255,0.06);">' +
+                    '<span class="vos-list-name" style="color:#64D2FF;font-size:20px;" onclick="loadFullData(\'' + lQueue[l].id + '\');switchMainTab(\'patient\');">' + escapeHtml(lQueue[l].name) + '</span></div>';
+            }
+        }
+        document.getElementById('vosLabList').innerHTML = labHtml;
+
+        /* --- LEFT: Seen Today --- */
+        document.getElementById('vosSeenCount').innerText = sQueue.length;
+        var seenHtml = '';
+        if (sQueue.length === 0) {
+            seenHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No patients finished today.</p>';
+        } else {
+            for (var s = 0; s < sQueue.length; s++) {
+                seenHtml += '<div class="vos-list-item">' +
+                    '<span class="vos-list-name" style="font-size:18px;" onclick="loadFullData(\'' + sQueue[s].id + '\');switchMainTab(\'patient\');">' + escapeHtml(sQueue[s].name) + '</span></div>';
+            }
+        }
+        document.getElementById('vosSeenList').innerHTML = seenHtml;
+    }
+
+    function vosCallNext() {
+        if (!vosCurrentId || vosProcessing) return;
+        vosProcessing = true;
+        db.ref('patientIndex/' + vosCurrentId).update({ isWaiting: false }).then(function() {
+            setTimeout(function() { vosProcessing = false; }, 600);
+        }).catch(handleFirebaseError);
+    }
     /* ================================================================
        BOOT
     ================================================================ */
