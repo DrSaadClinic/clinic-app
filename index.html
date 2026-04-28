@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-<head><script>window.onerror = function(msg, url, line, col, error) { alert("Error: " + msg + "\nLine: " + line); };</script>
+<head><script>window.onerror = function(msg, url, line, col, error) { console.error("Error:", msg, "Line:", line); };</script>
     <meta charset="UTF-8">
     <!-- FIXED: Removed user-scalable=no and maximum-scale=1.0 for accessibility -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1508,6 +1508,11 @@
                 <div style="width:100%;">
                     <h2 id="viewName" contenteditable="true" onblur="updatePatientName(this)" style="color:var(--primary); margin:0; padding:5px; border-radius:8px; font-size:1.5em;"></h2>
                     <div id="waArea" style="margin-top:8px;"></div>
+<div id="viewContact" style="font-size:13px; color:var(--text-secondary); margin-top:4px;"></div>
+<div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+    <span id="viewRegDate" style="font-size:12px; color:var(--text-tertiary);"></span>
+    <button class="action-btn" style="font-size:10px; padding:2px 6px; color:var(--text-tertiary);" onclick="editRegDate()" title="Edit registration date">&#9998;</button>
+</div>
                 </div>
                 <div id="syncIndicator" style="display:none; padding:5px 12px;">SAVING</div>
             </div>
@@ -2021,7 +2026,7 @@
             showToast(ptIdx[id].name + ' \u2014 file opened.');
         } else {
             var today = new Date().toLocaleDateString('en-GB');
-            db.ref('patientIndex/' + id).update({ isWaiting: true, lastVisit: today }).catch(handleFirebaseError);
+            db.ref('patientIndex/' + id).update({ isWaiting: true, lastVisit: today, queueTime: Date.now() }).catch(handleFirebaseError);
             db.ref('patientDetails/' + id).once('value', function(snap) {
                 var d = snap.val() || {};
                 var dates = d.visitDates || [];
