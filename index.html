@@ -2497,7 +2497,182 @@
             }
         });
     }
+         /* ================================================================
+          /* ================================================================
+       WEB BOOKING REQUESTS
+    ================================================================ */
+    function renderWebRequests() {
+        var card = document.getElementById('webInboxCard');
+        var list = document.getElementById('webReqList');
+        var countEl = document.getElementById('webReqCount');
+        if (!card || !list) return;
 
+        var keys = Object.keys(pendingBookings);
+        var pending = [];
+        for (var i = 0; i < keys.length; i++) {
+            var b = pendingBookings[keys[i]];
+            if (b.status === 'pending') pending.push({ id: keys[i], data: b });
+        }
+        pending.sort(function(a, b) { return parseIraqiDate(b.data.dateBooked || b.data.timestamp) - parseIraqiDate(a.data.dateBooked || a.data.timestamp); });
+
+        countEl.textContent = pending.length;
+
+        if (pending.length === 0) {
+            card.style.display = 'none';
+            return;
+        }
+        card.style.display = 'block';
+
+        /* Fields to show in the header row */
+        var headerFields = { name: 'Name', age: 'Age', phone: 'Phone', gender: 'Gender' };
+        /* Fields to show in the complaint area */
+        var complaintFields = ['complaint', 'reason', 'chiefComplaint', 'co'];
+        /* Fields to show as preferred slot */
+        var slotFields = { preferredDate: 'Preferred Date', preferredTime: 'Preferred Time', appointmentDate: 'Appointment Date', appointmentTime: 'Appointment Time' };
+        /* Fields that are system/internal and should never be displayed */
+        var skipFields = { status: 1, dateBooked: 1, timestamp: 1 };
+        /* Also skip fields already shown in header/complaint/slot */
+        var allShownKeys = Object.keys(headerFields).concat(complaintFields, Object.keys(slotFields));
+
+        var html = '';
+        for (var j = 0; j < pending.length; j++) {
+            var bk = pending[j];
+            var d = bk.data;
+            var bookedDate = d.dateBooked || d.timestamp || 'N/A';
+
+            /* Header row */
+            html += '<div class="web-req-item">' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">' +
+                '<strong style="color:var(--warning);font-size:15px;">' + escapeHtml(d.name || 'Unknown') + '</strong>' +
+                '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">' + escapeHtml(bookedDate) + '</span></div>';
+
+            /* Header fields row (age, phone, gender, etc.) */
+            var headerParts = [];
+            var hKeys = Object.keys(headerFields);
+            for (var h = 0; h < hKeys.length; h++) {
+                var hKey = hKeys[h];
+                if (d[hKey] && d[hKey] !== '--') {
+                    headerParts.push(escapeHtml(headerFields[hKey]) + ': <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(d[hKey]) + '</span>');
+                }
+            }
+            if (headerParts.length > 0) {
+                html += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px;">' + headerParts.join(' &nbsp;|&nbsp; ') + '</div>';
+            }
+
+            /* Complaint */
+            var complaintVal = '';
+            for (var c = 0; c < complaintFields.length; c++) {
+                if (d[complaintFields[c]]) { complaintVal = d[complaintFields[c]]; break; }
+            }
+            if (complaintVal) {
+                html += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px;">' +
+                    'C/O: <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(complaintVal) + '</span></div>';
+            }
+
+            /* Preferred slot */
+            var slotParts = [];
+            var sKeys = Object.keys(slotFields);
+            for (var s = 0; s < sKeys.length; s++) {
+                if (d[sKeys[s]]) slotParts.push(escapeHtml(slotFields[sKeys[s]]) + ': <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(d[sKeys[s]]) + '</span>');
+            }
+            if (slotParts.length > 0) {
+                html += '<div style="font-size:12px;color:var(--text-tertiary);line-height:1.6;margin-bottom:6px;">' + slotParts.join(' &nbsp;|&nbsp; ') + '</div>';
+            }
+
+            /* ALL remaining fields — show everything else the web form sent */
+            var extraParts = [];
+            var allDataKeys = Object.keys(d);
+            for (var k = 0; k < allDataKeys.length; k++) {
+                var dk = allDataKeys[k];
+                if (skipFields[dk]) continue;
+                if (allShownKeys.indexOf(dk) !== -1) continue;
+                var val = d[dk];
+                if (!val || val === '--' || val === '' || val === 'N/A') continue;
+                var label = dk.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) { return str.toUpperCase(); });
+                extraParts.push('<span style="color:var(--text-secondary);">' + escapeHtml(label) + ':</span> <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(val) + '</span>');
+            }
+            if (extraParts.length > 0) {
+                html += '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--separator);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:12px;line-height:1.8;">' +
+                    extraParts.join('<br>') + '</div>';
+            }
+
+            /* Action buttons */
+            html += '<div class="web-req-actions">' +
+                '<button onclick="acceptBooking(\'' + bk.id + '\')" style="background:var(--success);">Accept</button>' +
+                '<button onclick="declineBooking(\'' + bk.id + '\')" style="background:rgba(255,69,58,0.15);color:var(--danger);border:1px solid var(--danger);box-shadow:none;">Decline</button>' +
+                '</div></div>';
+        }
+        list.innerHTML = html;
+    }
+
+    function acceptBooking(bookingId) {
+        var bk = pendingBookings[bookingId];
+        if (!bk) return;
+
+        var today = new Date().toLocaleDateString('en-GB');
+        var newId = Date.now();
+
+        /* Build the index entry — pull every field the web form sent */
+        var idxData = {
+            name: bk.name || 'Web Patient',
+            age: bk.age || '',
+            phone: bk.phone || '',
+            complaint: bk.complaint || bk.reason || bk.chiefComplaint || 'Web booking',
+            dateAdded: today,
+            lastVisit: today,
+            isWaiting: true,
+            pinned: false
+        };
+
+        /* Copy any extra matching fields from booking into the index */
+        var extraIndexFields = ['gender', 'city', 'address', 'email', 'preferredDate', 'preferredTime', 'appointmentDate', 'appointmentTime'];
+        for (var e = 0; e < extraIndexFields.length; e++) {
+            if (bk[extraIndexFields[e]] && bk[extraIndexFields[e]] !== '--' && bk[extraIndexFields[e]] !== '') {
+                idxData[extraIndexFields[e]] = bk[extraIndexFields[e]];
+            }
+        }
+
+        db.ref('patientIndex/' + newId).set(idxData).catch(handleFirebaseError);
+
+        /* Build a detailed clinical note from ALL booking fields */
+        var noteLines = ['[Registered via web booking on ' + today + ']', 'Booking Ref: ' + bookingId, ''];
+        var allKeys = Object.keys(bk);
+        for (var a = 0; a < allKeys.length; a++) {
+            var key = allKeys[a];
+            if (key === 'status' || key === 'timestamp' || key === 'dateBooked') continue;
+            var val = bk[key];
+            if (!val || val === '--' || val === '') continue;
+            var label = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) { return str.toUpperCase(); });
+            noteLines.push(label + ': ' + val);
+        }
+        noteLines.push('');
+        noteLines.push('--- Visit: ' + today + ' ---');
+
+        db.ref('patientDetails/' + newId).set({
+            name: bk.name || 'Web Patient',
+            presentation: noteLines.join('\n'),
+            visits: '',
+            visitDates: [today],
+            labFindings: '',
+            webBookingRef: bookingId,
+            webBookingRaw: bk
+        }).catch(handleFirebaseError);
+
+        /* Mark booking as accepted */
+        db.ref('pendingBookings/' + bookingId).update({ status: 'accepted' }).catch(handleFirebaseError);
+
+        showToast('\u2705 ' + (bk.name || 'Patient') + ' accepted — all booking data saved to file!');
+        setTimeout(function() { loadFullData(String(newId)); }, 600);
+    }
+
+    function declineBooking(bookingId) {
+        var bk = pendingBookings[bookingId];
+        if (!bk) return;
+        if (confirm('Decline booking request from ' + (bk.name || 'Unknown') + '?')) {
+            db.ref('pendingBookings/' + bookingId).update({ status: 'declined' }).catch(handleFirebaseError);
+            showToast('Booking from ' + (bk.name || 'Unknown') + ' declined.');
+        }
+    }
     /* ================================================================
        LAB QUEUE
     ================================================================ */
