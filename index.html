@@ -805,12 +805,13 @@
                 <!-- Clinical History -->
                 <div class="section-block" style="border-left:4px solid var(--primary);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:9px;">
-                        <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Clinical History</span>
-                        <div style="display:flex; gap:6px;">
-                            <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="stampVisit('vPres')">+ Visit Stamp</button>
-                            <button class="restore-btn-header" onclick="openVersionPanel('vPres')" title="View &amp; restore previous versions">&#128220; History</button>
-                        </div>
-                    </div>
+    <span class="section-label" style="color:var(--text-secondary); margin-bottom:0;">Clinical History</span>
+    <div style="display:flex; gap:6px;">
+        <button class="action-btn" style="color:var(--lab); font-size:11px; background:rgba(100,210,255,0.1); padding:4px 10px; border-radius:8px;" onclick="insertClinicalTemplate()" title="Insert structured clinical sheet">📋 Sheet</button>
+        <button class="action-btn" style="color:var(--primary); font-size:11px;" onclick="stampVisit('vPres')">+ Visit Stamp</button>
+        <button class="restore-btn-header" onclick="openVersionPanel('vPres')" title="View &amp; restore previous versions">&#128220; History</button>
+    </div>
+</div>
                     <textarea id="vPres" oninput="smartAutoStamp('vPres'); autoExpand(this); autoSyncTrigger()" aria-label="Clinical history notes"></textarea>
                 </div>
 
@@ -1638,7 +1639,21 @@
             db.ref('patientIndex/' + activeId).update({ lastVisit: lastV }).catch(handleFirebaseError);
         }
     }
-
+    /* ================================================================
+       insert clinical template
+    ================================================================ */
+     function insertClinicalTemplate() {
+    if (!activeId) return;
+    var template = 'Hx:\n\nCC:\n\n\nHPI:\n\n\n\nPMHx:\n\u2610 DM \u2610 HTN \u2610 IHD \u2610 Asthma/COPD \u2610 CKD \u2610 Other:\n\n---\n\nPSHx:\n\n---\n\nDrugs:\n\n---\n\nAllergy:\n\n---\n\nFHx:\n\n---\n\nSHx:\nSmoking: __________\nAlcohol: __________\n\nROS:\nCVS: \nResp: \nGIT: \nGU: \nCNS: \n\nO/E:\n\nSystemic / Local Exam:\n\n---\n\n---\n\nDx / DDx:\n\n---\n';
+    var box = document.getElementById('vPres');
+    box.value = box.value + (box.value ? '\n\n' : '') + template;
+    box.dataset.stamped = 'true';
+    autoExpand(box);
+    box.focus();
+    box.setSelectionRange(box.value.length, box.value.length);
+    autoSyncTrigger();
+    showToast('Clinical sheet template inserted.');
+}
     /* ================================================================
        REFERRAL
     ================================================================ */
