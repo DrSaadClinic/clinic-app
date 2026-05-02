@@ -2239,11 +2239,11 @@
     }
 
     function sendWhatsApp(num, name) {
-        var template = 'Greetings ' + name + ',\nThis is a reminder that your medical consultation appointment with Dr. Saad Sabry Alzubaidy is scheduled for [DAY] on [DATE] at [TIME].\nPlease confirm your appointment at your earliest convenience.\nDr. Saad Sabry Alzubaidy - General Surgery Clinic.';
-        try { navigator.clipboard.writeText(template); } catch(err) {}
-        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(template), '_blank');
-        showToast("WhatsApp opened & template drafted!");
-    }
+    var template = 'مرحباً ' + name + '،\n\nنود تذكيركم بموعد استشارتكم الطبية مع الدكتور سعد صبري الزبيدي - استشاري الجراحة العامة، والمقرر يوم [اليوم] بتاريخ [التاريخ] الساعة [الوقت].\n\nنرجو منكم التأكيد على الموعد في أقرب فرصة.\n\nمع تحياتنا،\nعيادة الدكتور سعد صبري الزبيدي - الجراحة العامة';
+    try { navigator.clipboard.writeText(template); } catch(err) {}
+    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(template), '_blank');
+    showToast("تم فتح واتساب مع المسودة!");
+}
 
     function showToast(msg) {
         var toast = document.getElementById('liveToast');
