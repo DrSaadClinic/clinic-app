@@ -1112,13 +1112,14 @@
         });
 
         db.ref('patientIndex').on('value', function(snap) {
-            ptIdx = snap.val() || {};
-            renderList();
-            renderLabQueue();
-            scheduleCalendarRender();
-            document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
-            if (currentRegTab === 'followup') renderFollowUpPanel();
-        });
+    ptIdx = snap.val() || {};
+    renderList();
+    renderLabQueue();
+    scheduleCalendarRender();
+    document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
+    if (currentRegTab === 'followup') renderFollowUpPanel();
+    if (currentMainTab === 'waiting') renderVisionOSDisplay();
+});
 
         db.ref('reminders').on('value', function(snap) {
             allReminders = snap.val() || {};
@@ -3004,98 +3005,97 @@
         clearInterval(vosClockInterval);
     }
 
-    function renderVisionOSDisplay() {
-        if (currentMainTab !== 'waiting') return;
+    var vosRenderTimer = null;
+function renderVisionOSDisplay() {
+    if (currentMainTab !== 'waiting') return;
+    clearTimeout(vosRenderTimer);
+    vosRenderTimer = setTimeout(_renderVisionOSDisplay, 150);
+}
 
-        var todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        var todayTs = todayStart.getTime();
+function _renderVisionOSDisplay() {
+    if (currentMainTab !== 'waiting') return;
 
-        var qQueue = [], lQueue = [], sQueue = [];
-        var ids = Object.keys(ptIdx);
+    var todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    var todayTs = todayStart.getTime();
 
-        for (var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            var p = ptIdx[id];
-            var pName = p.name || '';
-            var pTime = p.queueTime || 0;
+    var qQueue = [], lQueue = [], sQueue = [];
+    var ids = Object.keys(ptIdx);
 
-            if (p.hasPendingLab === true) {
-                lQueue.push({ id: id, name: pName, time: pTime });
-            } else if (p.isWaiting) {
-                qQueue.push({ id: id, name: pName, time: pTime });
-            } else {
-                var lvTs = parseIraqiDate(p.lastVisit);
-                var daTs = parseIraqiDate(p.dateAdded);
-                if (lvTs >= todayTs || daTs >= todayTs) {
-                    sQueue.push({ id: id, name: pName, time: lvTs });
-                }
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var p = ptIdx[id];
+        var pName = p.name || '';
+        var pTime = p.queueTime || 0;
+
+        if (p.hasPendingLab === true) {
+            lQueue.push({ id: id, name: pName, time: pTime });
+        } else if (p.isWaiting) {
+            qQueue.push({ id: id, name: pName, time: pTime });
+        } else {
+            var lvTs = parseIraqiDate(p.lastVisit);
+            var daTs = parseIraqiDate(p.dateAdded);
+            if (lvTs >= todayTs || daTs >= todayTs) {
+                sQueue.push({ id: id, name: pName, time: lvTs });
             }
         }
+    }
 
-        qQueue.sort(function(a, b) { return a.time - b.time; });
-        lQueue.sort(function(a, b) { return a.time - b.time; });
-        sQueue.sort(function(a, b) { return b.time - a.time; });
+    qQueue.sort(function(a, b) { return a.time - b.time; });
+    lQueue.sort(function(a, b) { return a.time - b.time; });
+    sQueue.sort(function(a, b) { return b.time - a.time; });
 
-        /* --- CENTER: Doctor Queue --- */
-        if (qQueue.length > 0) {
-            var cur = qQueue[0];
-            vosCurrentId = cur.id;
-            document.getElementById('vosCurrentName').innerHTML = '<span class="vos-name-link" onclick="loadFullData(\'' + cur.id + '\');switchMainTab(\'patient\');">' + escapeHtml(cur.name) + '</span>';
-            document.getElementById('vosStatusPrompt').innerText = 'Doctor is ready for';
-            document.getElementById('vosFinishBtn').style.display = 'inline-flex';
+    /* --- CENTER: Doctor Queue --- */
+    if (qQueue.length > 0) {
+        var cur = qQueue[0];
+        vosCurrentId = cur.id;
+        document.getElementById('vosCurrentName').innerHTML = '<span class="vos-name-link" onclick="loadFullData(\'' + cur.id + '\');switchMainTab(\'patient\');">' + escapeHtml(cur.name) + '</span>';
+        document.getElementById('vosStatusPrompt').innerText = 'Doctor is ready for';
+        document.getElementById('vosFinishBtn').style.display = 'inline-flex';
 
-            if (qQueue.length > 1) {
-                document.getElementById('vosUpcomingBox').style.visibility = 'visible';
-                document.getElementById('vosUpcomingName').innerHTML = '<span class="vos-upcoming-link" onclick="loadFullData(\'' + qQueue[1].id + '\');switchMainTab(\'patient\');">' + escapeHtml(qQueue[1].name) + '</span>';
-                var extra = qQueue.length - 2;
-                document.getElementById('vosQCount').style.display = (extra > 0) ? 'block' : 'none';
-                document.getElementById('vosQCount').innerText = '+ ' + extra + ' more in lobby';
-            } else {
-                document.getElementById('vosUpcomingBox').style.visibility = 'hidden';
-            }
+        if (qQueue.length > 1) {
+            document.getElementById('vosUpcomingBox').style.visibility = 'visible';
+            document.getElementById('vosUpcomingName').innerHTML = '<span class="vos-upcoming-link" onclick="loadFullData(\'' + qQueue[1].id + '\');switchMainTab(\'patient\');">' + escapeHtml(qQueue[1].name) + '</span>';
+            var extra = qQueue.length - 2;
+            document.getElementById('vosQCount').style.display = (extra > 0) ? 'block' : 'none';
+            document.getElementById('vosQCount').innerText = '+ ' + extra + ' more in lobby';
         } else {
-            vosCurrentId = null;
-            document.getElementById('vosCurrentName').innerText = '';
-            document.getElementById('vosStatusPrompt').innerText = 'No patients are waiting';
-            document.getElementById('vosFinishBtn').style.display = 'none';
             document.getElementById('vosUpcomingBox').style.visibility = 'hidden';
         }
-
-        /* --- RIGHT: Lab Queue --- */
-        document.getElementById('vosLabCount').innerText = lQueue.length;
-        var labHtml = '';
-        if (lQueue.length === 0) {
-            labHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No tests requested.</p>';
-        } else {
-            for (var l = 0; l < lQueue.length; l++) {
-                labHtml += '<div class="vos-list-item" style="border-color:rgba(100,210,255,0.4);background:rgba(100,210,255,0.06);">' +
-                    '<span class="vos-list-name" style="color:#64D2FF;font-size:20px;" onclick="loadFullData(\'' + lQueue[l].id + '\');switchMainTab(\'patient\');">' + escapeHtml(lQueue[l].name) + '</span></div>';
-            }
-        }
-        document.getElementById('vosLabList').innerHTML = labHtml;
-
-        /* --- LEFT: Seen Today --- */
-        document.getElementById('vosSeenCount').innerText = sQueue.length;
-        var seenHtml = '';
-        if (sQueue.length === 0) {
-            seenHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No patients finished today.</p>';
-        } else {
-            for (var s = 0; s < sQueue.length; s++) {
-                seenHtml += '<div class="vos-list-item">' +
-                    '<span class="vos-list-name" style="font-size:18px;" onclick="loadFullData(\'' + sQueue[s].id + '\');switchMainTab(\'patient\');">' + escapeHtml(sQueue[s].name) + '</span></div>';
-            }
-        }
-        document.getElementById('vosSeenList').innerHTML = seenHtml;
+    } else {
+        vosCurrentId = null;
+        document.getElementById('vosCurrentName').innerText = '';
+        document.getElementById('vosStatusPrompt').innerText = 'No patients are waiting';
+        document.getElementById('vosFinishBtn').style.display = 'none';
+        document.getElementById('vosUpcomingBox').style.visibility = 'hidden';
     }
 
-    function vosCallNext() {
-        if (!vosCurrentId || vosProcessing) return;
-        vosProcessing = true;
-        db.ref('patientIndex/' + vosCurrentId).update({ isWaiting: false }).then(function() {
-            setTimeout(function() { vosProcessing = false; }, 600);
-        }).catch(handleFirebaseError);
+    /* --- RIGHT: Lab Queue --- */
+    document.getElementById('vosLabCount').innerText = lQueue.length;
+    var labHtml = '';
+    if (lQueue.length === 0) {
+        labHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No tests requested.</p>';
+    } else {
+        for (var l = 0; l < lQueue.length; l++) {
+            labHtml += '<div class="vos-list-item" style="border-color:rgba(100,210,255,0.4);background:rgba(100,210,255,0.06);">' +
+                '<span class="vos-list-name" style="color:#64D2FF;font-size:20px;" onclick="loadFullData(\'' + lQueue[l].id + '\');switchMainTab(\'patient\');">' + escapeHtml(lQueue[l].name) + '</span></div>';
+        }
     }
+    document.getElementById('vosLabList').innerHTML = labHtml;
+
+    /* --- LEFT: Seen Today --- */
+    document.getElementById('vosSeenCount').innerText = sQueue.length;
+    var seenHtml = '';
+    if (sQueue.length === 0) {
+        seenHtml = '<p style="color:rgba(255,255,255,0.3);text-align:center;padding-top:40px;font-size:14px;">No patients finished today.</p>';
+    } else {
+        for (var s = 0; s < sQueue.length; s++) {
+            seenHtml += '<div class="vos-list-item">' +
+                '<span class="vos-list-name" style="font-size:18px;" onclick="loadFullData(\'' + sQueue[s].id + '\');switchMainTab(\'patient\');">' + escapeHtml(sQueue[s].name) + '</span></div>';
+        }
+    }
+    document.getElementById('vosSeenList').innerHTML = seenHtml;
+}
     /* ================================================================
        BOOT
     ================================================================ */
