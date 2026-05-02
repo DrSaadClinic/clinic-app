@@ -1644,15 +1644,31 @@
     ================================================================ */
      function insertClinicalTemplate() {
     if (!activeId) return;
+    var today = new Date().toLocaleDateString('en-GB');
+    var stamp = '\n--- Visit: ' + today + ' ---\n';
     var template = 'Hx:\n\nCC:\n\n\nHPI:\n\n\n\nPMHx:\n\u2610 DM \u2610 HTN \u2610 IHD \u2610 Asthma/COPD \u2610 CKD \u2610 Other:\n\n---\n\nPSHx:\n\n---\n\nDrugs:\n\n---\n\nAllergy:\n\n---\n\nFHx:\n\n---\n\nSHx:\nSmoking: __________\nAlcohol: __________\n\nROS:\nCVS: \nResp: \nGIT: \nGU: \nCNS: \n\nO/E:\n\nSystemic / Local Exam:\n\n---\n\n---\n\nDx / DDx:\n\n---\n';
-    var box = document.getElementById('vPres');
-    box.value = box.value + (box.value ? '\n\n' : '') + template;
-    box.dataset.stamped = 'true';
-    autoExpand(box);
-    box.focus();
-    box.setSelectionRange(box.value.length, box.value.length);
+
+    var presBox = document.getElementById('vPres');
+    var visitsBox = document.getElementById('vVisits');
+
+    if (presBox.value.indexOf(stamp.trim()) === -1) {
+        presBox.value = presBox.value + (presBox.value ? '\n' : '') + stamp;
+    }
+    if (visitsBox.value.indexOf(stamp.trim()) === -1) {
+        visitsBox.value = visitsBox.value + (visitsBox.value ? '\n' : '') + stamp;
+    }
+
+    presBox.value = presBox.value + template;
+
+    presBox.dataset.stamped = 'true';
+    visitsBox.dataset.stamped = 'true';
+
+    autoExpand(presBox);
+    autoExpand(visitsBox);
+    presBox.focus();
+    presBox.setSelectionRange(presBox.value.length, presBox.value.length);
     autoSyncTrigger();
-    showToast('Clinical sheet template inserted.');
+    showToast('Clinical sheet + visit stamp inserted.');
 }
     /* ================================================================
        REFERRAL
