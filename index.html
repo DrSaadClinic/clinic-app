@@ -565,8 +565,6 @@
         box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15);
         border-radius: 44px; display: flex; flex-direction: row; box-sizing: border-box; overflow: hidden;
     }
-        
-
     .vos-side-left { width: 280px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-right: 1px solid rgba(255,255,255,0.1); }
     .vos-main { flex: 1; padding: 50px 60px; display: flex; flex-direction: column; justify-content: space-between; }
     .vos-side-right { width: 300px; padding: 40px 30px; display: flex; flex-direction: column; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.1); }
@@ -611,100 +609,69 @@
         .vos-main { padding: 20px; }
         .vos-current-name { font-size: 10vw; max-width: 90vw; }
         .vos-prompt { font-size: 4vw; }
-                .vos-btn-finish { font-size: 18px; padding: 16px 28px; }
+        .vos-btn-finish { font-size: 18px; padding: 16px 28px; }
     }
 
-    
-
-/* APPLE SCREENSAVER */
-#appleSS {
-    position: fixed; inset: 0; z-index: 500;
-    background: #000010;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-    cursor: pointer; overflow: hidden;
-}
-#appleSS.ss-visible { opacity: 1; pointer-events: all; }
-
-.ss-aurora { position: absolute; inset: 0; overflow: hidden; }
-.ss-aurora-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.75; }
-.ss-blob-1 { width: 75vw; height: 75vh; background: radial-gradient(ellipse, rgba(10,132,255,0.65), rgba(94,92,230,0.3), transparent 70%); top: -25%; left: -20%; animation: ssb1 30s ease-in-out infinite alternate; }
-.ss-blob-2 { width: 65vw; height: 65vh; background: radial-gradient(ellipse, rgba(94,92,230,0.6), rgba(175,82,222,0.25), transparent 70%); bottom: -20%; right: -10%; animation: ssb2 38s ease-in-out infinite alternate; }
-.ss-blob-3 { width: 55vw; height: 55vh; background: radial-gradient(ellipse, rgba(100,210,255,0.2), rgba(10,132,255,0.1), transparent 70%); top: 30%; left: 25%; animation: ssb3 24s ease-in-out infinite alternate; }
-.ss-blob-4 { width: 40vw; height: 40vh; background: radial-gradient(ellipse, rgba(48,209,88,0.12), transparent 70%); bottom: 5%; left: 5%; animation: ssb4 32s ease-in-out infinite alternate; }
-@keyframes ssb1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(18vw,22vh) scale(1.15)} }
-@keyframes ssb2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-20vw,-14vh) scale(1.2)} }
-@keyframes ssb3 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-12vw,14vh) scale(0.88)} }
-@keyframes ssb4 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(18vw,-8vh) scale(1.3)} }
-
-.ss-content {
-    position: relative; z-index: 1; width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between;
-    padding: 44px 56px; box-sizing: border-box;
-}
-.ss-top-bar {
-    display: flex; align-items: center; gap: 14px;
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-    padding: 11px 22px; border-radius: 22px;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-}
-.ss-logo { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
-.ss-clinic-title { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: -0.01em; }
-
-.ss-clock-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 4px; }
-.ss-time {
-    font-size: clamp(96px, 17vw, 210px); font-weight: 100; color: white;
-    letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 100px rgba(10,132,255,0.25), 0 0 30px rgba(94,92,230,0.15);
-}
-.ss-sub-row { display: flex; align-items: baseline; gap: 18px; }
-.ss-secs { font-size: clamp(28px, 3.5vw, 52px); font-weight: 200; color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums; }
-.ss-ampm { font-size: clamp(18px, 2.2vw, 32px); font-weight: 300; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
-.ss-date-en { font-size: clamp(16px, 2vw, 26px); font-weight: 300; color: rgba(255,255,255,0.5); letter-spacing: 0.01em; margin-top: 8px; }
-.ss-date-hijri { font-size: clamp(13px, 1.5vw, 20px); font-weight: 300; color: rgba(255,255,255,0.3); direction: rtl; margin-top: 2px; }
-
-.ss-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; max-width: 1080px; }
-.ss-card {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 24px; padding: 20px 24px;
-    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-}
-.ss-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 14px; display: block; }
-
-/* Calendar */
-.ss-cal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-.ss-cal-mname { font-size: 16px; font-weight: 600; color: white; }
-.ss-cal-yr { font-size: 13px; color: rgba(255,255,255,0.35); }
-.ss-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
-.ss-cal-dh { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.28); letter-spacing: 0.04em; padding: 3px 0; }
-.ss-cal-d { font-size: 12px; color: rgba(255,255,255,0.5); padding: 5px 2px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto; line-height: 1; }
-.ss-cal-d.ss-today { background: #0A84FF; color: white; font-weight: 700; box-shadow: 0 2px 10px rgba(10,132,255,0.5); }
-
-/* Prayer Times */
-.ss-prayer-list { display: flex; flex-direction: column; gap: 6px; }
-.ss-prayer-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 10px; }
-.ss-prayer-item.ss-current-prayer { background: rgba(10,132,255,0.2); border: 1px solid rgba(10,132,255,0.3); }
-.ss-prayer-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); }
-.ss-prayer-item.ss-current-prayer .ss-prayer-name { color: #64D2FF; font-weight: 700; }
-.ss-prayer-time { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums; }
-.ss-prayer-item.ss-current-prayer .ss-prayer-time { color: white; }
-
-/* Stats */
-.ss-stat-list { display: flex; flex-direction: column; gap: 10px; }
-.ss-stat-row { display: flex; align-items: center; gap: 12px; }
-.ss-stat-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
-.ss-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-.ss-stat-val { font-size: 24px; font-weight: 700; color: white; letter-spacing: -0.02em; line-height: 1.1; }
-.ss-stat-next { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.75); line-height: 1.3; }
-
-.ss-tap-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255,255,255,0.18); letter-spacing: 0.1em; text-transform: uppercase; animation: ssHint 3s ease-in-out infinite; }
-@keyframes ssHint { 0%,100%{opacity:0.4} 50%{opacity:1} }
-
+    /* ================================================================
+       APPLE SCREENSAVER
+    ================================================================ */
+    #appleSS {
+        position: fixed; inset: 0; z-index: 500;
+        background: #000010;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        opacity: 0; pointer-events: none;
+        transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+        cursor: pointer; overflow: hidden;
+    }
+    #appleSS.ss-visible { opacity: 1; pointer-events: all; }
+    .ss-aurora { position: absolute; inset: 0; overflow: hidden; }
+    .ss-aurora-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.75; }
+    .ss-blob-1 { width: 75vw; height: 75vh; background: radial-gradient(ellipse, rgba(10,132,255,0.65), rgba(94,92,230,0.3), transparent 70%); top: -25%; left: -20%; animation: ssb1 30s ease-in-out infinite alternate; }
+    .ss-blob-2 { width: 65vw; height: 65vh; background: radial-gradient(ellipse, rgba(94,92,230,0.6), rgba(175,82,222,0.25), transparent 70%); bottom: -20%; right: -10%; animation: ssb2 38s ease-in-out infinite alternate; }
+    .ss-blob-3 { width: 55vw; height: 55vh; background: radial-gradient(ellipse, rgba(100,210,255,0.2), rgba(10,132,255,0.1), transparent 70%); top: 30%; left: 25%; animation: ssb3 24s ease-in-out infinite alternate; }
+    .ss-blob-4 { width: 40vw; height: 40vh; background: radial-gradient(ellipse, rgba(48,209,88,0.12), transparent 70%); bottom: 5%; left: 5%; animation: ssb4 32s ease-in-out infinite alternate; }
+    @keyframes ssb1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(18vw,22vh) scale(1.15)} }
+    @keyframes ssb2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-20vw,-14vh) scale(1.2)} }
+    @keyframes ssb3 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-12vw,14vh) scale(0.88)} }
+    @keyframes ssb4 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(18vw,-8vh) scale(1.3)} }
+    .ss-content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 44px 56px; box-sizing: border-box; }
+    .ss-top-bar { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 11px 22px; border-radius: 22px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .ss-logo { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
+    .ss-clinic-title { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: -0.01em; }
+    .ss-clock-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 4px; }
+    .ss-time { font-size: clamp(96px, 17vw, 210px); font-weight: 100; color: white; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 100px rgba(10,132,255,0.25), 0 0 30px rgba(94,92,230,0.15); }
+    .ss-sub-row { display: flex; align-items: baseline; gap: 18px; }
+    .ss-secs { font-size: clamp(28px, 3.5vw, 52px); font-weight: 200; color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums; }
+    .ss-ampm { font-size: clamp(18px, 2.2vw, 32px); font-weight: 300; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+    .ss-date-en { font-size: clamp(16px, 2vw, 26px); font-weight: 300; color: rgba(255,255,255,0.5); letter-spacing: 0.01em; margin-top: 8px; }
+    .ss-date-hijri { font-size: clamp(13px, 1.5vw, 20px); font-weight: 300; color: rgba(255,255,255,0.3); direction: rtl; margin-top: 2px; }
+    .ss-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; max-width: 1080px; }
+    .ss-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px 24px; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08); }
+    .ss-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 14px; display: block; }
+    .ss-cal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .ss-cal-mname { font-size: 16px; font-weight: 600; color: white; }
+    .ss-cal-yr { font-size: 13px; color: rgba(255,255,255,0.35); }
+    .ss-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+    .ss-cal-dh { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.28); letter-spacing: 0.04em; padding: 3px 0; }
+    .ss-cal-d { font-size: 12px; color: rgba(255,255,255,0.5); padding: 5px 2px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto; line-height: 1; }
+    .ss-cal-d.ss-today { background: #0A84FF; color: white; font-weight: 700; box-shadow: 0 2px 10px rgba(10,132,255,0.5); }
+    .ss-prayer-list { display: flex; flex-direction: column; gap: 6px; }
+    .ss-prayer-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 10px; }
+    .ss-prayer-item.ss-current-prayer { background: rgba(10,132,255,0.2); border: 1px solid rgba(10,132,255,0.3); }
+    .ss-prayer-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); }
+    .ss-prayer-item.ss-current-prayer .ss-prayer-name { color: #64D2FF; font-weight: 700; }
+    .ss-prayer-time { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums; }
+    .ss-prayer-item.ss-current-prayer .ss-prayer-time { color: white; }
+    .ss-stat-list { display: flex; flex-direction: column; gap: 10px; }
+    .ss-stat-row { display: flex; align-items: center; gap: 12px; }
+    .ss-stat-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .ss-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+    .ss-stat-val { font-size: 24px; font-weight: 700; color: white; letter-spacing: -0.02em; line-height: 1.1; }
+    .ss-stat-next { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.75); line-height: 1.3; }
+    .ss-tap-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255,255,255,0.18); letter-spacing: 0.1em; text-transform: uppercase; animation: ssHint 3s ease-in-out infinite; }
+    @keyframes ssHint { 0%,100%{opacity:0.4} 50%{opacity:1} }
     </style>
 </head>
 <body>
@@ -1133,82 +1100,62 @@
             </div>
         </div>
     </div>
-<!-- ═══ APPLE SCREENSAVER OVERLAY ═══ -->
-<div id="appleSS" onclick="dismissScreensaver()">
-    <div class="ss-aurora">
-        <div class="ss-aurora-blob ss-blob-1"></div>
-        <div class="ss-aurora-blob ss-blob-2"></div>
-        <div class="ss-aurora-blob ss-blob-3"></div>
-        <div class="ss-aurora-blob ss-blob-4"></div>
+
+    <!-- ═══ APPLE SCREENSAVER OVERLAY ═══ -->
+    <div id="appleSS" onclick="dismissScreensaver()">
+        <div class="ss-aurora">
+            <div class="ss-aurora-blob ss-blob-1"></div>
+            <div class="ss-aurora-blob ss-blob-2"></div>
+            <div class="ss-aurora-blob ss-blob-3"></div>
+            <div class="ss-aurora-blob ss-blob-4"></div>
+        </div>
+        <div class="ss-content">
+            <div class="ss-top-bar">
+                <img src="logo.jpg" class="ss-logo" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+                <span class="ss-clinic-title">Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</span>
+            </div>
+            <div class="ss-clock-wrap">
+                <div class="ss-time" id="ssTime">00:00</div>
+                <div class="ss-sub-row">
+                    <span class="ss-secs" id="ssSecs">00</span>
+                    <span class="ss-ampm" id="ssAmpm">AM</span>
+                </div>
+                <div class="ss-date-en" id="ssDateEn">Saturday, 1 January 2026</div>
+                <div class="ss-date-hijri" id="ssDateHijri">&#x661; ذو القعدة ١٤٤٧ هـ</div>
+            </div>
+            <div class="ss-bottom">
+                <div class="ss-card">
+                    <span class="ss-card-label">&#128197; Calendar</span>
+                    <div id="ssCalendar"></div>
+                </div>
+                <div class="ss-card">
+                    <span class="ss-card-label">&#x1F54C; Prayer Times &mdash; Baghdad</span>
+                    <div class="ss-prayer-list" id="ssPrayers">
+                        <div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:16px 0;">Loading...</div>
+                    </div>
+                </div>
+                <div class="ss-card">
+                    <span class="ss-card-label">&#128203; Today's Session</span>
+                    <div class="ss-stat-list">
+                        <div class="ss-stat-row">
+                            <div class="ss-stat-icon" style="background:rgba(48,209,88,0.15);">&#9989;</div>
+                            <div><div class="ss-stat-lbl">Seen Today</div><div class="ss-stat-val" id="ssSeen">0</div></div>
+                        </div>
+                        <div class="ss-stat-row">
+                            <div class="ss-stat-icon" style="background:rgba(10,132,255,0.15);">&#8987;</div>
+                            <div><div class="ss-stat-lbl">Waiting</div><div class="ss-stat-val" id="ssWaiting">0</div></div>
+                        </div>
+                        <div class="ss-stat-row">
+                            <div class="ss-stat-icon" style="background:rgba(255,159,10,0.15);">&#128100;</div>
+                            <div><div class="ss-stat-lbl">Next Patient</div><div class="ss-stat-next" id="ssNext">&mdash;</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ss-tap-hint">Tap anywhere to dismiss</div>
     </div>
-    <div class="ss-content">
-        <!-- TOP BAR: Clinic branding -->
-        <div class="ss-top-bar">
-            <img src="logo.jpg" class="ss-logo" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-            <span class="ss-clinic-title">Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</span>
-        </div>
-
-        <!-- CENTER: Giant clock -->
-        <div class="ss-clock-wrap">
-            <div class="ss-time" id="ssTime">00:00</div>
-            <div class="ss-sub-row">
-                <span class="ss-secs" id="ssSecs">00</span>
-                <span class="ss-ampm" id="ssAmpm">AM</span>
-            </div>
-            <div class="ss-date-en" id="ssDateEn">Saturday, 1 January 2026</div>
-            <div class="ss-date-hijri" id="ssDateHijri">&#x661; ذو القعدة ١٤٤٧ هـ</div>
-        </div>
-
-        <!-- BOTTOM ROW: Calendar | Prayer Times | Session Stats -->
-        <div class="ss-bottom">
-
-            <!-- Calendar -->
-            <div class="ss-card">
-                <span class="ss-card-label">&#128197; Calendar</span>
-                <div id="ssCalendar"></div>
-            </div>
-
-            <!-- Prayer Times -->
-            <div class="ss-card">
-                <span class="ss-card-label">&#x1F54C; Prayer Times &mdash; Baghdad</span>
-                <div class="ss-prayer-list" id="ssPrayers">
-                    <div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:16px 0;">Loading...</div>
-                </div>
-            </div>
-
-            <!-- Session Stats -->
-            <div class="ss-card">
-                <span class="ss-card-label">&#128203; Today's Session</span>
-                <div class="ss-stat-list">
-                    <div class="ss-stat-row">
-                        <div class="ss-stat-icon" style="background:rgba(48,209,88,0.15);">&#9989;</div>
-                        <div>
-                            <div class="ss-stat-lbl">Seen Today</div>
-                            <div class="ss-stat-val" id="ssSeen">0</div>
-                        </div>
-                    </div>
-                    <div class="ss-stat-row">
-                        <div class="ss-stat-icon" style="background:rgba(10,132,255,0.15);">&#8987;</div>
-                        <div>
-                            <div class="ss-stat-lbl">Waiting</div>
-                            <div class="ss-stat-val" id="ssWaiting">0</div>
-                        </div>
-                    </div>
-                    <div class="ss-stat-row">
-                        <div class="ss-stat-icon" style="background:rgba(255,159,10,0.15);">&#128100;</div>
-                        <div>
-                            <div class="ss-stat-lbl">Next Patient</div>
-                            <div class="ss-stat-next" id="ssNext">&#8212;</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /ss-bottom -->
-    </div><!-- /ss-content -->
-    <div class="ss-tap-hint">Tap anywhere to dismiss</div>
-</div>
-<!-- ═══ END SCREENSAVER ═══ -->
+    <!-- ═══ END SCREENSAVER ═══ -->
 
 </div><!-- /container -->
 
@@ -1243,6 +1190,7 @@
     var calendarTimer = null;
     var currentRegTab = 'new';
     var currentOpTab = 'upcoming';
+    var currentMainTab = 'home';
 
     /* ================================================================
        THEME
@@ -1283,14 +1231,13 @@
         });
 
         db.ref('patientIndex').on('value', function(snap) {
-            resetScreensaverTimer();
     ptIdx = snap.val() || {};
     renderList();
     renderLabQueue();
     scheduleCalendarRender();
     document.getElementById('totalPtCount').innerText = Object.keys(ptIdx).length + " Patients";
     if (currentRegTab === 'followup') renderFollowUpPanel();
-    if (currentMainTab === 'waiting') renderVisionOSDisplay();
+    if (currentMainTab === 'waiting') { renderVisionOSDisplay(); resetScreensaverTimer(); }
 });
 
         db.ref('reminders').on('value', function(snap) {
@@ -1445,8 +1392,8 @@
     }
 
     function checkInPatient(id) {
-        resetScreensaverTimer();
         if (!ptIdx[id]) return;
+        if (typeof resetScreensaverTimer === 'function') resetScreensaverTimer();
         if (ptIdx[id].isWaiting) {
             loadFullData(id);
             showToast(ptIdx[id].name + ' \u2014 file opened.');
@@ -2258,9 +2205,9 @@
        ADD / DELETE PATIENT
     ================================================================ */
     function addPatient() {
+        if (typeof resetScreensaverTimer === 'function') resetScreensaverTimer();
         var n = document.getElementById('newName').value;
         if (!n) return;
-        resetScreensaverTimer();
         var id = Date.now();
         var d = new Date().toLocaleDateString('en-GB');
         db.ref('patientIndex/' + id).set({ name: n, age: document.getElementById('newAge').value, phone: document.getElementById('newPhone').value, complaint: document.getElementById('newComp').value, dateAdded: d, lastVisit: d, isWaiting: true, pinned: false }).catch(handleFirebaseError);
@@ -2759,7 +2706,6 @@
         var tabMap = { home: 'mtHome', patient: 'mtPatient', dashboard: 'mtDashboard', waiting: 'mtWaiting' };
         Object.keys(tabMap).forEach(function(t) {
             var el = document.getElementById(tabMap[t]);
-            if(tab==='waiting') resetScreensaverTimer(); else {clearTimeout(ssTimer); dismissScreensaver();}
             if (el) { if (t === tab) el.classList.add('active'); else el.classList.remove('active'); }
         });
 
@@ -2789,12 +2735,18 @@
             sidebar.style.display = 'block';
             sidebar.style.maxWidth = '700px';
             sidebar.style.margin = '0 auto';
+            clearTimeout(ssTimer);
+            if (typeof dismissScreensaver === 'function') dismissScreensaver();
         } else if (tab === 'patient') {
             content.style.display = 'block';
+            clearTimeout(ssTimer);
+            if (typeof dismissScreensaver === 'function') dismissScreensaver();
         } else if (tab === 'dashboard') {
             dashboard.style.display = 'block';
             renderDashboardReminders();
             renderCalendarFromDB();
+            clearTimeout(ssTimer);
+            if (typeof dismissScreensaver === 'function') dismissScreensaver();
         } else if (tab === 'waiting') {
             /* FULL-SCREEN DISPLAY MODE */
             appHeader.style.display = 'none';
@@ -2805,6 +2757,7 @@
             waiting.classList.add('active-display');
             startVosClock();
             renderVisionOSDisplay();
+            resetScreensaverTimer();
         }
     }
 
@@ -3300,200 +3253,7 @@ function _renderVisionOSDisplay() {
         }
     }
     document.getElementById('vosSeenList').innerHTML = seenHtml;
-    /* ================================================================
-   
-
-/* ── SCREENSAVER STATE ── */
-var ssVisible = false;
-var ssTimer = null;
-var ssClockInterval = null;
-var ssPrayerCache = null;
-var ssPrayerCacheDate = null;
-var SS_DELAY = 3 * 60 * 1000; /* 3 minutes */
-
-/* ── TIMER MANAGEMENT ── */
-function resetScreensaverTimer() {
-    clearTimeout(ssTimer);
-    if (ssVisible) dismissScreensaver();
-    if (currentMainTab === 'waiting') {
-        ssTimer = setTimeout(showScreensaver, SS_DELAY);
-    }
 }
-
-function showScreensaver() {
-    var el = document.getElementById('appleSS');
-    if (!el || ssVisible) return;
-    ssVisible = true;
-    el.classList.add('ss-visible');
-    buildSSCalendar();
-    loadSSPrayers();
-    updateSSStats();
-    clearInterval(ssClockInterval);
-    updateSSClock();
-    ssClockInterval = setInterval(updateSSClock, 1000);
-}
-
-function dismissScreensaver() {
-    var el = document.getElementById('appleSS');
-    if (!el || !ssVisible) return;
-    ssVisible = false;
-    el.classList.remove('ss-visible');
-    clearInterval(ssClockInterval);
-    if (currentMainTab === 'waiting') {
-        ssTimer = setTimeout(showScreensaver, SS_DELAY);
-    }
-}
-
-/* ── CLOCK ── */
-function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-
-function updateSSClock() {
-    var now = new Date();
-    var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    var h12 = h % 12 || 12;
-    var tEl = document.getElementById('ssTime');
-    var sEl = document.getElementById('ssSecs');
-    var aEl = document.getElementById('ssAmpm');
-    var dEn = document.getElementById('ssDateEn');
-    var dHijri = document.getElementById('ssDateHijri');
-    if (tEl) tEl.textContent = pad2(h12) + ':' + pad2(m);
-    if (sEl) sEl.textContent = pad2(s);
-    if (aEl) aEl.textContent = ampm;
-    var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    if (dEn) dEn.textContent = dayNames[now.getDay()] + ', ' + now.getDate() + ' ' + monthNames[now.getMonth()] + ' ' + now.getFullYear();
-    if (dHijri) dHijri.textContent = getHijriStr(now);
-    if (ssPrayerCache) highlightCurrentPrayer();
-}
-
-/* ── HIJRI DATE ── */
-function getHijriStr(date) {
-    var y = date.getFullYear(), mo = date.getMonth() + 1, d = date.getDate();
-    var jd = Math.floor((1461*(y+4800+Math.floor((mo-14)/12)))/4)
-           + Math.floor((367*(mo-2-12*Math.floor((mo-14)/12)))/12)
-           - Math.floor((3*Math.floor((y+4900+Math.floor((mo-14)/12))/100))/4)
-           + d - 32075;
-    var l = jd - 1948440 + 10632;
-    var n = Math.floor((l-1)/10631);
-    l = l - 10631*n + 354;
-    var j = Math.floor((10985-l)/5316)*Math.floor((50*l)/17719)
-          + Math.floor(l/5670)*Math.floor((43*l)/15238);
-    l = l - Math.floor((30-j)/15)*Math.floor((17719*j)/50)
-          - Math.floor(j/16)*Math.floor((15238*j)/43) + 29;
-    var hm = Math.floor((24*l)/709);
-    var hd = l - Math.floor((709*hm)/24);
-    var hy = 30*n + j - 30;
-    var hMonths = ['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
-    var toAr = function(x) { return String(x).replace(/\d/g, function(c){ return '٠١٢٣٤٥٦٧٨٩'[c]; }); };
-    return toAr(hd) + ' ' + hMonths[hm-1] + ' ' + toAr(hy) + ' هـ';
-}
-
-/* ── CALENDAR ── */
-function buildSSCalendar() {
-    var cal = document.getElementById('ssCalendar');
-    if (!cal) return;
-    var now = new Date();
-    var yr = now.getFullYear(), mo = now.getMonth(), td = now.getDate();
-    var firstDay = new Date(yr, mo, 1).getDay();
-    var daysInMo = new Date(yr, mo+1, 0).getDate();
-    var mNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var dh = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-    var html = '<div class="ss-cal-top"><span class="ss-cal-mname">' + mNames[mo] + '</span><span class="ss-cal-yr">' + yr + '</span></div>';
-    html += '<div class="ss-cal-grid">';
-    for (var i = 0; i < 7; i++) html += '<div class="ss-cal-dh">' + dh[i] + '</div>';
-    for (var e = 0; e < firstDay; e++) html += '<div class="ss-cal-d"></div>';
-    for (var d = 1; d <= daysInMo; d++) {
-        html += '<div class="ss-cal-d' + (d === td ? ' ss-today' : '') + '">' + d + '</div>';
-    }
-    html += '</div>';
-    cal.innerHTML = html;
-}
-
-/* ── PRAYER TIMES (Baghdad) ── */
-function loadSSPrayers() {
-    var now = new Date();
-    var dk = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
-    if (ssPrayerCache && ssPrayerCacheDate === dk) { renderSSPrayers(ssPrayerCache); return; }
-    var ds = now.getDate() + '-' + (now.getMonth()+1) + '-' + now.getFullYear();
-    fetch('https://api.aladhan.com/v1/timingsByCity/' + ds + '?city=Baghdad&country=Iraq&method=3')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            var t = data.data.timings;
-            ssPrayerCache = { Fajr: t.Fajr, Dhuhr: t.Dhuhr, Asr: t.Asr, Maghrib: t.Maghrib, Isha: t.Isha };
-            ssPrayerCacheDate = dk;
-            renderSSPrayers(ssPrayerCache);
-        })
-        .catch(function() {
-            ssPrayerCache = { Fajr: '04:15', Dhuhr: '12:15', Asr: '15:30', Maghrib: '18:30', Isha: '19:55' };
-            renderSSPrayers(ssPrayerCache);
-        });
-}
-
-function renderSSPrayers(p) {
-    var el = document.getElementById('ssPrayers');
-    if (!el) return;
-    var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
-    var labels = { Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء' };
-    var cur = getCurrentPrayer(p);
-    var html = '';
-    for (var i = 0; i < keys.length; i++) {
-        var k = keys[i];
-        html += '<div class="ss-prayer-item' + (k===cur?' ss-current-prayer':'') + '" id="ssp_'+k+'">'
-              + '<span class="ss-prayer-name">' + labels[k] + ' — ' + k + '</span>'
-              + '<span class="ss-prayer-time">' + p[k] + '</span></div>';
-    }
-    el.innerHTML = html;
-}
-
-function getCurrentPrayer(p) {
-    var now = new Date();
-    var nowM = now.getHours()*60 + now.getMinutes();
-    var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
-    var mins = {};
-    for (var i = 0; i < keys.length; i++) {
-        var parts = (p[keys[i]] || '00:00').split(':');
-        mins[keys[i]] = parseInt(parts[0])*60 + parseInt(parts[1]);
-    }
-    var cur = 'Isha';
-    for (var j = keys.length - 1; j >= 0; j--) {
-        if (nowM >= mins[keys[j]]) { cur = keys[j]; break; }
-    }
-    return cur;
-}
-
-function highlightCurrentPrayer() {
-    if (!ssPrayerCache) return;
-    var cur = getCurrentPrayer(ssPrayerCache);
-    var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
-    for (var i = 0; i < keys.length; i++) {
-        var el = document.getElementById('ssp_' + keys[i]);
-        if (el) {
-            if (keys[i] === cur) el.classList.add('ss-current-prayer');
-            else el.classList.remove('ss-current-prayer');
-        }
-    }
-}
-
-/* ── SESSION STATS ── */
-function updateSSStats() {
-    var seen = 0, waiting = 0, nextName = '—';
-    var ids = Object.keys(ptIdx);
-    var todayStr = new Date().toLocaleDateString('en-GB');
-    for (var i = 0; i < ids.length; i++) {
-        var p = ptIdx[ids[i]];
-        if (p.isWaiting) { waiting++; if (nextName === '—') nextName = p.name; }
-        if (p.lastVisit === todayStr && !p.isWaiting) seen++;
-    }
-    var sEl = document.getElementById('ssSeen');
-    var wEl = document.getElementById('ssWaiting');
-    var nEl = document.getElementById('ssNext');
-    if (sEl) sEl.textContent = seen;
-    if (wEl) wEl.textContent = waiting;
-    if (nEl) nEl.textContent = nextName;
-}
-
-
     /* ================================================================
        BOOT
     ================================================================ */
@@ -3514,6 +3274,192 @@ function updateSSStats() {
         applyStoredTheme();
         checkPinOnLoad();
     });
+
+    /* ================================================================
+       APPLE SCREENSAVER — FULL LOGIC
+    ================================================================ */
+    var ssVisible = false;
+    var ssTimer = null;
+    var ssClockInterval = null;
+    var ssPrayerCache = null;
+    var ssPrayerCacheDate = null;
+    var SS_DELAY = 3 * 60 * 1000; /* 3 minutes */
+
+    function resetScreensaverTimer() {
+        clearTimeout(ssTimer);
+        if (ssVisible) dismissScreensaver();
+        if (currentMainTab === 'waiting') {
+            ssTimer = setTimeout(showScreensaver, SS_DELAY);
+        }
+    }
+
+    function showScreensaver() {
+        var el = document.getElementById('appleSS');
+        if (!el || ssVisible) return;
+        ssVisible = true;
+        el.classList.add('ss-visible');
+        buildSSCalendar();
+        loadSSPrayers();
+        updateSSStats();
+        clearInterval(ssClockInterval);
+        updateSSClock();
+        ssClockInterval = setInterval(updateSSClock, 1000);
+    }
+
+    function dismissScreensaver() {
+        var el = document.getElementById('appleSS');
+        if (!el || !ssVisible) return;
+        ssVisible = false;
+        el.classList.remove('ss-visible');
+        clearInterval(ssClockInterval);
+        if (currentMainTab === 'waiting') {
+            ssTimer = setTimeout(showScreensaver, SS_DELAY);
+        }
+    }
+
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function updateSSClock() {
+        var now = new Date();
+        var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        var h12 = h % 12 || 12;
+        var tEl = document.getElementById('ssTime');
+        var sEl = document.getElementById('ssSecs');
+        var aEl = document.getElementById('ssAmpm');
+        var dEn = document.getElementById('ssDateEn');
+        var dHijri = document.getElementById('ssDateHijri');
+        if (tEl) tEl.textContent = pad2(h12) + ':' + pad2(m);
+        if (sEl) sEl.textContent = pad2(s);
+        if (aEl) aEl.textContent = ampm;
+        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        if (dEn) dEn.textContent = dayNames[now.getDay()] + ', ' + now.getDate() + ' ' + monthNames[now.getMonth()] + ' ' + now.getFullYear();
+        if (dHijri) dHijri.textContent = getHijriStr(now);
+        if (ssPrayerCache) highlightCurrentPrayer();
+    }
+
+    function getHijriStr(date) {
+        var y = date.getFullYear(), mo = date.getMonth() + 1, d = date.getDate();
+        var jd = Math.floor((1461*(y+4800+Math.floor((mo-14)/12)))/4)
+               + Math.floor((367*(mo-2-12*Math.floor((mo-14)/12)))/12)
+               - Math.floor((3*Math.floor((y+4900+Math.floor((mo-14)/12))/100))/4)
+               + d - 32075;
+        var l = jd - 1948440 + 10632;
+        var n = Math.floor((l-1)/10631);
+        l = l - 10631*n + 354;
+        var j = Math.floor((10985-l)/5316)*Math.floor((50*l)/17719)
+              + Math.floor(l/5670)*Math.floor((43*l)/15238);
+        l = l - Math.floor((30-j)/15)*Math.floor((17719*j)/50)
+              - Math.floor(j/16)*Math.floor((15238*j)/43) + 29;
+        var hm = Math.floor((24*l)/709);
+        var hd = l - Math.floor((709*hm)/24);
+        var hy = 30*n + j - 30;
+        var hMonths = ['\u0645\u062d\u0631\u0645','\u0635\u0641\u0631','\u0631\u0628\u064a\u0639 \u0627\u0644\u0623\u0648\u0644','\u0631\u0628\u064a\u0639 \u0627\u0644\u0622\u062e\u0631','\u062c\u0645\u0627\u062f\u0649 \u0627\u0644\u0623\u0648\u0644\u0649','\u062c\u0645\u0627\u062f\u0649 \u0627\u0644\u0622\u062e\u0631\u0629','\u0631\u062c\u0628','\u0634\u0639\u0628\u0627\u0646','\u0631\u0645\u0636\u0627\u0646','\u0634\u0648\u0627\u0644','\u0630\u0648 \u0627\u0644\u0642\u0639\u062f\u0629','\u0630\u0648 \u0627\u0644\u062d\u062c\u0629'];
+        var toAr = function(x) { return String(x).replace(/\d/g, function(c){ return '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669'[c]; }); };
+        return toAr(hd) + ' ' + hMonths[hm-1] + ' ' + toAr(hy) + ' \u0647\u0640';
+    }
+
+    function buildSSCalendar() {
+        var cal = document.getElementById('ssCalendar');
+        if (!cal) return;
+        var now = new Date();
+        var yr = now.getFullYear(), mo = now.getMonth(), td = now.getDate();
+        var firstDay = new Date(yr, mo, 1).getDay();
+        var daysInMo = new Date(yr, mo+1, 0).getDate();
+        var mNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        var dh = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+        var html = '<div class="ss-cal-top"><span class="ss-cal-mname">' + mNames[mo] + '</span><span class="ss-cal-yr">' + yr + '</span></div>';
+        html += '<div class="ss-cal-grid">';
+        for (var i = 0; i < 7; i++) html += '<div class="ss-cal-dh">' + dh[i] + '</div>';
+        for (var e = 0; e < firstDay; e++) html += '<div class="ss-cal-d"></div>';
+        for (var day = 1; day <= daysInMo; day++) {
+            html += '<div class="ss-cal-d' + (day === td ? ' ss-today' : '') + '">' + day + '</div>';
+        }
+        html += '</div>';
+        cal.innerHTML = html;
+    }
+
+    function loadSSPrayers() {
+        var now = new Date();
+        var dk = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+        if (ssPrayerCache && ssPrayerCacheDate === dk) { renderSSPrayers(ssPrayerCache); return; }
+        var ds = now.getDate() + '-' + (now.getMonth()+1) + '-' + now.getFullYear();
+        fetch('https://api.aladhan.com/v1/timingsByCity/' + ds + '?city=Baghdad&country=Iraq&method=3')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var t = data.data.timings;
+                ssPrayerCache = { Fajr: t.Fajr, Dhuhr: t.Dhuhr, Asr: t.Asr, Maghrib: t.Maghrib, Isha: t.Isha };
+                ssPrayerCacheDate = dk;
+                renderSSPrayers(ssPrayerCache);
+            })
+            .catch(function() {
+                ssPrayerCache = { Fajr: '04:15', Dhuhr: '12:15', Asr: '15:30', Maghrib: '18:30', Isha: '19:55' };
+                renderSSPrayers(ssPrayerCache);
+            });
+    }
+
+    function renderSSPrayers(p) {
+        var el = document.getElementById('ssPrayers');
+        if (!el) return;
+        var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+        var labels = { Fajr:'\u0627\u0644\u0641\u062c\u0631', Dhuhr:'\u0627\u0644\u0638\u0647\u0631', Asr:'\u0627\u0644\u0639\u0635\u0631', Maghrib:'\u0627\u0644\u0645\u063a\u0631\u0628', Isha:'\u0627\u0644\u0639\u0634\u0627\u0621' };
+        var cur = getCurrentPrayer(p);
+        var html = '';
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            html += '<div class="ss-prayer-item' + (k===cur?' ss-current-prayer':'') + '" id="ssp_'+k+'">'
+                  + '<span class="ss-prayer-name">' + labels[k] + ' \u2014 ' + k + '</span>'
+                  + '<span class="ss-prayer-time">' + p[k] + '</span></div>';
+        }
+        el.innerHTML = html;
+    }
+
+    function getCurrentPrayer(p) {
+        var now = new Date();
+        var nowM = now.getHours()*60 + now.getMinutes();
+        var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+        var mins = {};
+        for (var i = 0; i < keys.length; i++) {
+            var parts = (p[keys[i]] || '00:00').split(':');
+            mins[keys[i]] = parseInt(parts[0])*60 + parseInt(parts[1]);
+        }
+        var cur = 'Isha';
+        for (var j = keys.length - 1; j >= 0; j--) {
+            if (nowM >= mins[keys[j]]) { cur = keys[j]; break; }
+        }
+        return cur;
+    }
+
+    function highlightCurrentPrayer() {
+        if (!ssPrayerCache) return;
+        var cur = getCurrentPrayer(ssPrayerCache);
+        var keys = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+        for (var i = 0; i < keys.length; i++) {
+            var el = document.getElementById('ssp_' + keys[i]);
+            if (el) {
+                if (keys[i] === cur) el.classList.add('ss-current-prayer');
+                else el.classList.remove('ss-current-prayer');
+            }
+        }
+    }
+
+    function updateSSStats() {
+        var seen = 0, waiting = 0, nextName = '\u2014';
+        var ids = Object.keys(ptIdx);
+        var todayStr = new Date().toLocaleDateString('en-GB');
+        for (var i = 0; i < ids.length; i++) {
+            var p = ptIdx[ids[i]];
+            if (p.isWaiting) { waiting++; if (nextName === '\u2014') nextName = p.name; }
+            if (p.lastVisit === todayStr && !p.isWaiting) seen++;
+        }
+        var sEl = document.getElementById('ssSeen');
+        var wEl = document.getElementById('ssWaiting');
+        var nEl = document.getElementById('ssNext');
+        if (sEl) sEl.textContent = seen;
+        if (wEl) wEl.textContent = waiting;
+        if (nEl) nEl.textContent = nextName;
+    }
 </script>
 </body>
 </html>
