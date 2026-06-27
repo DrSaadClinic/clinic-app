@@ -17,6 +17,9 @@
             --call: #5E5CE6;
             --lab: #64D2FF;
             --img: #BF5AF2;
+            --monjaro: #A78BFA;
+            --monjaro-dark: #7C3AED;
+            --monjaro-glow: rgba(167,139,250,0.35);
             --bg-root: #000000;
             --card-bg: rgba(28, 28, 30, 0.8);
             --card-bg-solid: #1C1C1E;
@@ -672,6 +675,204 @@
     .ss-stat-next { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.75); line-height: 1.3; }
     .ss-tap-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255,255,255,0.18); letter-spacing: 0.1em; text-transform: uppercase; animation: ssHint 3s ease-in-out infinite; }
     @keyframes ssHint { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+        /* ================================================================
+           MONJARO FEATURE STYLES
+        ================================================================ */
+        :root, [data-theme="dark"] {
+            --monjaro: #A78BFA;
+            --monjaro-dark: #7C3AED;
+            --monjaro-glow: rgba(167,139,250,0.35);
+        }
+        [data-theme="glass"] {
+            --monjaro: #7C3AED;
+            --monjaro-dark: #5B21B6;
+            --monjaro-glow: rgba(124,58,237,0.2);
+        }
+
+        /* Main Monjaro tab active style */
+        .main-tab.active.mj-active { background: var(--monjaro-dark) !important; box-shadow: 0 2px 12px var(--monjaro-glow) !important; }
+
+        /* Monjaro dashboard stats grid */
+        .mj-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+        @media (max-width: 900px) { .mj-stats-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 500px) { .mj-stats-grid { grid-template-columns: 1fr; } }
+
+        .mj-stat-card {
+            background: var(--color-fill-secondary); border: 1px solid var(--color-separator);
+            border-radius: 18px; padding: 18px 16px; text-align: center;
+            transition: all 0.3s ease; animation: cardEnter 0.4s ease both;
+            position: relative; overflow: hidden;
+        }
+        .mj-stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--monjaro-dark), var(--monjaro));
+            border-radius: 18px 18px 0 0;
+        }
+        .mj-stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.15); }
+        [data-theme="glass"] .mj-stat-card { background: rgba(255,255,255,0.75); }
+        .mj-stat-val { font-size: 2.2rem; font-weight: 800; color: var(--monjaro); letter-spacing: -0.03em; line-height: 1; }
+        .mj-stat-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
+        .mj-stat-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+        /* Dose tier distribution bar */
+        .mj-dist-bar { display: flex; height: 10px; border-radius: 10px; overflow: hidden; gap: 2px; margin: 12px 0 8px; }
+        .mj-dist-seg { transition: all 0.4s ease; border-radius: 4px; min-width: 4px; }
+
+        /* Patient list card in Monjaro tab */
+        .mj-pt-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px; background: var(--color-fill-secondary);
+            border: 1px solid var(--color-separator); border-left: 4px solid var(--monjaro);
+            border-radius: 16px; margin-bottom: 10px; cursor: pointer;
+            transition: all 0.2s ease; animation: listSlide 0.3s ease both;
+        }
+        .mj-pt-card:hover { transform: translateX(3px); background: rgba(167,139,250,0.08); border-left-color: var(--monjaro-dark); box-shadow: 0 4px 16px rgba(124,58,237,0.12); }
+        [data-theme="glass"] .mj-pt-card { background: rgba(255,255,255,0.75); }
+        .mj-dose-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; white-space: nowrap; color: white; }
+        .mj-overdue-badge { background: rgba(255,69,58,0.15); color: var(--danger); border: 1px solid rgba(255,69,58,0.3); padding: 3px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+        .mj-due-badge { background: rgba(255,159,10,0.15); color: var(--warning); border: 1px solid rgba(255,159,10,0.3); padding: 3px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+
+        /* Per-patient Monjaro file */
+        .mj-summary-bar {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px; margin-bottom: 20px; padding: 16px;
+            background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(167,139,250,0.06));
+            border: 1px solid rgba(167,139,250,0.2); border-radius: 18px;
+        }
+        [data-theme="glass"] .mj-summary-bar { background: rgba(124,58,237,0.06); border: 0.5px solid rgba(124,58,237,0.15); }
+        .mj-sum-item { text-align: center; }
+        .mj-sum-val { font-size: 1.4rem; font-weight: 800; color: var(--monjaro); letter-spacing: -0.02em; }
+        .mj-sum-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+        /* BMI gauge */
+        .mj-bmi-gauge-wrap { position: relative; margin: 12px 0 8px; }
+        .mj-bmi-track { height: 12px; border-radius: 10px; overflow: hidden;
+            background: linear-gradient(90deg, #30D158 0%, #FFD60A 40%, #FF9F0A 65%, #FF453A 85%, #BF5AF2 100%);
+        }
+        .mj-bmi-marker { position: absolute; top: -4px; width: 20px; height: 20px; background: white;
+            border: 3px solid var(--monjaro); border-radius: 50%; transform: translateX(-50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .mj-bmi-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-tertiary); margin-top: 4px; }
+        .mj-ai-box {
+            background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(167,139,250,0.04));
+            border: 1px solid rgba(167,139,250,0.2); border-radius: 14px;
+            padding: 14px 16px; margin-top: 12px; font-size: 13px;
+            line-height: 1.65; color: var(--text-primary); white-space: pre-wrap;
+        }
+        [data-theme="glass"] .mj-ai-box { background: rgba(124,58,237,0.04); border: 0.5px solid rgba(124,58,237,0.12); }
+
+        /* Dose timeline */
+        .mj-timeline { position: relative; padding-left: 28px; margin-top: 16px; }
+        .mj-timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(180deg, var(--monjaro-dark), var(--monjaro), transparent);
+            border-radius: 2px;
+        }
+        .mj-dose-card {
+            position: relative; background: var(--color-fill-secondary);
+            border: 1px solid var(--color-separator); border-radius: 16px;
+            padding: 14px 16px; margin-bottom: 12px;
+            transition: all 0.2s ease; animation: listSlide 0.3s ease both;
+        }
+        .mj-dose-card:hover { box-shadow: 0 4px 16px rgba(124,58,237,0.12); transform: translateX(3px); }
+        [data-theme="glass"] .mj-dose-card { background: rgba(255,255,255,0.75); }
+        .mj-dose-card::before { content: ''; position: absolute; left: -22px; top: 18px;
+            width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;
+            background: var(--monjaro); box-shadow: 0 0 0 3px var(--monjaro-glow);
+        }
+        .mj-dose-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .mj-dose-number { font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+        .mj-delta { font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+        .mj-delta.down { background: rgba(48,209,88,0.12); color: var(--success); }
+        .mj-delta.up { background: rgba(255,69,58,0.12); color: var(--danger); }
+        .mj-delta.same { background: rgba(142,142,147,0.12); color: var(--text-secondary); }
+        .mj-dose-note { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 8px; }
+        .mj-dose-note strong { color: var(--text-primary); }
+        .mj-reminder-flag { color: var(--warning); font-size: 13px; }
+
+        /* Dose tier accordion */
+        .mj-tier-accordion { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+        [data-theme="glass"] .mj-tier-accordion { background: rgba(124,58,237,0.04); border: 0.5px solid rgba(124,58,237,0.12); }
+        .mj-tier-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; color: var(--text-primary); }
+        .mj-tier-header:hover { background: rgba(167,139,250,0.1); }
+        .mj-tier-body { display: none; padding: 12px 16px; border-top: 1px solid var(--separator); }
+        .mj-tier-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--separator); color: var(--text-primary); }
+        .mj-tier-row:last-child { border-bottom: none; }
+
+        /* WhatsApp Arabic message */
+        .mj-msg-bubble {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white; padding: 18px 20px; border-radius: 20px 20px 4px 20px;
+            font-size: 15px; line-height: 1.8; font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            margin: 14px 0; direction: rtl; text-align: right;
+            box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+            white-space: pre-line; letter-spacing: 0.2px;
+        }
+        .mj-msg-actions { display: flex; gap: 10px; }
+        .mj-copy-btn { background: linear-gradient(135deg, #25D366, #128C7E); color: white; border: none; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; flex: 1; }
+        .mj-copy-btn:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(37,211,102,0.4); }
+
+        /* Add to Monjaro button */
+        .mj-enroll-btn {
+            background: linear-gradient(135deg, var(--monjaro-dark), var(--monjaro));
+            color: white; border: none; border-radius: 16px; padding: 13px;
+            font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
+            margin-top: 12px; box-shadow: 0 4px 16px var(--monjaro-glow);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .mj-enroll-btn:hover { transform: translateY(-2px) scale(1.01); filter: brightness(1.08); }
+
+        /* Enrollment modal */
+        .mj-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .mj-modal {
+            background: var(--card-bg); backdrop-filter: var(--backdrop-blur); -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border); border-radius: 24px; padding: 28px;
+            width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+            animation: panelPopIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+        }
+        [data-theme="glass"] .mj-modal { background: rgba(255,255,255,0.9); }
+        .mj-modal h3 { color: var(--monjaro); border-bottom: 1px solid rgba(167,139,250,0.2); padding-bottom: 12px; margin-bottom: 18px; font-size: 18px; }
+        .mj-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .mj-dose-select {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 14px;
+        }
+        .mj-dose-opt { border: 2px solid var(--color-separator); background: var(--color-fill-tertiary);
+            border-radius: 12px; padding: 10px; text-align: center; cursor: pointer;
+            transition: all 0.2s; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+        }
+        .mj-dose-opt:hover { border-color: var(--monjaro); color: var(--monjaro); background: rgba(167,139,250,0.08); }
+        .mj-dose-opt.selected { border-color: var(--monjaro-dark); background: rgba(124,58,237,0.12); color: var(--monjaro-dark); }
+        [data-theme="glass"] .mj-dose-opt { background: rgba(0,0,0,0.03); }
+
+        /* Dose entry form */
+        .mj-add-form { background: rgba(124,58,237,0.06); border: 1px solid rgba(167,139,250,0.2); border-radius: 18px; padding: 18px; margin-bottom: 18px; }
+        [data-theme="glass"] .mj-add-form { background: rgba(124,58,237,0.04); border: 0.5px solid rgba(124,58,237,0.12); }
+        .mj-add-form h4 { color: var(--monjaro); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+        .mj-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        @media (max-width: 600px) { .mj-form-grid { grid-template-columns: 1fr; } }
+        .mj-reminder-toggle { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,159,10,0.08); border: 1px solid rgba(255,159,10,0.2); border-radius: 12px; margin-top: 8px; cursor: pointer; }
+        .mj-reminder-toggle input { width: 18px; height: 18px; accent-color: var(--warning); margin: 0; }
+        .mj-reminder-toggle label { font-size: 13px; color: var(--text-secondary); cursor: pointer; font-weight: 500; }
+
+        /* Sub-tab Monjaro badge */
+        .mj-sub-tab-badge { background: var(--monjaro); color: white; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 6px; margin-left: 4px; vertical-align: middle; }
+
+        /* Monjaro 2-col layout */
+        .mj-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+        @media (max-width: 900px) { .mj-grid-2 { grid-template-columns: 1fr; } }
+
+        /* Section header in Monjaro file */
+        .mj-section-hdr { color: var(--monjaro); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 18px 0 10px; display: flex; align-items: center; gap: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(167,139,250,0.2); }
+
+        /* Protocol hint banner */
+        .mj-protocol-hint { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; margin-bottom: 16px; font-size: 13px; font-weight: 600; }
+        .mj-protocol-hint.escalate { background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.25); color: var(--warning); }
+        .mj-protocol-hint.overdue { background: rgba(255,69,58,0.1); border: 1px solid rgba(255,69,58,0.25); color: var(--danger); }
+        .mj-protocol-hint.ok { background: rgba(48,209,88,0.08); border: 1px solid rgba(48,209,88,0.2); color: var(--success); }
+
     </style>
 </head>
 <body>
@@ -732,6 +933,7 @@
     <button class="main-tab" id="mtPatient" onclick="switchMainTab('patient')">📋 Patient</button>
     <button class="main-tab" id="mtDashboard" onclick="switchMainTab('dashboard')">📊 Dashboard</button>
     <button class="main-tab" id="mtWaiting" onclick="switchMainTab('waiting')">📺 Display</button>
+    <button class="main-tab" id="mtMonjaro" onclick="switchMainTab('monjaro')" style="color:var(--monjaro);">💉 Monjaro</button>
 </div>
 
 <div id="mainContent" class="container">
@@ -854,10 +1056,11 @@
             <button id="dismissOverdueBtn" onclick="dismissPatientOverdue()" style="background:rgba(255,69,58,0.12); color:var(--danger); border:1px solid var(--danger); margin-bottom:18px; display:none; padding:10px 15px; border-radius:12px; width:auto; box-shadow:none;">Dismiss 25-Day Alert</button>
 
             <!-- SUB-TAB BAR -->
-            <div class="sub-tab-bar">
+            <div class="sub-tab-bar" id="fileSubTabBar">
                 <button class="sub-tab active" id="stClinical" onclick="switchSubTab('clinical')">📝 Clinical</button>
                 <button class="sub-tab" id="stInvestigations" onclick="switchSubTab('investigations')">🔬 Investigations</button>
                 <button class="sub-tab" id="stHistory" onclick="switchSubTab('history')">📁 History</button>
+                <button class="sub-tab" id="stMonjaro" onclick="switchSubTab('monjaro')" style="display:none; color:var(--monjaro);">💉 Monjaro</button>
             </div>
 
             <!-- ===== CLINICAL SUB-TAB ===== -->
@@ -982,6 +1185,16 @@
 
             </div><!-- /subHistory -->
 
+            <!-- ===== MONJARO SUB-TAB ===== -->
+            <div id="subMonjaro" class="sub-panel"></div><!-- /subMonjaro -->
+
+            <!-- Add to Monjaro button (shown only for non-enrolled patients) -->
+            <div id="mjEnrollBtnWrap" style="display:none; margin-top:14px;">
+                <button class="mj-enroll-btn" onclick="openMonjaroEnrollModal()">
+                    💉 Add This Patient to Monjaro Program
+                </button>
+            </div>
+
             <button onclick="manualSync()" style="background:var(--success); height:58px; font-size:16px; margin-top:8px; box-shadow:0 4px 16px rgba(48,209,88,0.3); border-radius:18px;">Force Cloud Database Sync</button>
 
         </div><!-- /fileView -->
@@ -1058,6 +1271,107 @@
             </div>
         </div>
     </div><!-- /dashboardPanel -->
+
+    <!-- ═══ MONJARO TAB PANEL ═══ -->
+    <div id="monjaroPanel" style="display:none; grid-column:1/-1;">
+
+        <!-- Dashboard Stats -->
+        <div class="card" style="border-left:4px solid var(--monjaro); margin-bottom:22px;">
+            <h3 style="color:var(--monjaro); border-color:rgba(167,139,250,0.2); margin-bottom:14px;">💉 Monjaro Program Dashboard</h3>
+            <div class="mj-stats-grid" id="mjStatsGrid">
+                <div class="mj-stat-card">
+                    <div class="mj-stat-val" id="mjTotalPts">—</div>
+                    <div class="mj-stat-label">Total Patients</div>
+                </div>
+                <div class="mj-stat-card">
+                    <div class="mj-stat-val" id="mjTotalDoses">—</div>
+                    <div class="mj-stat-label">Total Doses Given</div>
+                </div>
+                <div class="mj-stat-card">
+                    <div class="mj-stat-val" id="mjAvgLoss">—</div>
+                    <div class="mj-stat-label">Avg Weight Lost</div>
+                    <div class="mj-stat-sub">kg per patient</div>
+                </div>
+                <div class="mj-stat-card">
+                    <div class="mj-stat-val" id="mjDueSoon">—</div>
+                    <div class="mj-stat-label">Due This Week</div>
+                </div>
+            </div>
+            <!-- Dose distribution -->
+            <div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em;">Dose Distribution</span>
+                </div>
+                <div class="mj-dist-bar" id="mjDistBar"></div>
+                <div id="mjDistLegend" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;"></div>
+            </div>
+        </div>
+
+        <!-- Search + Patient List -->
+        <div class="card">
+            <h3 style="color:var(--monjaro); border-color:rgba(167,139,250,0.2);">
+                💊 Enrolled Patients
+                <input type="text" id="mjSearchBox" placeholder="🔍 Search..." oninput="renderMonjaroList()" style="width:180px; font-size:13px; padding:7px 12px; margin:0; border-radius:10px; float:right;">
+            </h3>
+            <div id="mjPatientList"></div>
+        </div>
+
+    </div><!-- /monjaroPanel -->
+
+    <!-- Monjaro Enrollment Modal -->
+    <div id="mjEnrollModal" class="mj-modal-overlay" style="display:none;" onclick="if(event.target===this)closeMonjaroEnrollModal()">
+        <div class="mj-modal">
+            <h3>💉 Enroll in Monjaro Program</h3>
+            <p id="mjEnrollPatientName" style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:16px;"></p>
+
+            <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:6px;">Starting Dose (mg)</span>
+            <div class="mj-dose-select" id="mjEnrollDoseSelect">
+                <div class="mj-dose-opt selected" data-dose="2.5" onclick="selectEnrollDose(this)">2.5 mg<br><span style='font-size:10px;color:inherit;opacity:0.7;'>Starter</span></div>
+                <div class="mj-dose-opt" data-dose="5" onclick="selectEnrollDose(this)">5 mg</div>
+                <div class="mj-dose-opt" data-dose="7.5" onclick="selectEnrollDose(this)">7.5 mg</div>
+                <div class="mj-dose-opt" data-dose="10" onclick="selectEnrollDose(this)">10 mg</div>
+                <div class="mj-dose-opt" data-dose="12.5" onclick="selectEnrollDose(this)">12.5 mg</div>
+                <div class="mj-dose-opt" data-dose="15" onclick="selectEnrollDose(this)">15 mg<br><span style='font-size:10px;color:inherit;opacity:0.7;'>Max</span></div>
+            </div>
+
+            <div class="mj-form-row">
+                <div>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Height (cm)</span>
+                    <input type="number" id="mjEnrollHeight" placeholder="e.g. 170" style="margin:0;">
+                </div>
+                <div>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Start Weight (kg)</span>
+                    <input type="number" id="mjEnrollWeight" placeholder="e.g. 95" style="margin:0;">
+                </div>
+            </div>
+            <div class="mj-form-row" style="margin-top:10px;">
+                <div>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Target Weight (kg)</span>
+                    <input type="number" id="mjEnrollTarget" placeholder="e.g. 80" style="margin:0;">
+                </div>
+                <div>
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Age</span>
+                    <input type="number" id="mjEnrollAge" placeholder="e.g. 45" style="margin:0;">
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Gender</span>
+                <div style="display:flex; gap:10px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:14px; color:var(--text-primary);"><input type="radio" name="mjGender" value="male" id="mjGenderM" checked style="accent-color:var(--monjaro); margin:0;"> Male</label>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:14px; color:var(--text-primary);"><input type="radio" name="mjGender" value="female" id="mjGenderF" style="accent-color:var(--monjaro); margin:0;"> Female</label>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Enrollment Date</span>
+                <input type="date" id="mjEnrollDate" style="margin:0;">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="confirmMonjaroEnroll()" style="background:linear-gradient(135deg,var(--monjaro-dark),var(--monjaro)); box-shadow:0 4px 16px var(--monjaro-glow); flex:1;">Enroll Patient 💉</button>
+                <button onclick="closeMonjaroEnrollModal()" style="background:rgba(255,255,255,0.08); color:var(--text-secondary); box-shadow:none; flex:0 0 100px;">Cancel</button>
+            </div>
+        </div>
+    </div>
 
         <!-- VISIONOS DISPLAY TAB PANEL -->
     <div id="waitingPanel" style="display:none; grid-column:1/-1;">
@@ -1215,8 +1529,10 @@
     }
 
     /* ================================================================
-       FIREBASE SYNC
+       FIREBASE STATE — patch loadFullData to show/hide Monjaro tab
     ================================================================ */
+    var _origLoadFullData = null;
+    /* We patch loadFullData after Monjaro state is ready. See initMonjaro() */
     function initSync() {
         db.ref('globalLabs').on('value', function(snap) {
             if (snap.exists()) { globalLabs = snap.val(); }
@@ -2154,9 +2470,11 @@
                 var pinIcon = p.pinned ? '&#11088;' : '&#9734;';
                 var pinClass = p.pinned ? 'pinned' : '';
                 var isActive = activeId == id ? ' active' : '';
+                var mjBadge = monjaroData[id] ? ' <span style="font-size:11px;" title="Monjaro Patient">💉</span>' : '';
 
                 list.innerHTML += '<div id="pt-' + id + '" class="pt-item' + isActive + '" onclick="loadFullData(\'' + id + '\')">' +
                     '<strong>' + escapeHtml(p.name || 'Unnamed Patient') + '</strong>' +
+                    mjBadge +
                     (p.isWaiting ? ' <span style="background:var(--primary);color:white;padding:2px 6px;border-radius:8px;font-size:10px;margin-left:4px;">WAITING</span>' : '') +
                     (p.hasPendingLab ? ' &#129514;' : '') + alertBadge +
                     '<span class="pt-meta">Reg: ' + escapeHtml(p.dateAdded) + ' &nbsp;|&nbsp; Last: ' + escapeHtml(lastVisit) + '</span>' +
@@ -2684,14 +3002,14 @@
 
     function switchSubTab(tab) {
         currentSubTab = tab;
-        var tabs = ['stClinical','stInvestigations','stHistory'];
-        var names = ['clinical','investigations','history'];
+        var tabs = ['stClinical','stInvestigations','stHistory','stMonjaro'];
+        var names = ['clinical','investigations','history','monjaro'];
         for (var i = 0; i < tabs.length; i++) {
             var el = document.getElementById(tabs[i]);
             if (el) { if (names[i] === tab) el.classList.add('active'); else el.classList.remove('active'); }
         }
-        var panels = ['subClinical','subInvestigations','subHistory'];
-        var panelNames = ['clinical','investigations','history'];
+        var panels = ['subClinical','subInvestigations','subHistory','subMonjaro'];
+        var panelNames = ['clinical','investigations','history','monjaro'];
         for (var j = 0; j < panels.length; j++) {
             var p = document.getElementById(panels[j]);
             if (p) {
@@ -2699,20 +3017,26 @@
                 else { p.classList.remove('active'); p.style.display = 'none'; }
             }
         }
+        /* If switching to monjaro sub-tab, render it */
+        if (tab === 'monjaro' && activeId) renderMonjaroPatientFile(activeId);
     }
 
         function switchMainTab(tab) {
         currentMainTab = tab;
-        var tabMap = { home: 'mtHome', patient: 'mtPatient', dashboard: 'mtDashboard', waiting: 'mtWaiting' };
+        var tabMap = { home: 'mtHome', patient: 'mtPatient', dashboard: 'mtDashboard', waiting: 'mtWaiting', monjaro: 'mtMonjaro' };
         Object.keys(tabMap).forEach(function(t) {
             var el = document.getElementById(tabMap[t]);
             if (el) { if (t === tab) el.classList.add('active'); else el.classList.remove('active'); }
         });
+        /* Monjaro tab gets purple active color */
+        var mjTab = document.getElementById('mtMonjaro');
+        if (mjTab) { if (tab === 'monjaro') { mjTab.style.background = 'var(--monjaro-dark)'; mjTab.style.color = 'white'; mjTab.classList.add('mj-active'); } else { mjTab.style.background = ''; mjTab.style.color = 'var(--monjaro)'; mjTab.classList.remove('mj-active'); } }
 
         var sidebar = document.getElementById('sidebarPanel');
         var content = document.getElementById('contentPanel');
         var dashboard = document.getElementById('dashboardPanel');
         var waiting = document.getElementById('waitingPanel');
+        var monjaro = document.getElementById('monjaroPanel');
         var container = document.getElementById('mainContent');
         var appHeader = document.querySelector('header');
         var tabBar = document.getElementById('mainTabBar');
@@ -2723,6 +3047,7 @@
         content.style.display = 'none';
         dashboard.style.display = 'none';
         waiting.style.display = 'none';
+        if (monjaro) monjaro.style.display = 'none';
         waiting.classList.remove('active-display');
         appHeader.style.display = 'flex';
         tabBar.style.display = 'flex';
@@ -2758,6 +3083,11 @@
             startVosClock();
             renderVisionOSDisplay();
             resetScreensaverTimer();
+        } else if (tab === 'monjaro') {
+            if (monjaro) monjaro.style.display = 'block';
+            renderMonjaroDashboard();
+            clearTimeout(ssTimer);
+            if (typeof dismissScreensaver === 'function') dismissScreensaver();
         }
     }
 
@@ -3460,6 +3790,541 @@ function _renderVisionOSDisplay() {
         if (wEl) wEl.textContent = waiting;
         if (nEl) nEl.textContent = nextName;
     }
+
+    /* ================================================================
+       MONJARO JAVASCRIPT ENGINE
+    ================================================================ */
+    var monjaroData = {};     /* keyed by patient ID */
+    var monjaroListener = null;
+    var mjEnrollTargetId = null;
+    var mjViewingId = null;
+
+    var MJ_DOSE_COLORS = {
+        '2.5':  { bg: 'linear-gradient(135deg,#3B82F6,#2563EB)', hex: '#3B82F6' },
+        '5':    { bg: 'linear-gradient(135deg,#06B6D4,#0284C7)', hex: '#06B6D4' },
+        '7.5':  { bg: 'linear-gradient(135deg,#10B981,#059669)', hex: '#10B981' },
+        '10':   { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', hex: '#F59E0B' },
+        '12.5': { bg: 'linear-gradient(135deg,#EF4444,#DC2626)', hex: '#EF4444' },
+        '15':   { bg: 'linear-gradient(135deg,#A78BFA,#7C3AED)', hex: '#A78BFA' }
+    };
+
+    /* ---------- Firebase listener ---------- */
+    function initMonjaro() {
+        if (monjaroListener) monjaroListener.off();
+        monjaroListener = db.ref('monjaro_patients');
+        monjaroListener.on('value', function(snap) {
+            monjaroData = snap.val() || {};
+            if (currentMainTab === 'monjaro') renderMonjaroDashboard();
+            if (activeId && currentSubTab === 'monjaro') renderMonjaroPatientFile(activeId);
+            renderList();
+            if (activeId) refreshMonjaroSubTab(activeId);
+        });
+    }
+
+    function refreshMonjaroSubTab(id) {
+        var btn = document.getElementById('stMonjaro');
+        var enrollBtn = document.getElementById('mjEnrollBtnWrap');
+        if (!btn || !enrollBtn) return;
+        if (monjaroData[id]) {
+            btn.style.display = 'inline-block';
+            enrollBtn.style.display = 'none';
+        } else {
+            btn.style.display = 'none';
+            enrollBtn.style.display = 'block';
+        }
+    }
+
+    /* Patch loadFullData to trigger Monjaro tab visibility */
+    var _mjPatched = false;
+    function patchLoadFullData() {
+        if (_mjPatched) return;
+        var origFn = window.loadFullData;
+        if (!origFn) { setTimeout(patchLoadFullData, 400); return; }
+        _mjPatched = true;
+        var patched = function(id) {
+            origFn(id);
+            setTimeout(function() { refreshMonjaroSubTab(id); }, 400);
+        };
+        window.loadFullData = patched;
+    }
+
+    /* ---------- Dashboard ---------- */
+    function renderMonjaroDashboard() {
+        var ids = Object.keys(monjaroData);
+        var totalPts = ids.length;
+        var totalDoses = 0;
+        var totalLost = 0;
+        var lossPts = 0;
+        var now = Date.now();
+        var dueSoon = 0;
+        var doseCount = { '2.5':0, '5':0, '7.5':0, '10':0, '12.5':0, '15':0 };
+
+        for (var i = 0; i < ids.length; i++) {
+            var m = monjaroData[ids[i]];
+            var doses = m.doses || [];
+            totalDoses += doses.length;
+            var cd = m.currentDose ? String(m.currentDose) : '2.5';
+            if (doseCount[cd] !== undefined) doseCount[cd]++;
+            if (m.startWeight && doses.length > 0) {
+                var lastDose = doses[doses.length - 1];
+                if (lastDose.weight) { totalLost += (parseFloat(m.startWeight) - parseFloat(lastDose.weight)); lossPts++; }
+            }
+            if (doses.length > 0) {
+                var daysSince = Math.floor((now - new Date(doses[doses.length-1].date).getTime()) / 86400000);
+                if (daysSince >= 25 && daysSince < 42) dueSoon++;
+            } else if (m.startDate) {
+                if (Math.floor((now - new Date(m.startDate).getTime()) / 86400000) >= 25) dueSoon++;
+            }
+        }
+
+        var el;
+        el = document.getElementById('mjTotalPts');  if (el) el.textContent = totalPts;
+        el = document.getElementById('mjTotalDoses'); if (el) el.textContent = totalDoses;
+        el = document.getElementById('mjAvgLoss');
+        if (el) el.textContent = lossPts > 0 ? (totalLost / lossPts).toFixed(1) + ' kg' : '\u2014';
+        el = document.getElementById('mjDueSoon');   if (el) el.textContent = dueSoon;
+
+        var distBar    = document.getElementById('mjDistBar');
+        var distLegend = document.getElementById('mjDistLegend');
+        if (distBar) {
+            if (totalPts > 0) {
+                var tiers = ['2.5','5','7.5','10','12.5','15'];
+                var barHtml = '', legendHtml = '';
+                for (var t = 0; t < tiers.length; t++) {
+                    var cnt = doseCount[tiers[t]];
+                    if (!cnt) continue;
+                    var col = MJ_DOSE_COLORS[tiers[t]];
+                    barHtml += '<div class="mj-dist-seg" style="flex:' + cnt + ';background:' + col.bg + ';" title="' + tiers[t] + ' mg: ' + cnt + ' patients"></div>';
+                    legendHtml += '<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary);"><span style="width:10px;height:10px;border-radius:3px;background:' + col.hex + ';display:inline-block;"></span>' + tiers[t] + ' mg <b style="color:var(--text-primary);">' + cnt + '</b></span>';
+                }
+                distBar.innerHTML = barHtml || '<div style="flex:1;background:var(--separator);border-radius:4px;"></div>';
+                if (distLegend) distLegend.innerHTML = legendHtml;
+            } else {
+                distBar.innerHTML = '<div style="flex:1;background:var(--separator);border-radius:4px;height:10px;"></div>';
+                if (distLegend) distLegend.innerHTML = '';
+            }
+        }
+        renderMonjaroList();
+    }
+
+    function renderMonjaroList() {
+        var list = document.getElementById('mjPatientList');
+        if (!list) return;
+        var searchEl = document.getElementById('mjSearchBox');
+        var search = searchEl ? searchEl.value.toLowerCase() : '';
+        var ids = Object.keys(monjaroData);
+        if (ids.length === 0) {
+            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-secondary);"><div style="font-size:48px;margin-bottom:14px;">&#128138;</div><p style="font-weight:600;">No patients enrolled yet.</p><p style="font-size:13px;margin-top:6px;">Open a patient file and click &#8220;Add to Monjaro Program&#8221;.</p></div>';
+            return;
+        }
+        var now = Date.now();
+        var filtered = [];
+        for (var i = 0; i < ids.length; i++) {
+            var name = ptIdx[ids[i]] ? ptIdx[ids[i]].name : (monjaroData[ids[i]].patientName || 'Unknown');
+            if (search && name.toLowerCase().indexOf(search) === -1) continue;
+            filtered.push(ids[i]);
+        }
+        filtered.sort(function(a, b) {
+            var mA = monjaroData[a], mB = monjaroData[b];
+            var dA = mA.doses && mA.doses.length ? new Date(mA.doses[mA.doses.length-1].date).getTime() : 0;
+            var dB = mB.doses && mB.doses.length ? new Date(mB.doses[mB.doses.length-1].date).getTime() : 0;
+            return dB - dA;
+        });
+        var html = '';
+        for (var j = 0; j < filtered.length; j++) {
+            var fid = filtered[j];
+            var m = monjaroData[fid];
+            var doses = m.doses || [];
+            var ptName = ptIdx[fid] ? ptIdx[fid].name : (m.patientName || 'Unknown');
+            var currentDose = m.currentDose ? String(m.currentDose) : '2.5';
+            var col = MJ_DOSE_COLORS[currentDose] || MJ_DOSE_COLORS['2.5'];
+            var wLost = '';
+            if (m.startWeight && doses.length > 0 && doses[doses.length-1].weight) {
+                var lost = parseFloat(m.startWeight) - parseFloat(doses[doses.length-1].weight);
+                wLost = (lost >= 0 ? '&#9660; ' : '&#9650; ') + Math.abs(lost).toFixed(1) + ' kg';
+            }
+            var dueBadge = '';
+            if (doses.length > 0) {
+                var ds = Math.floor((now - new Date(doses[doses.length-1].date).getTime()) / 86400000);
+                if (ds >= 35) dueBadge = '<span class="mj-overdue-badge">&#128308; Overdue</span>';
+                else if (ds >= 25) dueBadge = '<span class="mj-due-badge">&#9201; Due Soon</span>';
+            }
+            var lastDoseStr = doses.length > 0 ? doses[doses.length-1].date : (m.startDate || '--');
+            html += '<div class="mj-pt-card" onclick="openMonjaroFromList(\'' + fid + '\')">' +
+                '<div style="flex:1;min-width:0;">' +
+                '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+                '<span style="font-size:16px;font-weight:700;color:var(--text-primary);">' + escapeHtml(ptName) + '</span>' +
+                dueBadge + '</div>' +
+                '<div style="font-size:12px;color:var(--text-secondary);display:flex;gap:10px;flex-wrap:wrap;">' +
+                '<span>&#128138; ' + doses.length + ' doses</span>' +
+                (wLost ? '<span style="color:var(--success);font-weight:600;">' + wLost + '</span>' : '') +
+                '<span>Last: ' + escapeHtml(lastDoseStr) + '</span>' +
+                '</div></div>' +
+                '<span class="mj-dose-badge" style="background:' + col.bg + ';">' + currentDose + ' mg</span>' +
+                '</div>';
+        }
+        list.innerHTML = html || '<p style="text-align:center;padding:30px;color:var(--text-secondary);font-size:13px;">No patients match your search.</p>';
+    }
+
+    function openMonjaroFromList(id) {
+        loadFullData(id);
+        switchMainTab('patient');
+        setTimeout(function() { switchSubTab('monjaro'); }, 600);
+    }
+
+    /* ---------- Enrollment ---------- */
+    function openMonjaroEnrollModal() {
+        if (!activeId) return;
+        mjEnrollTargetId = activeId;
+        var name = ptIdx[activeId] ? ptIdx[activeId].name : 'this patient';
+        document.getElementById('mjEnrollPatientName').textContent = '\uD83D\uDC64 ' + name;
+        var age = ptIdx[activeId] ? ptIdx[activeId].age : '';
+        if (age) document.getElementById('mjEnrollAge').value = age;
+        document.getElementById('mjEnrollDate').value = new Date().toISOString().split('T')[0];
+        var opts = document.querySelectorAll('#mjEnrollDoseSelect .mj-dose-opt');
+        for (var i = 0; i < opts.length; i++) {
+            opts[i].classList.remove('selected');
+            if (opts[i].dataset.dose === '2.5') opts[i].classList.add('selected');
+        }
+        document.getElementById('mjEnrollModal').style.display = 'flex';
+    }
+
+    function closeMonjaroEnrollModal() {
+        document.getElementById('mjEnrollModal').style.display = 'none';
+        mjEnrollTargetId = null;
+    }
+
+    function selectEnrollDose(el) {
+        var opts = el.parentNode.querySelectorAll('.mj-dose-opt');
+        for (var i = 0; i < opts.length; i++) opts[i].classList.remove('selected');
+        el.classList.add('selected');
+    }
+
+    function confirmMonjaroEnroll() {
+        var id = mjEnrollTargetId;
+        if (!id) return;
+        var selOpt = document.querySelector('#mjEnrollDoseSelect .mj-dose-opt.selected');
+        var dose = selOpt ? parseFloat(selOpt.dataset.dose) : 2.5;
+        var height = parseFloat(document.getElementById('mjEnrollHeight').value) || 0;
+        var startWeight = parseFloat(document.getElementById('mjEnrollWeight').value) || 0;
+        var targetWeight = parseFloat(document.getElementById('mjEnrollTarget').value) || 0;
+        var age = parseInt(document.getElementById('mjEnrollAge').value) || 0;
+        var genderEl = document.querySelector('input[name="mjGender"]:checked');
+        var gender = genderEl ? genderEl.value : 'male';
+        var enrollDate = document.getElementById('mjEnrollDate').value || new Date().toISOString().split('T')[0];
+        var patientName = ptIdx[id] ? ptIdx[id].name : 'Unknown';
+        var record = { patientName: patientName, enrollDate: enrollDate, startDate: enrollDate, currentDose: dose, gender: gender, height: height, startWeight: startWeight, targetWeight: targetWeight, age: age, doses: [] };
+        db.ref('monjaro_patients/' + id).set(record).catch(handleFirebaseError);
+        closeMonjaroEnrollModal();
+        showToast('\uD83D\uDC89 ' + patientName + ' enrolled in Monjaro program!');
+        setTimeout(function() { refreshMonjaroSubTab(id); switchSubTab('monjaro'); }, 700);
+    }
+
+    /* ---------- Per-patient file ---------- */
+    function renderMonjaroPatientFile(id) {
+        mjViewingId = id;
+        var panel = document.getElementById('subMonjaro');
+        if (!panel) return;
+        var m = monjaroData[id];
+        if (!m) { panel.innerHTML = '<p style="color:var(--text-secondary);padding:20px;">Not enrolled in Monjaro program.</p>'; return; }
+        var doses = m.doses || [];
+        var ptName = ptIdx[id] ? ptIdx[id].name : m.patientName;
+        var now = Date.now();
+
+        /* Protocol hint */
+        var protocolHint = '';
+        if (doses.length > 0) {
+            var daysSinceLast = Math.floor((now - new Date(doses[doses.length-1].date).getTime()) / 86400000);
+            if (daysSinceLast >= 35) {
+                protocolHint = '<div class="mj-protocol-hint overdue">&#128308; Last dose was <strong>' + daysSinceLast + ' days ago</strong> &mdash; Overdue for injection!</div>';
+            } else if (daysSinceLast >= 25) {
+                protocolHint = '<div class="mj-protocol-hint escalate">&#9201; Last dose was <strong>' + daysSinceLast + ' days ago</strong> &mdash; Due for next injection.</div>';
+                var dosesAtCurrentLevel = 0;
+                for (var di = doses.length - 1; di >= 0; di--) {
+                    if (String(doses[di].doseAmount) === String(m.currentDose)) dosesAtCurrentLevel++;
+                    else break;
+                }
+                if (dosesAtCurrentLevel >= 2 && parseFloat(m.currentDose) < 15) {
+                    protocolHint += '<div class="mj-protocol-hint escalate" style="margin-top:8px;">&#128161; Patient has had <strong>' + dosesAtCurrentLevel + ' doses</strong> at ' + m.currentDose + ' mg &mdash; Consider escalating to ' + nextDoseTier(m.currentDose) + ' mg.</div>';
+                }
+            } else {
+                protocolHint = '<div class="mj-protocol-hint ok">&#9989; On track &mdash; Next dose due in approx. <strong>' + Math.max(0, 28 - daysSinceLast) + ' days</strong>.</div>';
+            }
+        } else {
+            protocolHint = '<div class="mj-protocol-hint ok" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.2);color:var(--monjaro);">&#128138; Enrolled &mdash; Add first dose entry below.</div>';
+        }
+
+        /* Summary bar */
+        var currentWeight = (doses.length > 0 && doses[doses.length-1].weight) ? parseFloat(doses[doses.length-1].weight) : (parseFloat(m.startWeight) || 0);
+        var weightLost = m.startWeight ? (parseFloat(m.startWeight) - currentWeight) : 0;
+        var weightLostPct = (m.startWeight && parseFloat(m.startWeight) > 0) ? ((weightLost / parseFloat(m.startWeight)) * 100).toFixed(1) : '0';
+        var summaryBar = '<div class="mj-summary-bar">' +
+            '<div class="mj-sum-item"><div class="mj-sum-val">' + (m.startWeight || '--') + '</div><div class="mj-sum-label">Start Wt (kg)</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val">' + (currentWeight || '--') + '</div><div class="mj-sum-label">Current Wt (kg)</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val" style="color:var(--success);">' + (weightLost > 0 ? '&#9660; ' + weightLost.toFixed(1) : '&mdash;') + '</div><div class="mj-sum-label">Lost (kg)</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val" style="color:var(--success);">' + weightLostPct + '%</div><div class="mj-sum-label">Weight Loss</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val">' + (m.currentDose || '--') + ' mg</div><div class="mj-sum-label">Current Dose</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val">' + doses.length + '</div><div class="mj-sum-label">Total Doses</div></div>' +
+            '<div class="mj-sum-item"><div class="mj-sum-val" style="font-size:1rem;">' + escapeHtml(m.enrollDate || m.startDate || '--') + '</div><div class="mj-sum-label">Enrolled</div></div>' +
+            '</div>';
+
+        /* BMI / BMR panel */
+        var bmiHtml = renderBMIBMRPanel(m, currentWeight);
+
+        /* Add dose form */
+        var tiers = [2.5, 5, 7.5, 10, 12.5, 15];
+        var doseTierOpts = '';
+        for (var t = 0; t < tiers.length; t++) {
+            var sel = (String(tiers[t]) === String(m.currentDose)) ? ' selected' : '';
+            doseTierOpts += '<div class="mj-dose-opt' + sel + '" data-dose="' + tiers[t] + '" onclick="selectDoseFormOpt(this)">' + tiers[t] + ' mg</div>';
+        }
+        var addFormHtml = '<div class="mj-add-form">' +
+            '<h4>+ Add New Dose Entry</h4>' +
+            '<div style="margin-bottom:10px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px;">Dose Amount</span>' +
+            '<div class="mj-dose-select" id="mjDoseFormSelect">' + doseTierOpts + '</div></div>' +
+            '<div class="mj-form-grid">' +
+            '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Date</span><input type="date" id="mjDoseDate" style="margin:0;" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
+            '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Weight (kg)</span><input type="number" id="mjDoseWeight" placeholder="e.g. 88.5" style="margin:0;"></div>' +
+            '</div>' +
+            '<div style="margin-top:8px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Note / Observation</span><textarea id="mjDoseNote" placeholder="Patient\'s response, side effects, improvements..." style="min-height:70px;resize:vertical;"></textarea></div>' +
+            '<div style="margin-top:4px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Comment on Previous Dose</span><textarea id="mjDosePrevComment" placeholder="How did patient respond to previous dose?" style="min-height:50px;resize:vertical;"></textarea></div>' +
+            '<div class="mj-reminder-toggle" onclick="document.getElementById(\'mjReminderFlag\').checked=!document.getElementById(\'mjReminderFlag\').checked;">' +
+            '<input type="checkbox" id="mjReminderFlag"><label for="mjReminderFlag">&#128276; Flag this dose for follow-up reminder</label></div>' +
+            '<button onclick="saveMJDose(\'' + id + '\')" style="margin-top:12px;background:linear-gradient(135deg,var(--monjaro-dark),var(--monjaro));box-shadow:0 4px 14px var(--monjaro-glow);">Save Dose Entry &#128138;</button>' +
+            '</div>';
+
+        /* Arabic message */
+        var msgHtml = buildArabicMessage(ptName, m);
+
+        /* Timeline + Accordion */
+        var timelineHtml = renderDoseTimeline(doses);
+        var accordionHtml = renderDoseAccordion(doses);
+
+        panel.innerHTML =
+            protocolHint +
+            summaryBar +
+            '<div class="mj-grid-2">' +
+                '<div>' +
+                    bmiHtml +
+                    '<div class="mj-section-hdr">&#128172; WhatsApp Reminder</div>' +
+                    msgHtml +
+                    '<div class="mj-section-hdr">&#128203; By Dose Tier</div>' +
+                    accordionHtml +
+                '</div>' +
+                '<div>' +
+                    addFormHtml +
+                    '<div class="mj-section-hdr">&#128197; Dose Timeline</div>' +
+                    timelineHtml +
+                '</div>' +
+            '</div>';
+    }
+
+    function selectDoseFormOpt(el) {
+        var opts = el.parentNode.querySelectorAll('.mj-dose-opt');
+        for (var i = 0; i < opts.length; i++) opts[i].classList.remove('selected');
+        el.classList.add('selected');
+    }
+
+    function saveMJDose(id) {
+        var selOpt = document.querySelector('#mjDoseFormSelect .mj-dose-opt.selected');
+        if (!selOpt) { showToast('Please select a dose amount.'); return; }
+        var doseAmount = parseFloat(selOpt.dataset.dose);
+        var date = document.getElementById('mjDoseDate').value;
+        if (!date) { showToast('Please enter a date.'); return; }
+        var weight = document.getElementById('mjDoseWeight').value;
+        var note = document.getElementById('mjDoseNote').value.trim();
+        var prevComment = document.getElementById('mjDosePrevComment').value.trim();
+        var reminderFlag = document.getElementById('mjReminderFlag').checked;
+        var m = monjaroData[id];
+        var doses = m ? (m.doses || []) : [];
+        var doseNumber = doses.length + 1;
+        doses.push({ id: Date.now(), date: date, doseAmount: doseAmount, doseNumber: doseNumber, weight: weight ? parseFloat(weight) : null, note: note, prevComment: prevComment, reminderFlag: reminderFlag });
+        db.ref('monjaro_patients/' + id + '/doses').set(doses).catch(handleFirebaseError);
+        db.ref('monjaro_patients/' + id + '/currentDose').set(doseAmount).catch(handleFirebaseError);
+        if (reminderFlag) {
+            var ptName = ptIdx[id] ? ptIdx[id].name : 'Monjaro Patient';
+            db.ref('reminders').push({ text: '[Monjaro &#128138;] ' + ptName + ' \u2014 Dose ' + doseNumber + ' follow-up (' + doseAmount + ' mg)', date: date, status: 'pending', ptId: id }).catch(handleFirebaseError);
+        }
+        showToast('\u2705 Dose #' + doseNumber + ' saved!');
+        document.getElementById('mjDoseNote').value = '';
+        document.getElementById('mjDosePrevComment').value = '';
+        document.getElementById('mjDoseWeight').value = '';
+        document.getElementById('mjReminderFlag').checked = false;
+    }
+
+    /* ---------- BMI / BMR Panel ---------- */
+    function renderBMIBMRPanel(m, currentWeight) {
+        var height = parseFloat(m.height) || 0;
+        var weight = currentWeight || parseFloat(m.startWeight) || 0;
+        var age = parseInt(m.age) || 0;
+        var gender = m.gender || 'male';
+        var bmi = (height > 0 && weight > 0) ? (weight / Math.pow(height / 100, 2)) : 0;
+        var bmr = 0;
+        if (weight > 0 && height > 0 && age > 0) {
+            bmr = gender === 'male' ? (10 * weight + 6.25 * height - 5 * age + 5) : (10 * weight + 6.25 * height - 5 * age - 161);
+        }
+        var bmiCat = getBMICategory(bmi);
+        var gaugePct = bmi > 0 ? Math.min(Math.max(((bmi - 15) / 30) * 100, 2), 98) : 50;
+        var aiText = generateBMIAIText(bmi, bmiCat, bmr, m);
+
+        return '<div class="mj-section-hdr">&#9877;&#65039; BMI &amp; BMR Analysis</div>' +
+            '<div class="section-block" style="border-left:4px solid var(--monjaro);margin-bottom:14px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">' +
+            '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">BMI</span>' +
+            '<div style="font-size:2.5rem;font-weight:800;color:var(--monjaro);letter-spacing:-0.03em;line-height:1;">' + (bmi > 0 ? bmi.toFixed(1) : '--') + '</div>' +
+            '<div style="font-size:12px;font-weight:700;color:' + bmiCat.color + ';">' + bmiCat.label + '</div></div>' +
+            '<div style="text-align:right;">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">BMR (Mifflin-St Jeor)</div>' +
+            '<div style="font-size:1.6rem;font-weight:800;color:var(--text-primary);">' + (bmr > 0 ? Math.round(bmr) : '--') + '</div>' +
+            '<div style="font-size:11px;color:var(--text-secondary);">kcal/day</div></div></div>' +
+            '<div class="mj-bmi-gauge-wrap"><div class="mj-bmi-track"></div>' +
+            '<div class="mj-bmi-marker" style="left:' + gaugePct + '%;"></div>' +
+            '<div class="mj-bmi-labels"><span>Underweight</span><span>Normal</span><span>Overweight</span><span>Obese</span></div></div>' +
+            (m.targetWeight ? '<div style="margin-top:10px;font-size:13px;color:var(--text-secondary);">Target: <b style="color:var(--success);">' + m.targetWeight + ' kg</b> &nbsp;|&nbsp; Still to lose: <b style="color:var(--monjaro);">' + Math.max(0, weight - parseFloat(m.targetWeight)).toFixed(1) + ' kg</b></div>' : '') +
+            '<div class="mj-ai-box">' + escapeHtml(aiText) + '</div>' +
+            '</div>';
+    }
+
+    function getBMICategory(bmi) {
+        if (!bmi || bmi <= 0) return { label: '--', color: 'var(--text-tertiary)' };
+        if (bmi < 18.5) return { label: 'Underweight',     color: '#3B82F6' };
+        if (bmi < 25)   return { label: 'Normal Weight',   color: 'var(--success)' };
+        if (bmi < 30)   return { label: 'Overweight',      color: 'var(--warning)' };
+        if (bmi < 35)   return { label: 'Obese Class I',   color: '#F97316' };
+        if (bmi < 40)   return { label: 'Obese Class II',  color: 'var(--danger)' };
+        return              { label: 'Obese Class III', color: '#BF5AF2' };
+    }
+
+    function generateBMIAIText(bmi, cat, bmr, m) {
+        var dose = m.currentDose ? String(m.currentDose) : '2.5';
+        var expLoss = { '2.5':'5\u20138%', '5':'8\u201312%', '7.5':'12\u201315%', '10':'15\u201318%', '12.5':'17\u201320%', '15':'20\u201322.5%' };
+        var exp = expLoss[dose] || '5\u201315%';
+        var lines = [];
+        if (bmi > 0) lines.push('BMI ' + bmi.toFixed(1) + ' \u2014 ' + cat.label + '.');
+        lines.push('At ' + dose + ' mg Monjaro (Tirzepatide), SURMOUNT-1 data shows expected body weight reduction of ' + exp + ' over 36\u201372 weeks.');
+        if (m.startWeight && m.targetWeight) {
+            var toGo = parseFloat(m.startWeight) - parseFloat(m.targetWeight);
+            lines.push('Target loss: ' + toGo.toFixed(1) + ' kg (' + ((toGo / parseFloat(m.startWeight)) * 100).toFixed(1) + '% of starting weight).');
+        }
+        if (bmr > 0) lines.push('BMR: ' + Math.round(bmr) + ' kcal/day \u2014 recalculate at each visit as weight changes.');
+        if (parseFloat(dose) < 15) lines.push('Protocol: escalate dose every 4 weeks if tolerated, up to max 15 mg.');
+        return lines.join('\n');
+    }
+
+    function nextDoseTier(current) {
+        var tiers = [2.5, 5, 7.5, 10, 12.5, 15];
+        var idx = tiers.indexOf(parseFloat(current));
+        return (idx >= 0 && idx < tiers.length - 1) ? tiers[idx + 1] : current;
+    }
+
+    /* ---------- Timeline ---------- */
+    function renderDoseTimeline(doses) {
+        if (!doses || doses.length === 0) return '<div style="text-align:center;padding:30px;color:var(--text-secondary);font-size:13px;">&#128138; No doses logged yet.</div>';
+        var html = '<div class="mj-timeline">';
+        var reversed = doses.slice().reverse();
+        for (var i = 0; i < reversed.length; i++) {
+            var d = reversed[i];
+            var doseStr = String(d.doseAmount || '2.5');
+            var col = MJ_DOSE_COLORS[doseStr] || MJ_DOSE_COLORS['2.5'];
+            var realIdx = doses.length - 1 - i;
+            var deltaHtml = '';
+            if (realIdx > 0 && doses[realIdx].weight && doses[realIdx-1].weight) {
+                var delta = parseFloat(doses[realIdx].weight) - parseFloat(doses[realIdx-1].weight);
+                var cls = delta < 0 ? 'down' : (delta > 0 ? 'up' : 'same');
+                var sign = delta < 0 ? '&#9660; ' : (delta > 0 ? '&#9650; ' : '= ');
+                deltaHtml = '<span class="mj-delta ' + cls + '">' + sign + Math.abs(delta).toFixed(1) + ' kg</span>';
+            }
+            html += '<div class="mj-dose-card" style="border-left:3px solid ' + col.hex + ';">' +
+                '<div class="mj-dose-header">' +
+                '<span class="mj-dose-number">Dose #' + d.doseNumber + '</span>' +
+                '<span class="mj-dose-badge" style="background:' + col.bg + ';font-size:11px;padding:3px 10px;border-radius:14px;">' + doseStr + ' mg</span>' +
+                '<span style="font-size:12px;color:var(--text-secondary);">' + escapeHtml(d.date || '') + '</span>' +
+                (d.weight ? '<span style="font-size:13px;font-weight:700;color:var(--text-primary);">&#9878;&#65039; ' + d.weight + ' kg</span>' : '') +
+                deltaHtml +
+                (d.reminderFlag ? '<span class="mj-reminder-flag">&#128276;</span>' : '') +
+                '<button onclick="deleteMJDose(\'' + mjViewingId + '\',' + realIdx + ')" style="margin-left:auto;background:rgba(255,69,58,0.1);color:var(--danger);border:none;padding:4px 9px;border-radius:8px;font-size:11px;cursor:pointer;width:auto;box-shadow:none;">&times;</button>' +
+                '</div>' +
+                (d.note ? '<div class="mj-dose-note"><strong>Note:</strong> ' + escapeHtml(d.note) + '</div>' : '') +
+                (d.prevComment ? '<div class="mj-dose-note" style="margin-top:5px;"><strong>Prev. response:</strong> ' + escapeHtml(d.prevComment) + '</div>' : '') +
+                '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    /* ---------- Accordion by tier ---------- */
+    function renderDoseAccordion(doses) {
+        if (!doses || doses.length === 0) return '<p style="color:var(--text-tertiary);font-size:13px;font-style:italic;">No doses yet.</p>';
+        var tierMap = {};
+        for (var i = 0; i < doses.length; i++) {
+            var dStr = String(doses[i].doseAmount || '2.5');
+            if (!tierMap[dStr]) tierMap[dStr] = [];
+            tierMap[dStr].push(doses[i]);
+        }
+        var html = '';
+        var tierKeys = Object.keys(tierMap).sort(function(a, b) { return parseFloat(a) - parseFloat(b); });
+        for (var j = 0; j < tierKeys.length; j++) {
+            var tier = tierKeys[j];
+            var tierDoses = tierMap[tier];
+            var col = MJ_DOSE_COLORS[tier] || MJ_DOSE_COLORS['2.5'];
+            var rowsHtml = '';
+            for (var k = 0; k < tierDoses.length; k++) {
+                var td = tierDoses[k];
+                rowsHtml += '<div class="mj-tier-row">' +
+                    '<span>#' + td.doseNumber + ' &nbsp;' + escapeHtml(td.date || '') + '</span>' +
+                    '<span>' + (td.weight ? '&#9878; ' + td.weight + ' kg' : '--') + '</span>' +
+                    (td.note ? '<span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary);font-size:11px;">' + escapeHtml(td.note) + '</span>' : '<span></span>') +
+                    '</div>';
+            }
+            html += '<div class="mj-tier-accordion">' +
+                '<div class="mj-tier-header" onclick="this.nextElementSibling.style.display=(this.nextElementSibling.style.display===\'block\'?\'none\':\'block\')">' +
+                '<span style="display:flex;align-items:center;gap:8px;"><span class="mj-dose-badge" style="background:' + col.bg + ';font-size:11px;">' + tier + ' mg</span>' + tier + ' mg</span>' +
+                '<span style="color:var(--text-secondary);font-size:12px;">' + tierDoses.length + ' doses &#9660;</span></div>' +
+                '<div class="mj-tier-body" style="display:none;">' + rowsHtml + '</div>' +
+                '</div>';
+        }
+        return html;
+    }
+
+    /* ---------- Delete dose ---------- */
+    function deleteMJDose(id, idx) {
+        if (!confirm('Delete dose entry #' + (idx+1) + '?')) return;
+        var doses = (monjaroData[id] && monjaroData[id].doses) ? monjaroData[id].doses.slice() : [];
+        doses.splice(idx, 1);
+        for (var i = 0; i < doses.length; i++) doses[i].doseNumber = i + 1;
+        db.ref('monjaro_patients/' + id + '/doses').set(doses).catch(handleFirebaseError);
+        if (doses.length > 0) db.ref('monjaro_patients/' + id + '/currentDose').set(doses[doses.length-1].doseAmount).catch(handleFirebaseError);
+        showToast('Dose deleted.');
+    }
+
+    /* ---------- Arabic message ---------- */
+    function buildArabicMessage(ptName, m) {
+        var dose = m.currentDose ? String(m.currentDose) : '2.5';
+        var msg = '\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064a\u0643\u0645 ' + ptName + ' \uD83C\uDF3F\n\n\u0646\u062A\u0645\u0646\u0649 \u0623\u0646 \u062A\u0643\u0648\u0646\u0648\u0627 \u0628\u062E\u064A\u0631 \u0648\u0639\u0627\u0641\u064A\u0629.\n\n\u0646\u0648\u062F\u0651 \u062A\u0630\u0643\u064A\u0631\u0643\u0645 \u0628\u0645\u0648\u0639\u062F \u062C\u0631\u0639\u0629 \u0627\u0644\u0645\u0646\u062C\u0627\u0631\u0648 \u0627\u0644\u0642\u0627\u062F\u0645\u0629 \uD83D\uDC89\n\u062C\u0631\u0639\u062A\u0643\u0645 \u0627\u0644\u062D\u0627\u0644\u064A\u0629: ' + dose + ' \u0645\u0644\u063A\n\n\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u062A\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0639\u064A\u0627\u062F\u0629 \u0644\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0645\u0648\u0639\u062F \u0627\u0644\u0645\u0646\u0627\u0633\u0628.\n\n\u0634\u0643\u0631\u0627\u064B \u0644\u062B\u0642\u062A\u0643\u0645 \u0628\u0646\u0627 \uD83D\uDE4F\n\u062F. \u0633\u0639\u062F \u0635\u0628\u0631\u064A \u0627\u0644\u0632\u0628\u064A\u062F\u064A';
+        var escapedName = ptName ? ptName.replace(/\\/g,'\\\\').replace(/'/g,"\\'") : '';
+        var escapedDose = dose.replace(/'/g,"\\'");
+        return '<div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:16px;padding:14px;">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">&#128241; Arabic Reminder Message</div>' +
+            '<div class="mj-msg-bubble">' + escapeHtml(msg) + '</div>' +
+            '<div class="mj-msg-actions">' +
+            '<button class="mj-copy-btn" onclick="copyArabicMsg(\'' + escapedName + '\',\'' + escapedDose + '\')">&#128203; Copy Message</button>' +
+            '</div></div>';
+    }
+
+    function copyArabicMsg(ptName, dose) {
+        var msg = '\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064a\u0643\u0645 ' + ptName + ' \uD83C\uDF3F\n\n\u0646\u062A\u0645\u0646\u0649 \u0623\u0646 \u062A\u0643\u0648\u0646\u0648\u0627 \u0628\u062E\u064A\u0631 \u0648\u0639\u0627\u0641\u064A\u0629.\n\n\u0646\u0648\u062F\u0651 \u062A\u0630\u0643\u064A\u0631\u0643\u0645 \u0628\u0645\u0648\u0639\u062F \u062C\u0631\u0639\u0629 \u0627\u0644\u0645\u0646\u062C\u0627\u0631\u0648 \u0627\u0644\u0642\u0627\u062F\u0645\u0629 \uD83D\uDC89\n\u062C\u0631\u0639\u062A\u0643\u0645 \u0627\u0644\u062D\u0627\u0644\u064A\u0629: ' + dose + ' \u0645\u0644\u063A\n\n\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u062A\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0639\u064A\u0627\u062F\u0629 \u0644\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0645\u0648\u0639\u062F \u0627\u0644\u0645\u0646\u0627\u0633\u0628.\n\n\u0634\u0643\u0631\u0627\u064B \u0644\u062B\u0642\u062A\u0643\u0645 \u0628\u0646\u0627 \uD83D\uDE4F\n\u062F. \u0633\u0639\u062F \u0635\u0628\u0631\u064A \u0627\u0644\u0632\u0628\u064A\u062F\u064A';
+        try { navigator.clipboard.writeText(msg); showToast('\u2705 \u062A\u0645 \u0646\u0633\u062E \u0627\u0644\u0631\u0633\u0627\u0644\u0629!'); } catch(e) { showToast('Please copy the message manually.'); }
+    }
+
+    /* Wire up initMonjaro in bootApp */
+    var _origBootApp = bootApp;
+    bootApp = function() {
+        _origBootApp();
+        initMonjaro();
+        setTimeout(patchLoadFullData, 1200);
+    };
+
 </script>
 </body>
 </html>
+
