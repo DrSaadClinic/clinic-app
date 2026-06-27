@@ -1328,6 +1328,12 @@
 
     </div><!-- /monjaroPanel -->
 
+    <!-- Patient View Full-Screen Modal -->
+    <div id="mjPatientViewModal" style="display:none;position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 20% 30%,#1a0a3a 0%,#0a0015 60%,#000 100%);overflow-y:auto;">
+        <button onclick="document.getElementById('mjPatientViewModal').style.display='none'" style="position:fixed;top:20px;right:24px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:50%;width:44px;height:44px;font-size:22px;cursor:pointer;z-index:10;box-shadow:none;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;">&times;</button>
+        <div id="mjPatientViewContent" style="max-width:900px;margin:0 auto;padding:40px 24px 60px;"></div>
+    </div>
+
     <!-- Monjaro Enrollment Modal -->
     <div id="mjEnrollModal" class="mj-modal-overlay" style="display:none;" onclick="if(event.target===this)closeMonjaroEnrollModal()">
         <div class="mj-modal">
@@ -1374,6 +1380,10 @@
             <div style="margin-top:10px;">
                 <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Enrollment Date</span>
                 <input type="date" id="mjEnrollDate" style="margin:0;">
+            </div>
+            <div style="margin-top:10px;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:4px;">Waist Circumference (cm)</span>
+                <input type="number" id="mjEnrollWaist" placeholder="e.g. 98" style="margin:0;">
             </div>
 
             <div style="display:flex; gap:10px; margin-top:20px;">
@@ -3098,6 +3108,7 @@
         } else if (tab === 'monjaro') {
             if (monjaro) monjaro.style.display = 'block';
             renderMonjaroDashboard();
+            renderMJRemindersTab();
             clearTimeout(ssTimer);
             if (typeof dismissScreensaver === 'function') dismissScreensaver();
         }
@@ -3962,8 +3973,12 @@ function _renderVisionOSDisplay() {
                 else if (ds >= 25) dueBadge = '<span class="mj-due-badge">&#9201; Due Soon</span>';
             }
             var lastDoseStr = doses.length > 0 ? doses[doses.length-1].date : (m.startDate || '--');
-            html += '<div class="mj-pt-card" onclick="openMonjaroFromList(\'' + fid + '\')">' +
-                '<div style="flex:1;min-width:0;">' +
+            var startDateStr = m.enrollDate || m.startDate || '';
+            html += '<div class="mj-pt-card" style="position:relative;">' +
+                '<div style="position:absolute;top:8px;right:8px;z-index:2;">' +
+                '<button onclick="event.stopPropagation();quickUnenrollMJ(\'' + fid + '\',\'' + escapeHtml(ptName).replace(/'/g,'&#39;') + '\')" title="Remove from Monjaro" style="background:rgba(255,69,58,0.15);color:var(--danger);border:1px solid rgba(255,69,58,0.3);border-radius:50%;width:22px;height:22px;font-size:12px;line-height:1;cursor:pointer;padding:0;box-shadow:none;display:flex;align-items:center;justify-content:center;">&times;</button>' +
+                '</div>' +
+                '<div style="flex:1;min-width:0;cursor:pointer;" onclick="openMonjaroFromList(\'' + fid + '\')">' +
                 '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
                 '<span style="font-size:16px;font-weight:700;color:var(--text-primary);">' + escapeHtml(ptName) + '</span>' +
                 dueBadge + '</div>' +
@@ -3971,11 +3986,18 @@ function _renderVisionOSDisplay() {
                 '<span>&#128138; ' + doses.length + ' doses</span>' +
                 (wLost ? '<span style="color:var(--success);font-weight:600;">' + wLost + '</span>' : '') +
                 '<span>Last: ' + escapeHtml(lastDoseStr) + '</span>' +
+                (startDateStr ? '<span style="color:var(--monjaro);font-size:11px;">&#128197; Since: ' + escapeHtml(startDateStr) + '</span>' : '') +
                 '</div></div>' +
                 '<span class="mj-dose-badge" style="background:' + col.bg + ';">' + currentDose + ' mg</span>' +
                 '</div>';
         }
         list.innerHTML = html || '<p style="text-align:center;padding:30px;color:var(--text-secondary);font-size:13px;">No patients match your search.</p>';
+    }
+
+    function quickUnenrollMJ(id, ptName) {
+        if (!confirm('Remove ' + ptName + ' from Monjaro program?')) return;
+        db.ref('monjaro_patients/' + id).remove().catch(handleFirebaseError);
+        showToast('Patient removed from Monjaro.');
     }
 
     function openMonjaroFromList(id) {
@@ -4029,9 +4051,10 @@ function _renderVisionOSDisplay() {
         var genderF = document.getElementById('mjGenderF');
         var gender = (genderF && genderF.checked) ? 'female' : 'male';
         var enrollDate = document.getElementById('mjEnrollDate').value || new Date().toISOString().split('T')[0];
+        var waist = parseFloat(document.getElementById('mjEnrollWaist') ? document.getElementById('mjEnrollWaist').value : 0) || 0;
         var patientName = ptIdx[id] ? ptIdx[id].name : 'Unknown';
-        var initialDose = { id: Date.now(), date: enrollDate, doseAmount: dose, doseNumber: 1, weight: startWeight || null, note: 'Initial Enrollment Dose', prevComment: '', reminderFlag: false };
-        var record = { patientName: patientName, enrollDate: enrollDate, startDate: enrollDate, currentDose: dose, gender: gender, height: height, startWeight: startWeight, targetWeight: targetWeight, age: age, doses: [initialDose] };
+        var initialDose = { id: Date.now(), date: enrollDate, doseAmount: dose, doseNumber: 1, weight: startWeight || null, waist: waist || null, note: 'Initial Enrollment Dose', prevComment: '', reminderFlag: false };
+        var record = { patientName: patientName, enrollDate: enrollDate, startDate: enrollDate, currentDose: dose, gender: gender, height: height, startWeight: startWeight, targetWeight: targetWeight, age: age, startWaist: waist, doses: [initialDose] };
         db.ref('monjaro_patients/' + id).set(record).catch(handleFirebaseError);
         closeMonjaroEnrollModal();
         showToast('\uD83D\uDC89 ' + patientName + ' enrolled in Monjaro program!');
@@ -4103,6 +4126,7 @@ function _renderVisionOSDisplay() {
             '<div class="mj-form-grid">' +
             '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Date</span><input type="date" id="mjDoseDate" style="margin:0;" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
             '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Weight (kg)</span><input type="number" id="mjDoseWeight" placeholder="e.g. 88.5" style="margin:0;"></div>' +
+            '<div><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Waist (cm)</span><input type="number" id="mjDoseWaist" placeholder="e.g. 96" style="margin:0;"></div>' +
             '</div>' +
             '<div style="margin-top:8px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Note / Observation</span><textarea id="mjDoseNote" placeholder="Patient\'s response, side effects, improvements..." style="min-height:70px;resize:vertical;"></textarea></div>' +
             '<div style="margin-top:4px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Comment on Previous Dose</span><textarea id="mjDosePrevComment" placeholder="How did patient respond to previous dose?" style="min-height:50px;resize:vertical;"></textarea></div>' +
@@ -4122,9 +4146,10 @@ function _renderVisionOSDisplay() {
         var ptRemHtml = renderMonjaroPatientReminders(id, ptName, m);
 
         /* Unenroll + Edit enrollment buttons */
-        var mgmtBar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' +
-            '<button onclick="unenrollMJPatient(\'' + id + '\',\'' + escapeHtml(ptName).replace(/'/g,'&#39;') + '\')" style="background:rgba(255,69,58,0.12);color:var(--danger);border:1px solid rgba(255,69,58,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#128465; Un-enroll from Monjaro</button>' +
-            '<button onclick="editMJEnrollment(\'' + id + '\')" style="background:rgba(10,132,255,0.1);color:var(--primary);border:1px solid rgba(10,132,255,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#9998; Edit Enrollment Data</button>' +
+        var mgmtBar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">' +
+            '<button onclick="unenrollMJPatient(\'' + id + '\',\'' + escapeHtml(ptName).replace(/'/g,'&#39;') + '\')" style="background:rgba(255,69,58,0.12);color:var(--danger);border:1px solid rgba(255,69,58,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#128465; Un-enroll</button>' +
+            '<button onclick="editMJEnrollment(\'' + id + '\')" style="background:rgba(10,132,255,0.1);color:var(--primary);border:1px solid rgba(10,132,255,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#9998; Edit Data</button>' +
+            '<button onclick="showMJPatientView(\'' + id + '\')" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;border:none;border-radius:12px;padding:8px 20px;font-size:13px;font-weight:800;cursor:pointer;width:auto;box-shadow:0 4px 16px rgba(167,139,250,0.4);letter-spacing:0.02em;margin-left:auto;">&#127919; Patient View</button>' +
             '</div>';
 
         panel.innerHTML =
@@ -4162,24 +4187,23 @@ function _renderVisionOSDisplay() {
         var date = document.getElementById('mjDoseDate').value;
         if (!date) { showToast('Please enter a date.'); return; }
         var weight = document.getElementById('mjDoseWeight').value;
+        var waist = document.getElementById('mjDoseWaist') ? document.getElementById('mjDoseWaist').value : '';
         var note = document.getElementById('mjDoseNote').value.trim();
         var prevComment = document.getElementById('mjDosePrevComment').value.trim();
         var reminderFlag = document.getElementById('mjReminderFlag') ? document.getElementById('mjReminderFlag').checked : false;
         var m = monjaroData[id];
         var doses = m ? (m.doses || []) : [];
         var doseNumber = doses.length + 1;
-        doses.push({ id: Date.now(), date: date, doseAmount: doseAmount, doseNumber: doseNumber, weight: weight ? parseFloat(weight) : null, note: note, prevComment: prevComment, reminderFlag: reminderFlag });
+        doses.push({ id: Date.now(), date: date, doseAmount: doseAmount, doseNumber: doseNumber, weight: weight ? parseFloat(weight) : null, waist: waist ? parseFloat(waist) : null, note: note, prevComment: prevComment, reminderFlag: reminderFlag });
         db.ref('monjaro_patients/' + id + '/doses').set(doses).catch(handleFirebaseError);
         db.ref('monjaro_patients/' + id + '/currentDose').set(doseAmount).catch(handleFirebaseError);
         var ptName = ptIdx[id] ? ptIdx[id].name : 'Monjaro Patient';
-        /* Auto reminder: 7 days after dose */
         var autoRemDate = new Date(new Date(date).getTime() + 7 * 86400000).toISOString().split('T')[0];
         db.ref('reminders').push({
             text: '[Monjaro] ' + ptName + ' — Dose ' + doseNumber + ' (' + doseAmount + ' mg) — Follow-up / Next injection approaching',
             date: autoRemDate, status: 'pending', ptId: id, isMjAuto: true,
             lastDoseDate: date, nextDoseDate: new Date(new Date(date).getTime() + 28 * 86400000).toISOString().split('T')[0]
         }).catch(handleFirebaseError);
-        /* Manual flag reminder on dose date */
         if (reminderFlag) {
             db.ref('reminders').push({
                 text: '[Monjaro] ' + ptName + ' — Dose ' + doseNumber + ' manual flag (' + doseAmount + ' mg)',
@@ -4191,7 +4215,9 @@ function _renderVisionOSDisplay() {
         document.getElementById('mjDoseNote').value = '';
         document.getElementById('mjDosePrevComment').value = '';
         document.getElementById('mjDoseWeight').value = '';
+        if (document.getElementById('mjDoseWaist')) document.getElementById('mjDoseWaist').value = '';
         if (document.getElementById('mjReminderFlag')) document.getElementById('mjReminderFlag').checked = false;
+        setTimeout(function() { refreshMonjaroSubTab(id); }, 700);
     }
 
     function unenrollMJPatient(id, ptName) {
@@ -4576,6 +4602,183 @@ function _renderVisionOSDisplay() {
             lastDoseDate: lastDoseDate, nextDoseDate: nextDoseDate
         }).catch(handleFirebaseError);
         showToast('&#128276; Reminder set for ' + dateEl.value + '!');
+    }
+
+    /* ================================================================
+       PATIENT VIEW MODAL
+    ================================================================ */
+    function showMJPatientView(id) {
+        var modal = document.getElementById('mjPatientViewModal');
+        var content = document.getElementById('mjPatientViewContent');
+        if (!modal || !content) return;
+        var m = monjaroData[id];
+        if (!m) { showToast('No data available.'); return; }
+        var doses = m.doses || [];
+        var ptName = ptIdx[id] ? ptIdx[id].name : (m.patientName || 'Patient');
+        var now = new Date();
+
+        /* Stats */
+        var startW = parseFloat(m.startWeight) || 0;
+        var currentW = (doses.length > 0 && doses[doses.length-1].weight) ? parseFloat(doses[doses.length-1].weight) : startW;
+        var lostKg = startW ? (startW - currentW) : 0;
+        var lostPct = startW ? ((lostKg / startW) * 100).toFixed(1) : '0';
+        var startWaist = parseFloat(m.startWaist) || 0;
+        var currentWaist = 0;
+        for (var dj = doses.length - 1; dj >= 0; dj--) { if (doses[dj].waist) { currentWaist = parseFloat(doses[dj].waist); break; } }
+        var lostWaist = (startWaist && currentWaist) ? (startWaist - currentWaist).toFixed(1) : null;
+        var targetW = parseFloat(m.targetWeight) || 0;
+        var toGoKg = (targetW && currentW > targetW) ? (currentW - targetW).toFixed(1) : '0';
+        var pctToGoal = (targetW && startW && startW > targetW) ? Math.min(100, Math.round((lostKg / (startW - targetW)) * 100)) : 0;
+
+        /* SVG Weight Chart */
+        var weightPoints = [];
+        for (var wi = 0; wi < doses.length; wi++) {
+            if (doses[wi].weight) weightPoints.push({ d: doses[wi].date, v: parseFloat(doses[wi].weight), n: doses[wi].doseNumber });
+        }
+        var waistPoints = [];
+        for (var qi = 0; qi < doses.length; qi++) {
+            if (doses[qi].waist) waistPoints.push({ d: doses[qi].date, v: parseFloat(doses[qi].waist), n: doses[qi].doseNumber });
+        }
+
+        var weightChartSvg = buildMJChartSVG(weightPoints, '#a78bfa', '#7c3aed', 'kg');
+        var waistChartSvg = buildMJChartSVG(waistPoints, '#64D2FF', '#0A84FF', 'cm');
+
+        /* Goal ring */
+        var ringR = 52, ringC = 62, ringCirc = 2 * Math.PI * ringR;
+        var ringFill = ringCirc - (ringCirc * pctToGoal / 100);
+        var ringColor = pctToGoal >= 80 ? '#30D158' : pctToGoal >= 40 ? '#a78bfa' : '#FF9F0A';
+
+        content.innerHTML =
+            /* Header */
+            '<div style="text-align:center;margin-bottom:40px;">' +
+            '<div style="font-size:13px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(167,139,250,0.7);margin-bottom:8px;">Monjaro Weight Management</div>' +
+            '<div style="font-size:42px;font-weight:900;color:white;letter-spacing:-0.02em;margin-bottom:4px;">' + escapeHtml(ptName) + '</div>' +
+            '<div style="font-size:14px;color:rgba(255,255,255,0.45);">Program started: ' + escapeHtml(m.enrollDate || m.startDate || '—') + ' &nbsp;|&nbsp; ' + doses.length + ' doses completed &nbsp;|&nbsp; Current dose: <b style="color:#a78bfa;">' + (m.currentDose || '—') + ' mg</b></div>' +
+            '</div>' +
+
+            /* Big stat row */
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:40px;">' +
+            mjStatCard('&#9660; Lost', lostKg > 0 ? lostKg.toFixed(1) + ' kg' : '—', lostKg > 0 ? '#30D158' : '#a78bfa', '&#127919;') +
+            mjStatCard('% Lost', lostPct + '%', '#a78bfa', '&#128200;') +
+            mjStatCard('Current Weight', currentW ? currentW + ' kg' : '—', '#64D2FF', '&#9878;') +
+            mjStatCard('To Goal', toGoKg + ' kg', '#FF9F0A', '&#127937;') +
+            (lostWaist ? mjStatCard('Waist &#9660;', lostWaist + ' cm', '#30D158', '&#128089;') : '') +
+            '</div>' +
+
+            /* Goal ring + charts row */
+            '<div style="display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:start;margin-bottom:32px;">' +
+            /* Ring */
+            '<div style="text-align:center;">' +
+            '<svg width="124" height="124" viewBox="0 0 124 124">' +
+            '<circle cx="62" cy="62" r="' + ringR + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>' +
+            '<circle cx="62" cy="62" r="' + ringR + '" fill="none" stroke="' + ringColor + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + ringCirc.toFixed(1) + '" stroke-dashoffset="' + ringFill.toFixed(1) + '" transform="rotate(-90 62 62)"/>' +
+            '<text x="62" y="56" text-anchor="middle" font-size="20" font-weight="900" fill="white">' + pctToGoal + '%</text>' +
+            '<text x="62" y="74" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.5)">TO GOAL</text>' +
+            '</svg>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Target: <b style="color:#a78bfa;">' + (targetW || '—') + ' kg</b></div>' +
+            '</div>' +
+            /* Weight chart */
+            '<div>' +
+            '<div style="font-size:11px;font-weight:700;color:rgba(167,139,250,0.7);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">&#128200; Weight Progress (kg)</div>' +
+            weightChartSvg +
+            '</div>' +
+            '</div>' +
+
+            /* Waist chart (if data) */
+            (waistPoints.length > 1 ?
+            '<div style="margin-bottom:32px;">' +
+            '<div style="font-size:11px;font-weight:700;color:rgba(100,210,255,0.7);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">&#128089; Waist Circumference (cm)</div>' +
+            buildMJChartSVG(waistPoints, '#64D2FF', '#0A84FF', 'cm') +
+            '</div>' : '') +
+
+            /* Dose history table */
+            '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">' +
+            '<div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;">Dose History</div>' +
+            '<div style="overflow-x:auto;">' +
+            '<table style="width:100%;border-collapse:collapse;font-size:13px;color:rgba(255,255,255,0.85);">' +
+            '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.06);">' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">#</th>' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">Date</th>' +
+            '<th style="padding:12px 16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">Dose</th>' +
+            '<th style="padding:12px 16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">Weight</th>' +
+            '<th style="padding:12px 16px;text-align:center;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">Waist</th>' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;">Note</th>' +
+            '</tr></thead><tbody>' +
+            (function() {
+                var rows = '';
+                for (var ti = 0; ti < doses.length; ti++) {
+                    var d = doses[ti];
+                    var prevW = (ti > 0 && doses[ti-1].weight && d.weight) ? parseFloat(doses[ti-1].weight) : null;
+                    var delta = prevW ? (d.weight - prevW) : null;
+                    var deltaHtml = delta !== null ? ('<span style="color:' + (delta < 0 ? '#30D158' : '#FF453A') + ';font-size:11px;"> (' + (delta > 0 ? '+' : '') + delta.toFixed(1) + ')</span>') : '';
+                    rows += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">' +
+                        '<td style="padding:10px 16px;color:#a78bfa;font-weight:700;">D' + d.doseNumber + '</td>' +
+                        '<td style="padding:10px 16px;">' + escapeHtml(d.date || '') + '</td>' +
+                        '<td style="padding:10px 16px;text-align:center;"><span style="background:rgba(167,139,250,0.15);color:#a78bfa;padding:3px 10px;border-radius:8px;font-weight:700;">' + d.doseAmount + ' mg</span></td>' +
+                        '<td style="padding:10px 16px;text-align:center;">' + (d.weight ? d.weight + ' kg' + deltaHtml : '<span style="color:rgba(255,255,255,0.3);">—</span>') + '</td>' +
+                        '<td style="padding:10px 16px;text-align:center;">' + (d.waist ? d.waist + ' cm' : '<span style="color:rgba(255,255,255,0.3);">—</span>') + '</td>' +
+                        '<td style="padding:10px 16px;color:rgba(255,255,255,0.55);font-size:12px;">' + escapeHtml(d.note || '') + '</td>' +
+                        '</tr>';
+                }
+                return rows || '<tr><td colspan="6" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">No dose entries yet.</td></tr>';
+            })() +
+            '</tbody></table></div></div>' +
+
+            /* Motivational footer */
+            '<div style="text-align:center;margin-top:40px;padding:28px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(167,139,250,0.08));border:1px solid rgba(167,139,250,0.2);border-radius:20px;">' +
+            '<div style="font-size:28px;margin-bottom:8px;">&#127775;</div>' +
+            '<div style="font-size:18px;font-weight:700;color:white;margin-bottom:6px;">Keep going, you are doing amazing!</div>' +
+            '<div style="font-size:14px;color:rgba(255,255,255,0.5);">د. سعد صبري الزبيدي &nbsp;&mdash;&nbsp; Monjaro Program</div>' +
+            '</div>';
+
+        modal.style.display = 'block';
+    }
+
+    function mjStatCard(label, val, color, icon) {
+        return '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:20px 16px;text-align:center;">' +
+            '<div style="font-size:24px;margin-bottom:6px;">' + icon + '</div>' +
+            '<div style="font-size:26px;font-weight:900;color:' + color + ';letter-spacing:-0.02em;line-height:1;margin-bottom:4px;">' + val + '</div>' +
+            '<div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;">' + label + '</div>' +
+            '</div>';
+    }
+
+    function buildMJChartSVG(points, strokeColor, fillColor, unit) {
+        if (points.length < 2) {
+            return '<div style="text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:13px;">Not enough data points yet (' + points.length + '/2 needed)</div>';
+        }
+        var W = 520, H = 140, padL = 46, padR = 16, padT = 16, padB = 28;
+        var vals = points.map(function(p) { return p.v; });
+        var minV = Math.min.apply(null, vals);
+        var maxV = Math.max.apply(null, vals);
+        var range = (maxV - minV) || 1;
+        var pW = W - padL - padR, pH = H - padT - padB;
+        var xs = points.map(function(_, i) { return padL + (i / (points.length - 1)) * pW; });
+        var ys = points.map(function(p) { return padT + pH - ((p.v - minV) / range) * pH; });
+
+        var polyline = xs.map(function(x, i) { return x + ',' + ys[i]; }).join(' ');
+        var area = 'M' + xs[0] + ',' + (padT + pH) + ' L' + xs.map(function(x, i) { return x + ',' + ys[i]; }).join(' L') + ' L' + xs[xs.length-1] + ',' + (padT + pH) + ' Z';
+
+        var yLabels = '';
+        for (var yi = 0; yi <= 4; yi++) {
+            var yv = minV + (range * yi / 4);
+            var yy = padT + pH - (yi / 4) * pH;
+            yLabels += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (W - padR) + '" y2="' + yy + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+            yLabels += '<text x="' + (padL - 5) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="9" fill="rgba(255,255,255,0.35)">' + yv.toFixed(1) + '</text>';
+        }
+
+        var dots = '';
+        for (var di = 0; di < points.length; di++) {
+            dots += '<circle cx="' + xs[di] + '" cy="' + ys[di] + '" r="4" fill="' + strokeColor + '" stroke="#0a0015" stroke-width="2"/>';
+            dots += '<text x="' + xs[di] + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.35)">D' + points[di].n + '</text>';
+        }
+
+        return '<svg width="100%" viewBox="0 0 ' + W + ' ' + H + '" style="overflow:visible;display:block;">' +
+            '<defs><linearGradient id="mjfill_' + encodeURIComponent(unit) + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + fillColor + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + fillColor + '" stop-opacity="0"/></linearGradient></defs>' +
+            yLabels +
+            '<path d="' + area + '" fill="url(#mjfill_' + encodeURIComponent(unit) + ')" />' +
+            '<polyline points="' + polyline + '" fill="none" stroke="' + strokeColor + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+            dots +
+            '</svg>';
     }
 
     /* Wire up initMonjaro in bootApp */
