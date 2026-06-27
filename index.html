@@ -1316,6 +1316,16 @@
             <div id="mjPatientList"></div>
         </div>
 
+        <!-- Monjaro Reminders Dashboard -->
+        <div class="card" style="border-left:4px solid var(--warning); margin-top:4px;">
+            <h3 style="color:var(--warning); border-color:rgba(255,159,10,0.2); margin-bottom:14px; display:flex; align-items:center; gap:10px;">
+                <span>&#128276; Monjaro Dose Reminders</span>
+                <span id="mjRemCount" style="background:var(--danger);color:white;padding:3px 10px;border-radius:12px;font-size:11px;">0</span>
+                <button onclick="addMJManualReminder()" style="margin-left:auto;background:rgba(255,159,10,0.15);color:var(--warning);border:1px solid rgba(255,159,10,0.3);padding:7px 14px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:none;width:auto;">+ Manual Reminder</button>
+            </h3>
+            <div id="mjRemList"><p style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">Loading...</p></div>
+        </div>
+
     </div><!-- /monjaroPanel -->
 
     <!-- Monjaro Enrollment Modal -->
@@ -1558,9 +1568,11 @@
 
         db.ref('reminders').on('value', function(snap) {
             allReminders = snap.val() || {};
-            renderRems();       /* FIX 7: renderRems now also updates dashboard reminders */
+            renderRems();
             checkActiveReminderBanner();
             if (currentRegTab === 'followup') renderFollowUpPanel();
+            if (currentMainTab === 'monjaro') renderMJRemindersTab();
+            if (activeId && currentSubTab === 'monjaro') renderMonjaroPatientFile(activeId);
         });
     }
 
@@ -2470,7 +2482,7 @@
                 var pinIcon = p.pinned ? '&#11088;' : '&#9734;';
                 var pinClass = p.pinned ? 'pinned' : '';
                 var isActive = activeId == id ? ' active' : '';
-                var mjBadge = monjaroData[id] ? ' <span style="font-size:11px;" title="Monjaro Patient">💉</span>' : '';
+                var mjBadge = monjaroData[id] ? ' <span style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.06em;vertical-align:middle;margin-left:4px;box-shadow:0 2px 6px rgba(167,139,250,0.4);">MONJARO</span>' : '';
 
                 list.innerHTML += '<div id="pt-' + id + '" class="pt-item' + isActive + '" onclick="loadFullData(\'' + id + '\')">' +
                     '<strong>' + escapeHtml(p.name || 'Unnamed Patient') + '</strong>' +
@@ -3814,7 +3826,7 @@ function _renderVisionOSDisplay() {
         monjaroListener = db.ref('monjaro_patients');
         monjaroListener.on('value', function(snap) {
             monjaroData = snap.val() || {};
-            if (currentMainTab === 'monjaro') renderMonjaroDashboard();
+            if (currentMainTab === 'monjaro') { renderMonjaroDashboard(); renderMJRemindersTab(); }
             if (activeId && currentSubTab === 'monjaro') renderMonjaroPatientFile(activeId);
             renderList();
             if (activeId) refreshMonjaroSubTab(activeId);
@@ -3986,6 +3998,11 @@ function _renderVisionOSDisplay() {
             opts[i].classList.remove('selected');
             if (opts[i].dataset.dose === '2.5') opts[i].classList.add('selected');
         }
+        /* Always reset gender to Male on open so previous selection doesn't persist */
+        var gM = document.getElementById('mjGenderM');
+        var gF = document.getElementById('mjGenderF');
+        if (gM) gM.checked = true;
+        if (gF) gF.checked = false;
         document.getElementById('mjEnrollModal').style.display = 'flex';
     }
 
@@ -4009,11 +4026,12 @@ function _renderVisionOSDisplay() {
         var startWeight = parseFloat(document.getElementById('mjEnrollWeight').value) || 0;
         var targetWeight = parseFloat(document.getElementById('mjEnrollTarget').value) || 0;
         var age = parseInt(document.getElementById('mjEnrollAge').value) || 0;
-        var genderEl = document.querySelector('input[name="mjGender"]:checked');
-        var gender = genderEl ? genderEl.value : 'male';
+        var genderF = document.getElementById('mjGenderF');
+        var gender = (genderF && genderF.checked) ? 'female' : 'male';
         var enrollDate = document.getElementById('mjEnrollDate').value || new Date().toISOString().split('T')[0];
         var patientName = ptIdx[id] ? ptIdx[id].name : 'Unknown';
-        var record = { patientName: patientName, enrollDate: enrollDate, startDate: enrollDate, currentDose: dose, gender: gender, height: height, startWeight: startWeight, targetWeight: targetWeight, age: age, doses: [] };
+        var initialDose = { id: Date.now(), date: enrollDate, doseAmount: dose, doseNumber: 1, weight: startWeight || null, note: 'Initial Enrollment Dose', prevComment: '', reminderFlag: false };
+        var record = { patientName: patientName, enrollDate: enrollDate, startDate: enrollDate, currentDose: dose, gender: gender, height: height, startWeight: startWeight, targetWeight: targetWeight, age: age, doses: [initialDose] };
         db.ref('monjaro_patients/' + id).set(record).catch(handleFirebaseError);
         closeMonjaroEnrollModal();
         showToast('\uD83D\uDC89 ' + patientName + ' enrolled in Monjaro program!');
@@ -4088,8 +4106,8 @@ function _renderVisionOSDisplay() {
             '</div>' +
             '<div style="margin-top:8px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Note / Observation</span><textarea id="mjDoseNote" placeholder="Patient\'s response, side effects, improvements..." style="min-height:70px;resize:vertical;"></textarea></div>' +
             '<div style="margin-top:4px;"><span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Comment on Previous Dose</span><textarea id="mjDosePrevComment" placeholder="How did patient respond to previous dose?" style="min-height:50px;resize:vertical;"></textarea></div>' +
-            '<div class="mj-reminder-toggle" onclick="document.getElementById(\'mjReminderFlag\').checked=!document.getElementById(\'mjReminderFlag\').checked;">' +
-            '<input type="checkbox" id="mjReminderFlag"><label for="mjReminderFlag">&#128276; Flag this dose for follow-up reminder</label></div>' +
+            '<div class="mj-reminder-toggle">' +
+            '<input type="checkbox" id="mjReminderFlag" style="width:18px;height:18px;accent-color:var(--warning);margin:0;cursor:pointer;"><label for="mjReminderFlag" style="cursor:pointer;user-select:none;">&#128276; Flag this dose for follow-up reminder</label></div>' +
             '<button onclick="saveMJDose(\'' + id + '\')" style="margin-top:12px;background:linear-gradient(135deg,var(--monjaro-dark),var(--monjaro));box-shadow:0 4px 14px var(--monjaro-glow);">Save Dose Entry &#128138;</button>' +
             '</div>';
 
@@ -4100,7 +4118,17 @@ function _renderVisionOSDisplay() {
         var timelineHtml = renderDoseTimeline(doses);
         var accordionHtml = renderDoseAccordion(doses);
 
+        /* Patient-level reminders panel */
+        var ptRemHtml = renderMonjaroPatientReminders(id, ptName, m);
+
+        /* Unenroll + Edit enrollment buttons */
+        var mgmtBar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' +
+            '<button onclick="unenrollMJPatient(\'' + id + '\',\'' + escapeHtml(ptName).replace(/'/g,'&#39;') + '\')" style="background:rgba(255,69,58,0.12);color:var(--danger);border:1px solid rgba(255,69,58,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#128465; Un-enroll from Monjaro</button>' +
+            '<button onclick="editMJEnrollment(\'' + id + '\')" style="background:rgba(10,132,255,0.1);color:var(--primary);border:1px solid rgba(10,132,255,0.25);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#9998; Edit Enrollment Data</button>' +
+            '</div>';
+
         panel.innerHTML =
+            mgmtBar +
             protocolHint +
             summaryBar +
             '<div class="mj-grid-2">' +
@@ -4108,6 +4136,8 @@ function _renderVisionOSDisplay() {
                     bmiHtml +
                     '<div class="mj-section-hdr">&#128172; WhatsApp Reminder</div>' +
                     msgHtml +
+                    '<div class="mj-section-hdr">&#128276; Dose Reminders</div>' +
+                    ptRemHtml +
                     '<div class="mj-section-hdr">&#128203; By Dose Tier</div>' +
                     accordionHtml +
                 '</div>' +
@@ -4134,22 +4164,82 @@ function _renderVisionOSDisplay() {
         var weight = document.getElementById('mjDoseWeight').value;
         var note = document.getElementById('mjDoseNote').value.trim();
         var prevComment = document.getElementById('mjDosePrevComment').value.trim();
-        var reminderFlag = document.getElementById('mjReminderFlag').checked;
+        var reminderFlag = document.getElementById('mjReminderFlag') ? document.getElementById('mjReminderFlag').checked : false;
         var m = monjaroData[id];
         var doses = m ? (m.doses || []) : [];
         var doseNumber = doses.length + 1;
         doses.push({ id: Date.now(), date: date, doseAmount: doseAmount, doseNumber: doseNumber, weight: weight ? parseFloat(weight) : null, note: note, prevComment: prevComment, reminderFlag: reminderFlag });
         db.ref('monjaro_patients/' + id + '/doses').set(doses).catch(handleFirebaseError);
         db.ref('monjaro_patients/' + id + '/currentDose').set(doseAmount).catch(handleFirebaseError);
+        var ptName = ptIdx[id] ? ptIdx[id].name : 'Monjaro Patient';
+        /* Auto reminder: 7 days after dose */
+        var autoRemDate = new Date(new Date(date).getTime() + 7 * 86400000).toISOString().split('T')[0];
+        db.ref('reminders').push({
+            text: '[Monjaro] ' + ptName + ' — Dose ' + doseNumber + ' (' + doseAmount + ' mg) — Follow-up / Next injection approaching',
+            date: autoRemDate, status: 'pending', ptId: id, isMjAuto: true,
+            lastDoseDate: date, nextDoseDate: new Date(new Date(date).getTime() + 28 * 86400000).toISOString().split('T')[0]
+        }).catch(handleFirebaseError);
+        /* Manual flag reminder on dose date */
         if (reminderFlag) {
-            var ptName = ptIdx[id] ? ptIdx[id].name : 'Monjaro Patient';
-            db.ref('reminders').push({ text: '[Monjaro &#128138;] ' + ptName + ' \u2014 Dose ' + doseNumber + ' follow-up (' + doseAmount + ' mg)', date: date, status: 'pending', ptId: id }).catch(handleFirebaseError);
+            db.ref('reminders').push({
+                text: '[Monjaro] ' + ptName + ' — Dose ' + doseNumber + ' manual flag (' + doseAmount + ' mg)',
+                date: date, status: 'pending', ptId: id, isMjFlag: true,
+                lastDoseDate: date, nextDoseDate: new Date(new Date(date).getTime() + 28 * 86400000).toISOString().split('T')[0]
+            }).catch(handleFirebaseError);
         }
-        showToast('\u2705 Dose #' + doseNumber + ' saved!');
+        showToast('\u2705 Dose #' + doseNumber + ' saved! Reminder set for ' + autoRemDate + (reminderFlag ? ' + flag.' : '.'));
         document.getElementById('mjDoseNote').value = '';
         document.getElementById('mjDosePrevComment').value = '';
         document.getElementById('mjDoseWeight').value = '';
-        document.getElementById('mjReminderFlag').checked = false;
+        if (document.getElementById('mjReminderFlag')) document.getElementById('mjReminderFlag').checked = false;
+    }
+
+    function unenrollMJPatient(id, ptName) {
+        if (!confirm('Remove ' + ptName + ' from the Monjaro program? All dose history will be deleted.')) return;
+        db.ref('monjaro_patients/' + id).remove().catch(handleFirebaseError);
+        showToast('Patient removed from Monjaro program.');
+        switchSubTab('clinical');
+    }
+
+    function editMJEnrollment(id) {
+        var m = monjaroData[id];
+        if (!m) return;
+        var newHeight = prompt('Height (cm):', m.height || '');
+        if (newHeight === null) return;
+        var newWeight = prompt('Start weight (kg):', m.startWeight || '');
+        if (newWeight === null) return;
+        var newTarget = prompt('Target weight (kg):', m.targetWeight || '');
+        if (newTarget === null) return;
+        var newAge = prompt('Age:', m.age || '');
+        if (newAge === null) return;
+        var newGender = prompt('Gender (male/female):', m.gender || 'male');
+        if (newGender === null) return;
+        db.ref('monjaro_patients/' + id).update({
+            height: parseFloat(newHeight) || 0,
+            startWeight: parseFloat(newWeight) || 0,
+            targetWeight: parseFloat(newTarget) || 0,
+            age: parseInt(newAge) || 0,
+            gender: (newGender.toLowerCase() === 'female') ? 'female' : 'male'
+        }).catch(handleFirebaseError);
+        showToast('\u2705 Enrollment data updated!');
+    }
+
+    function editMJDose(id, idx) {
+        var m = monjaroData[id];
+        if (!m || !m.doses || !m.doses[idx]) return;
+        var d = m.doses[idx];
+        var newNote = prompt('Edit note:', d.note || '');
+        if (newNote === null) return;
+        var newWeight = prompt('Edit weight (kg):', d.weight || '');
+        if (newWeight === null) return;
+        var newComment = prompt('Edit comment on previous dose:', d.prevComment || '');
+        if (newComment === null) return;
+        var doses = m.doses.slice();
+        doses[idx].note = newNote;
+        doses[idx].weight = newWeight ? parseFloat(newWeight) : null;
+        doses[idx].prevComment = newComment;
+        db.ref('monjaro_patients/' + id + '/doses').set(doses).catch(handleFirebaseError);
+        showToast('\u2705 Dose entry updated!');
     }
 
     /* ---------- BMI / BMR Panel ---------- */
@@ -4314,6 +4404,178 @@ function _renderVisionOSDisplay() {
     function copyArabicMsg(ptName, dose) {
         var msg = '\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064a\u0643\u0645 ' + ptName + ' \uD83C\uDF3F\n\n\u0646\u062A\u0645\u0646\u0649 \u0623\u0646 \u062A\u0643\u0648\u0646\u0648\u0627 \u0628\u062E\u064A\u0631 \u0648\u0639\u0627\u0641\u064A\u0629.\n\n\u0646\u0648\u062F\u0651 \u062A\u0630\u0643\u064A\u0631\u0643\u0645 \u0628\u0645\u0648\u0639\u062F \u062C\u0631\u0639\u0629 \u0627\u0644\u0645\u0646\u062C\u0627\u0631\u0648 \u0627\u0644\u0642\u0627\u062F\u0645\u0629 \uD83D\uDC89\n\u062C\u0631\u0639\u062A\u0643\u0645 \u0627\u0644\u062D\u0627\u0644\u064A\u0629: ' + dose + ' \u0645\u0644\u063A\n\n\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u062A\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0639\u064A\u0627\u062F\u0629 \u0644\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0645\u0648\u0639\u062F \u0627\u0644\u0645\u0646\u0627\u0633\u0628.\n\n\u0634\u0643\u0631\u0627\u064B \u0644\u062B\u0642\u062A\u0643\u0645 \u0628\u0646\u0627 \uD83D\uDE4F\n\u062F. \u0633\u0639\u062F \u0635\u0628\u0631\u064A \u0627\u0644\u0632\u0628\u064A\u062F\u064A';
         try { navigator.clipboard.writeText(msg); showToast('\u2705 \u062A\u0645 \u0646\u0633\u062E \u0627\u0644\u0631\u0633\u0627\u0644\u0629!'); } catch(e) { showToast('Please copy the message manually.'); }
+    }
+
+    /* ---------- Monjaro Reminders Dashboard (main Monjaro tab) ---------- */
+    function renderMJRemindersTab() {
+        var list = document.getElementById('mjRemList');
+        var countEl = document.getElementById('mjRemCount');
+        if (!list) return;
+        var remIds = Object.keys(allReminders);
+        var mjRems = [];
+        for (var i = 0; i < remIds.length; i++) {
+            var r = allReminders[remIds[i]];
+            if (r && r.status === 'pending' && r.text && r.text.indexOf('[Monjaro]') === 0) {
+                mjRems.push({ id: remIds[i], r: r });
+            }
+        }
+        mjRems.sort(function(a, b) { return new Date(a.r.date).getTime() - new Date(b.r.date).getTime(); });
+        if (countEl) countEl.textContent = mjRems.length;
+        if (mjRems.length === 0) {
+            list.innerHTML = '<p style="text-align:center;padding:24px;color:var(--text-secondary);font-size:13px;">No pending Monjaro reminders 🎉</p>';
+            return;
+        }
+        var html = '';
+        var now = Date.now();
+        for (var j = 0; j < mjRems.length; j++) {
+            var entry = mjRems[j];
+            var r = entry.r;
+            var rid = entry.id;
+            /* Capture values as string literals for safe onclick use */
+            var safeRid = String(rid);
+            var safePtId = String(r.ptId || '');
+            var daysToGo = Math.ceil((new Date(r.date).getTime() - now) / 86400000);
+            var urgencyColor = daysToGo <= 0 ? 'var(--danger)' : (daysToGo <= 3 ? 'var(--warning)' : 'var(--success)');
+            var urgencyText = daysToGo <= 0 ? '&#128308; Today / Overdue' : (daysToGo === 1 ? '&#9201; Tomorrow' : '&#9989; In ' + daysToGo + ' days');
+            var ptLabel = (r.ptId && ptIdx[r.ptId]) ? ptIdx[r.ptId].name : 'General';
+            /* Last dose + next dose info */
+            var doseInfo = '';
+            if (r.lastDoseDate) doseInfo += 'Last dose: <b>' + r.lastDoseDate + '</b>';
+            if (r.nextDoseDate) doseInfo += (doseInfo ? ' &nbsp;|&nbsp; ' : '') + 'Next dose: <b style="color:var(--monjaro);">' + r.nextDoseDate + '</b>';
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,159,10,0.06);border:1px solid rgba(255,159,10,0.15);border-radius:14px;margin-bottom:8px;">' +
+                '<div style="flex:1;cursor:pointer;" onclick="' + (safePtId ? 'loadFullData(\'' + safePtId + '\');switchMainTab(\'patient\');setTimeout(function(){switchSubTab(\'monjaro\')},600);' : '') + '">' +
+                '<div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">' + escapeHtml(ptLabel) + '</div>' +
+                '<div style="font-size:12px;color:var(--text-secondary);">' + escapeHtml((r.text || '').replace('[Monjaro] ', '')) + '</div>' +
+                (doseInfo ? '<div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">' + doseInfo + '</div>' : '') +
+                '</div>' +
+                '<div style="text-align:right;min-width:100px;">' +
+                '<div style="font-size:12px;font-weight:800;color:' + urgencyColor + ';">' + urgencyText + '</div>' +
+                '<div style="font-size:11px;color:var(--text-secondary);">' + escapeHtml(r.date || '') + '</div>' +
+                '</div>' +
+                '<button onclick="mjDoneReminder(\'' + safeRid + '\')" style="background:rgba(48,209,88,0.15);color:var(--success);border:1px solid rgba(48,209,88,0.25);border-radius:10px;padding:7px 13px;font-size:14px;cursor:pointer;width:auto;box-shadow:none;font-weight:700;">&#10003;</button>' +
+                '</div>';
+        }
+        list.innerHTML = html;
+    }
+
+    function mjDoneReminder(rid) {
+        db.ref('reminders/' + rid).update({ status: 'done' }).catch(handleFirebaseError);
+        showToast('Reminder cleared!');
+    }
+
+    function addMJManualReminder() {
+        var ptSearch = prompt('Patient name to link (leave blank for general):');
+        var text = prompt('Reminder text:', 'Next Monjaro dose due');
+        if (!text) return;
+        var date = prompt('Date (YYYY-MM-DD):', new Date(Date.now() + 7*86400000).toISOString().split('T')[0]);
+        if (!date) return;
+        var ptId = '';
+        if (ptSearch && ptSearch.trim()) {
+            var keys = Object.keys(ptIdx);
+            for (var k = 0; k < keys.length; k++) {
+                if ((ptIdx[keys[k]].name||'').toLowerCase().indexOf(ptSearch.trim().toLowerCase()) !== -1) { ptId = keys[k]; break; }
+            }
+        }
+        db.ref('reminders').push({ text: '[Monjaro] ' + text, date: date, status: 'pending', ptId: ptId, isMjManual: true }).catch(handleFirebaseError);
+        showToast('&#128276; Monjaro reminder added!');
+    }
+
+    /* ---------- Per-patient reminders panel (inside patient file Monjaro tab) ---------- */
+    function renderMonjaroPatientReminders(id, ptName, m) {
+        var remIds = Object.keys(allReminders);
+        var ptRems = [];
+        for (var i = 0; i < remIds.length; i++) {
+            var r = allReminders[remIds[i]];
+            if (r && r.status === 'pending' && r.ptId === id && r.text && r.text.indexOf('[Monjaro]') === 0) {
+                ptRems.push({ id: remIds[i], r: r });
+            }
+        }
+        ptRems.sort(function(a, b) { return new Date(a.r.date).getTime() - new Date(b.r.date).getTime(); });
+
+        /* Calculate next dose date (28 days after last dose) and auto-reminder (7 days after) */
+        var lastDoseDate = '';
+        var nextDoseDate = '';
+        var autoRemDefault = '';
+        if (m && m.doses && m.doses.length > 0) {
+            lastDoseDate = m.doses[m.doses.length - 1].date;
+            var lastMs = new Date(lastDoseDate).getTime();
+            nextDoseDate = new Date(lastMs + 28 * 86400000).toISOString().split('T')[0];
+            autoRemDefault = new Date(lastMs + 7 * 86400000).toISOString().split('T')[0];
+        }
+
+        var html = '<div style="background:rgba(255,159,10,0.06);border:1px solid rgba(255,159,10,0.2);border-radius:16px;padding:14px;">';
+
+        /* Info row */
+        if (lastDoseDate) {
+            html += '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;gap:20px;flex-wrap:wrap;">' +
+                '<span style="font-size:12px;color:var(--text-secondary);">Last dose: <b style="color:var(--text-primary);">' + lastDoseDate + '</b></span>' +
+                '<span style="font-size:12px;color:var(--text-secondary);">Next dose due: <b style="color:var(--monjaro);">' + nextDoseDate + '</b></span>' +
+                '</div>';
+        }
+
+        /* Manual reminder setter with +/- controls */
+        var inputId = 'mjPtRemDate_' + id;
+        html += '<div style="margin-bottom:14px;">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Set Reminder Date</div>' +
+            '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<button onclick="mjShiftDate(\'' + inputId + '\',-1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;color:var(--text-primary);width:auto;box-shadow:none;">&#8722;</button>' +
+            '<input type="date" id="' + inputId + '" style="margin:0;flex:1;" value="' + (autoRemDefault || '') + '">' +
+            '<button onclick="mjShiftDate(\'' + inputId + '\',1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;color:var(--text-primary);width:auto;box-shadow:none;">&#43;</button>' +
+            '<button onclick="addMJPatientReminder(\'' + id + '\',\'' + (ptName || '').replace(/'/g, '&#39;') + '\')" style="background:var(--warning);color:#000;border:none;border-radius:12px;padding:0 16px;height:40px;font-size:13px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">Set</button>' +
+            '</div>' +
+            (autoRemDefault ? '<div style="font-size:11px;color:var(--text-secondary);margin-top:5px;">&#128161; Auto-suggestion: 7 days after last dose (' + autoRemDefault + ')</div>' : '') +
+            '</div>';
+
+        /* Reminder list */
+        var now = Date.now();
+        if (ptRems.length === 0) {
+            html += '<p style="text-align:center;padding:10px;color:var(--text-secondary);font-size:12px;">No pending Monjaro reminders for this patient.</p>';
+        } else {
+            for (var j = 0; j < ptRems.length; j++) {
+                var entry = ptRems[j];
+                var r = entry.r;
+                var safeRid = String(entry.id);
+                var daysToGo = Math.ceil((new Date(r.date).getTime() - now) / 86400000);
+                var col = daysToGo <= 0 ? 'var(--danger)' : (daysToGo <= 3 ? 'var(--warning)' : 'var(--monjaro)');
+                var label = daysToGo <= 0 ? '&#128308; Today/Overdue' : (daysToGo === 1 ? '&#9201; Tomorrow' : '&#9989; In ' + daysToGo + ' days');
+                var dInfo = '';
+                if (r.lastDoseDate) dInfo += 'Last: <b>' + r.lastDoseDate + '</b>';
+                if (r.nextDoseDate) dInfo += (dInfo ? ' | ' : '') + 'Next due: <b style="color:var(--monjaro);">' + r.nextDoseDate + '</b>';
+                html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:12px;margin-top:8px;">' +
+                    '<div style="flex:1;">' +
+                    '<div style="font-size:12px;color:var(--text-primary);font-weight:600;">' + escapeHtml((r.text || '').replace('[Monjaro] ', '')) + '</div>' +
+                    '<div style="font-size:11px;font-weight:700;color:' + col + ';margin-top:3px;">' + label + ' &mdash; ' + escapeHtml(r.date || '') + '</div>' +
+                    (dInfo ? '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">' + dInfo + '</div>' : '') +
+                    '</div>' +
+                    '<button onclick="mjDoneReminder(\'' + safeRid + '\')" style="background:rgba(48,209,88,0.15);color:var(--success);border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;width:auto;box-shadow:none;">&#10003; Done</button>' +
+                    '</div>';
+            }
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function mjShiftDate(inputId, days) {
+        var el = document.getElementById(inputId);
+        if (!el || !el.value) return;
+        var d = new Date(el.value);
+        d.setDate(d.getDate() + days);
+        el.value = d.toISOString().split('T')[0];
+    }
+
+    function addMJPatientReminder(id, ptName) {
+        var inputId = 'mjPtRemDate_' + id;
+        var dateEl = document.getElementById(inputId);
+        if (!dateEl || !dateEl.value) { showToast('Please pick a date first.'); return; }
+        var m = monjaroData[id];
+        var lastDoseDate = (m && m.doses && m.doses.length > 0) ? m.doses[m.doses.length-1].date : '';
+        var nextDoseDate = lastDoseDate ? new Date(new Date(lastDoseDate).getTime() + 28*86400000).toISOString().split('T')[0] : '';
+        db.ref('reminders').push({
+            text: '[Monjaro] ' + ptName + ' — Dose reminder',
+            date: dateEl.value, status: 'pending', ptId: id, isMjManual: true,
+            lastDoseDate: lastDoseDate, nextDoseDate: nextDoseDate
+        }).catch(handleFirebaseError);
+        showToast('&#128276; Reminder set for ' + dateEl.value + '!');
     }
 
     /* Wire up initMonjaro in bootApp */
