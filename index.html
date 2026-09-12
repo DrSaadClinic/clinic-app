@@ -1981,6 +1981,26 @@
             var b = ptIdx[id] || {};
             ptDetails[id] = d;
 
+            // 🆕 AUTO-REPAIR: Fix stuck hasPendingLab flag
+            var _labs = d.labs || {};
+            var _labKeys = Object.keys(_labs);
+            var _hasRealPending = false;
+            var _labFixes = {};
+            for (var _li = 0; _li < _labKeys.length; _li++) {
+                if (_labs[_labKeys[_li]] && _labs[_labKeys[_li]].pending) {
+                    if (!_labs[_labKeys[_li]].history || _labs[_labKeys[_li]].history.length === 0) {
+                        _hasRealPending = true;
+                    } else {
+                        _labFixes[_labKeys[_li] + '/pending'] = false;
+                    }
+                }
+            }
+            if (Object.keys(_labFixes).length > 0) {
+                db.ref('patientDetails/' + id + '/labs').update(_labFixes).catch(handleFirebaseError);
+            }
+            if (ptIdx[id] && ptIdx[id].hasPendingLab !== _hasRealPending) {
+                db.ref('patientIndex/' + id).update({ hasPendingLab: _hasRealPending }).catch(handleFirebaseError);
+            }
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('fileView').style.display = 'block';
             document.getElementById('referralResult').style.display = 'none';
@@ -2005,9 +2025,15 @@
                 else if (waNum.indexOf('964') !== 0) waNum = '964' + waNum;
             }
             var safeName = (b.name || '').replace(/'/g, "\\'");
-            document.getElementById('waArea').innerHTML = waNum
+                        var _labPending = ptIdx[id] && ptIdx[id].hasPendingLab;
+            var _resetStyle = _labPending
+                ? 'background:rgba(255,159,10,0.2);color:var(--warning);border:1px solid rgba(255,159,10,0.4);'
+                : 'background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--color-separator);';
+            var _labResetBtn = '<button onclick="resetPendingLabs(\'' + id + '\')" style="' + _resetStyle + 'padding:8px 14px;border-radius:12px;cursor:pointer;font-size:11px;font-weight:600;width:auto;display:inline-block;margin-left:8px;">↻ Reset Lab Pending</button>';
+
+            document.getElementById('waArea').innerHTML = (waNum
                 ? '<button onclick="sendWhatsApp(\'' + waNum + '\',\'' + safeName + '\')" style="background:#25d366;color:white;padding:8px 16px;border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 4px 10px rgba(37,211,102,0.3);width:auto;">WhatsApp Direct</button>'
-                : '';
+                : '') + _labResetBtn;
 
             var presBox = document.getElementById('vPres');
             var visitsBox = document.getElementById('vVisits');
@@ -2354,9 +2380,70 @@
         }
     }
 
-    function deleteFullLab(safeKey) { if (confirm("Permanently delete all records for this test?")) db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError); }
+    function deleteFullLab(safeKey) { if (confirm("    function deleteFullLab(safeKey) {
+        if (confirm("Permanently delete all records for this test?")) {
+            db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError);
+            // 🆕 Check if any other labs are still pending
+            var allLabs = ptDetails[activeId].labs || {};
+            var stillPending = false;
+            for (var lk in allLabs) {
+                if (lk === safeKey) continue;
+                if (allLabs[lk] && allLabs[lk].pending) { stillPending = true; break; }
+            }
+            if (!stillPending) {
+                db.ref('patientIndex/' + activeId).update({ hasPendingLab: false }).catch(handleFirebaseError);
+            }
+        }
+    }
+    delete all records for this test?")) db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError); }
     function deleteLabEntry(safeKey, idx) { if (confirm("Delete this entry?")) { var h = ptDetails[activeId].labs[safeKey].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError); } }
 
+  
+    /* ================================================================
+   RESET PENDING LABS — manual fix for stuck flags
+================================================================ */
+function resetPendingLabs(ptId) {
+    ptId = ptId || activeId;
+    if (!ptId) return;
+    var ptName = ptIdx[ptId] ? ptIdx[ptId].name : 'this patient';
+    if (!confirm('Reset lab pending status for ' + ptName + '?\n\nThis will:\n• Clear the "hasPendingLab" flag\n• Check all labs and clear pending for any that already have results')) return;
+
+    // Clear the index flag first
+    db.ref('patientIndex/' + ptId).update({ hasPendingLab: false }).catch(handleFirebaseError);
+
+    // Then check actual labs in patientDetails
+    db.ref('patientDetails/' + ptId + '/labs').once('value').then(function(snap) {
+        var labs = snap.val() || {};
+        var labKeys = Object.keys(labs);
+        var updates = {};
+        var realPendingCount = 0;
+
+        for (var i = 0; i < labKeys.length; i++) {
+            var key = labKeys[i];
+            if (labs[key] && labs[key].pending) {
+                if (labs[key].history && labs[key].history.length > 0) {
+                    // Has results — clear pending
+                    updates[key + '/pending'] = false;
+                } else {
+                    // Genuinely pending (no results yet)
+                    realPendingCount++;
+                }
+            }
+        }
+
+        if (Object.keys(updates).length > 0) {
+            db.ref('patientDetails/' + ptId + '/labs').update(updates).catch(handleFirebaseError);
+        }
+
+        if (realPendingCount > 0) {
+            db.ref('patientIndex/' + ptId).update({ hasPendingLab: true }).catch(handleFirebaseError);
+            showToast('⚠️ ' + ptName + ' still has ' + realPendingCount + ' lab(s) genuinely pending (no results yet).');
+        } else {
+            showToast('✅ Lab pending status reset for ' + ptName + '! Removed from lab queue.');
+        }
+    }).catch(handleFirebaseError);
+}
+    
     /* ================================================================
        IMAGING ENGINE
     ================================================================ */
@@ -3425,7 +3512,7 @@ function saveAll(manual, targetId) {
     /* ================================================================
        LAB QUEUE
     ================================================================ */
-    function renderLabQueue() {
+        function renderLabQueue() {
         var list = document.getElementById('labQueueList');
         var countEl = document.getElementById('labQueueCount');
         if (!list) return;
@@ -3440,7 +3527,10 @@ function saveAll(manual, targetId) {
                 html += '<div class="lab-queue-item" onclick="loadFullData(\'' + id + '\')">' +
                     '<div><div style="font-weight:600;font-size:14px;color:var(--text-primary);">' + escapeHtml(p.name) + '</div>' +
                     '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">' + escapeHtml(p.complaint || '--') + '</div></div>' +
-                    '<span style="font-size:11px;color:var(--lab);font-weight:700;">PENDING</span></div>';
+                    '<div style="display:flex;gap:6px;align-items:center;">' +
+                    '<button onclick="event.stopPropagation();resetPendingLabs(\'' + id + '\')" style="background:rgba(255,159,10,0.15);color:var(--warning);border:1px solid rgba(255,159,10,0.3);padding:4px 8px;border-radius:8px;font-size:10px;cursor:pointer;width:auto;box-shadow:none;font-weight:600;">↻ Reset</button>' +
+                    '<span style="font-size:11px;color:var(--lab);font-weight:700;">PENDING</span>' +
+                    '</div></div>';
             }
         }
         countEl.textContent = count;
@@ -3660,31 +3750,38 @@ function _renderVisionOSDisplay() {
     var qQueue = [], lQueue = [], sQueue = [], inClinic = [];
     var ids = Object.keys(ptIdx);
 
-    for (var i = 0; i < ids.length; i++) {
+        for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
         var p = ptIdx[id];
         var pName = p.name || '';
         var pTime = p.queueTime || 0;
 
+        // Doctor queue (in-clinic or waiting) — exclusive
         if (p.clinicStatus === 'inclinic') {
             inClinic.push({ id: id, name: pName, time: pTime });
         } else if (p.clinicStatus === 'waiting' || p.isWaiting) {
             qQueue.push({ id: id, name: pName, time: pTime });
-        } else if (p.hasPendingLab === true) {
-            lQueue.push({ id: id, name: pName, time: pTime });
-        } else if (p.clinicStatus === 'seentoday') {
-            // 🆕 ONLY put in Seen Today if they were actually seen today!
+        }
+
+        // SEEN TODAY — INDEPENDENT check (patient can be seen AND have pending labs)
+        if (p.clinicStatus === 'seentoday') {
             var lvTs = parseIraqiDate(p.lastVisit);
-            if (lvTs >= todayTs) sQueue.push({ id: id, name: pName, time: lvTs });
-        } else {
+            if (lvTs >= todayTs) {
+                sQueue.push({ id: id, name: pName, time: lvTs });
+            }
+        } else if (p.clinicStatus !== 'inclinic' && p.clinicStatus !== 'waiting' && !p.isWaiting) {
             var lvTs2 = parseIraqiDate(p.lastVisit);
             var daTs = parseIraqiDate(p.dateAdded);
             if (lvTs2 >= todayTs || daTs >= todayTs) {
                 sQueue.push({ id: id, name: pName, time: lvTs2 });
             }
         }
-    }
 
+        // LAB QUEUE — INDEPENDENT check (seen patients with pending labs appear in BOTH)
+        if (p.hasPendingLab === true && p.clinicStatus !== 'inclinic') {
+            lQueue.push({ id: id, name: pName, time: pTime });
+        }
+    }
     qQueue.sort(function(a, b) { return a.time - b.time; });
     lQueue.sort(function(a, b) { return a.time - b.time; });
     sQueue.sort(function(a, b) { return b.time - a.time; });
@@ -3945,28 +4042,7 @@ function _renderVisionOSDisplay() {
 
         var qQueue = [], lQueue = [], sQueue = [], inClinic = [];
         var ids = Object.keys(ptIdx);
-        for (var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            var p = ptIdx[id];
-            var pName = p.name || '';
-            var pTime = p.queueTime || 0;
-
-            if (p.clinicStatus === 'inclinic') {
-                inClinic.push({ id: id, name: pName, time: pTime });
-            } else if (p.clinicStatus === 'waiting' || p.isWaiting) {
-                qQueue.push({ id: id, name: pName, time: pTime });
-            } else if (p.hasPendingLab === true) {
-                lQueue.push({ id: id, name: pName, time: pTime });
-            } else if (p.clinicStatus === 'seentoday') {
-                // 🆕 ONLY put in Seen Today if they were actually seen today!
-                var lvTs = parseIraqiDate(p.lastVisit);
-                if (lvTs >= todayTs) sQueue.push({ id: id, name: pName, time: lvTs });
-            } else {
-                var lvTs2 = parseIraqiDate(p.lastVisit);
-                var daTs = parseIraqiDate(p.dateAdded);
-                if (lvTs2 >= todayTs || daTs >= todayTs) sQueue.push({ id: id, name: pName, time: lvTs2 });
-            }
-        }
+        updateSSStats()
         
         qQueue.sort(function(a, b) { return a.time - b.time; });
         lQueue.sort(function(a, b) { return a.time - b.time; });
