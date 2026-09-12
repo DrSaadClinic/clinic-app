@@ -2380,7 +2380,7 @@
         }
     }
 
-    function deleteFullLab(safeKey) { if (confirm("    function deleteFullLab(safeKey) {
+        function deleteFullLab(safeKey) {
         if (confirm("Permanently delete all records for this test?")) {
             db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError);
             // 🆕 Check if any other labs are still pending
@@ -2395,7 +2395,6 @@
             }
         }
     }
-    delete all records for this test?")) db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError); }
     function deleteLabEntry(safeKey, idx) { if (confirm("Delete this entry?")) { var h = ptDetails[activeId].labs[safeKey].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError); } }
 
   
@@ -4040,9 +4039,41 @@ function _renderVisionOSDisplay() {
         todayStart.setHours(0, 0, 0, 0);
         var todayTs = todayStart.getTime();
 
-        var qQueue = [], lQueue = [], sQueue = [], inClinic = [];
+                var qQueue = [], lQueue = [], sQueue = [], inClinic = [];
         var ids = Object.keys(ptIdx);
-        updateSSStats()
+
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var p = ptIdx[id];
+            var pName = p.name || '';
+            var pTime = p.queueTime || 0;
+
+            // Doctor queue (in-clinic or waiting) — exclusive
+            if (p.clinicStatus === 'inclinic') {
+                inClinic.push({ id: id, name: pName, time: pTime });
+            } else if (p.clinicStatus === 'waiting' || p.isWaiting) {
+                qQueue.push({ id: id, name: pName, time: pTime });
+            }
+
+            // SEEN TODAY — INDEPENDENT check (patient can be seen AND have pending labs)
+            if (p.clinicStatus === 'seentoday') {
+                var lvTs = parseIraqiDate(p.lastVisit);
+                if (lvTs >= todayTs) {
+                    sQueue.push({ id: id, name: pName, time: lvTs });
+                }
+            } else if (p.clinicStatus !== 'inclinic' && p.clinicStatus !== 'waiting' && !p.isWaiting) {
+                var lvTs2 = parseIraqiDate(p.lastVisit);
+                var daTs = parseIraqiDate(p.dateAdded);
+                if (lvTs2 >= todayTs || daTs >= todayTs) {
+                    sQueue.push({ id: id, name: pName, time: lvTs2 });
+                }
+            }
+
+            // LAB QUEUE — INDEPENDENT check (seen patients with pending labs appear in BOTH)
+            if (p.hasPendingLab === true && p.clinicStatus !== 'inclinic') {
+                lQueue.push({ id: id, name: pName, time: pTime });
+            }
+        }
         
         qQueue.sort(function(a, b) { return a.time - b.time; });
         lQueue.sort(function(a, b) { return a.time - b.time; });
