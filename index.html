@@ -1614,26 +1614,62 @@
             renderWebRequests();
         });
 
-                               var _firstPatientLoad = true;
+             var _firstPatientLoad = true;
         var _knownPatientIds = {};
+        var _knownStatuses = {};
         db.ref('patientIndex').on('value', function(snap) {
             ptIdx = snap.val() || {};
             
             var currentIds = Object.keys(ptIdx);
-            var newIds = [];
-            for (var i = 0; i < currentIds.length; i++) {
-                if (!_knownPatientIds[currentIds[i]]) newIds.push(currentIds[i]);
-            }
-            _knownPatientIds = {};
-            for (var j = 0; j < currentIds.length; j++) _knownPatientIds[currentIds[j]] = true;
+            var arrivals = [];
             
-                        // Trigger TV Arrival Animation & Sound
-            if (!_firstPatientLoad && newIds.length > 0 && currentMainTab === 'waiting') {
-                var newPtNames = [];
-                for (var n = 0; n < newIds.length; n++) {
-                    if (ptIdx[newIds[n]]) newPtNames.push(ptIdx[newIds[n]].name);
+            for (var i = 0; i < currentIds.length; i++) {
+                var id = currentIds[i];
+                var p = ptIdx[id];
+                var status = p.clinicStatus || (p.isWaiting ? 'waiting' : 'none');
+                
+                var wasNew = !_knownPatientIds[id];
+                var prevStatus = _knownStatuses[id] || 'none';
+                
+                // 1. New patient added to waiting
+                if (wasNew && status === 'waiting') {
+                    arrivals.push({ id: id, inclinic: false });
                 }
-                triggerTVArrival(newPtNames.join(', '));
+                // 2. Existing patient checked-in (waiting) from non-waiting state
+                else if (!wasNew && status === 'waiting' && prevStatus !== 'waiting' && prevStatus !== 'inclinic') {
+                    arrivals.push({ id: id, inclinic: false });
+                }
+                // 3. Patient called into doctor (inclinic) from waiting
+                else if (!wasNew && status === 'inclinic' && prevStatus === 'waiting') {
+                    arrivals.push({ id: id, inclinic: true });
+                }
+            }
+            
+            // Update known states
+            _knownPatientIds = {};
+            _knownStatuses = {};
+            for (var j = 0; j < currentIds.length; j++) {
+                _knownPatientIds[currentIds[j]] = true;
+                var p = ptIdx[currentIds[j]];
+                _knownStatuses[currentIds[j]] = p.clinicStatus || (p.isWaiting ? 'waiting' : 'none');
+            }
+            
+            // Trigger TV Arrival Animation & Sound
+            if (!_firstPatientLoad && arrivals.length > 0 && currentMainTab === 'waiting') {
+                var waitingNames = [];
+                var clinicNames = [];
+                for (var n = 0; n < arrivals.length; n++) {
+                    var ptName = ptIdx[arrivals[n].id] ? ptIdx[arrivals[n].id].name : 'Patient';
+                    if (arrivals[n].inclinic) clinicNames.push(ptName);
+                    else waitingNames.push(ptName);
+                }
+                if (waitingNames.length > 0) {
+                    triggerTVArrival(waitingNames.join(', '), false);
+                }
+                if (clinicNames.length > 0) {
+                    // Delay slightly so they don't overlap if both happen at once
+                    setTimeout(function() { triggerTVArrival(clinicNames.join(', '), true); }, 100);
+                }
             }
             _firstPatientLoad = false;
             
@@ -1718,7 +1754,7 @@
         osc2.stop(now + 1.65);
     }
 
-        function triggerTVArrival(ptName) {
+            function triggerTVArrival(ptName, isInClinic) {
         playChime();
         var existing = document.getElementById('vosArrivalOverlay');
         if (existing) existing.remove();
@@ -1727,8 +1763,10 @@
         overlay.id = 'vosArrivalOverlay';
         overlay.className = 'vos-arrival-overlay';
         
-        var nameDisplay = ptName ? ptName : 'New Patient';
-        overlay.innerHTML = '<div class="vos-arrival-text"><div class="vos-arrival-label">New Patient Arrived</div>' + escapeHtml(nameDisplay) + '</div>';
+        var nameDisplay = ptName ? ptName : 'Patient';
+        var labelText = isInClinic ? 'Please Proceed to Doctor' : 'New Patient Arrived';
+        
+        overlay.innerHTML = '<div class="vos-arrival-text"><div class="vos-arrival-label">' + labelText + '</div>' + escapeHtml(nameDisplay) + '</div>';
         
         document.body.appendChild(overlay);
         
