@@ -883,33 +883,41 @@
         .mj-protocol-hint.overdue { background: rgba(255,69,58,0.1); border: 1px solid rgba(255,69,58,0.25); color: var(--danger); }
         .mj-protocol-hint.ok { background: rgba(48,209,88,0.08); border: 1px solid rgba(48,209,88,0.2); color: var(--success); }
 
-        /* TV ARRIVAL ANIMATION */
+                /* TV ARRIVAL ANIMATION - CENTER POPUP TO NOTIFICATION */
         .vos-arrival-overlay {
             position: fixed; inset: 0; z-index: 99999; pointer-events: none;
             display: flex; align-items: center; justify-content: center;
-            opacity: 0;
-            animation: vosArrivalPulse 2.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            animation: vosOverlayFade 6s ease-out forwards;
         }
         .vos-arrival-text {
-            font-size: 3vw; font-weight: 800; color: white; text-align: center;
-            background: linear-gradient(135deg, rgba(48,209,88,0.9), rgba(10,132,255,0.9));
-            padding: 24px 60px; border-radius: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            font-size: 2.8vw; font-weight: 800; color: white; text-align: center;
+            background: linear-gradient(135deg, rgba(48,209,88,0.95), rgba(10,132,255,0.95));
+            padding: 30px 70px; border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             transform: scale(0.5);
-            animation: vosTextPop 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: vosTextFlow 6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            max-width: 80vw;
         }
-        @keyframes vosArrivalPulse {
+        .vos-arrival-label {
+            font-size: 0.35em; opacity: 0.85; letter-spacing: 0.25em; 
+            text-transform: uppercase; margin-bottom: 12px; font-weight: 600;
+        }
+        @keyframes vosOverlayFade {
             0% { opacity: 0; backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
-            20% { opacity: 1; backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
-            80% { opacity: 1; backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
+            10% { opacity: 1; backdrop-filter: blur(10px); background: rgba(0,0,0,0.4); }
+            40% { opacity: 1; backdrop-filter: blur(10px); background: rgba(0,0,0,0.4); }
+            50% { opacity: 0; backdrop-filter: blur(0px); background: rgba(0,0,0,0); } /* Backdrop fades as text flies to corner */
             100% { opacity: 0; backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
         }
-        @keyframes vosTextPop {
-            0% { transform: scale(0.5) translateY(20px); opacity: 0; }
-            20% { transform: scale(1.1) translateY(0); opacity: 1; }
-            80% { transform: scale(1) translateY(0); opacity: 1; }
-            100% { transform: scale(1.2) translateY(-20px); opacity: 0; }
+        @keyframes vosTextFlow {
+            0% { transform: scale(0.5); opacity: 0; }
+            10% { transform: scale(1.1); opacity: 1; }
+            20% { transform: scale(1.0); opacity: 1; }
+            40% { transform: scale(1.0) translate(0, 0); opacity: 1; } /* Holds in center */
+            55% { transform: scale(0.5) translate(40vw, -38vh); opacity: 1; } /* Flies to top-right corner and shrinks */
+            85% { transform: scale(0.5) translate(40vw, -38vh); opacity: 1; } /* Stays as notification */
+            100% { transform: scale(0.5) translate(40vw, -38vh); opacity: 0; } /* Disappears */
         }
 
     </style>
@@ -1619,9 +1627,13 @@
             _knownPatientIds = {};
             for (var j = 0; j < currentIds.length; j++) _knownPatientIds[currentIds[j]] = true;
             
-            // Trigger TV Arrival Animation & Sound
+                        // Trigger TV Arrival Animation & Sound
             if (!_firstPatientLoad && newIds.length > 0 && currentMainTab === 'waiting') {
-                triggerTVArrival();
+                var newPtNames = [];
+                for (var n = 0; n < newIds.length; n++) {
+                    if (ptIdx[newIds[n]]) newPtNames.push(ptIdx[newIds[n]].name);
+                }
+                triggerTVArrival(newPtNames.join(', '));
             }
             _firstPatientLoad = false;
             
@@ -1706,7 +1718,7 @@
         osc2.stop(now + 1.65);
     }
 
-    function triggerTVArrival() {
+        function triggerTVArrival(ptName) {
         playChime();
         var existing = document.getElementById('vosArrivalOverlay');
         if (existing) existing.remove();
@@ -1714,12 +1726,16 @@
         var overlay = document.createElement('div');
         overlay.id = 'vosArrivalOverlay';
         overlay.className = 'vos-arrival-overlay';
-        overlay.innerHTML = '<div class="vos-arrival-text">New Patient Arrived</div>';
+        
+        var nameDisplay = ptName ? ptName : 'New Patient';
+        overlay.innerHTML = '<div class="vos-arrival-text"><div class="vos-arrival-label">New Patient Arrived</div>' + escapeHtml(nameDisplay) + '</div>';
+        
         document.body.appendChild(overlay);
         
+        // Remove from DOM after 6 seconds when animation finishes
         setTimeout(function() { 
             if (overlay.parentNode) overlay.remove(); 
-        }, 2500);
+        }, 6000);
     }
 
     function handleFirebaseError(error) {
