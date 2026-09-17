@@ -883,6 +883,35 @@
         .mj-protocol-hint.overdue { background: rgba(255,69,58,0.1); border: 1px solid rgba(255,69,58,0.25); color: var(--danger); }
         .mj-protocol-hint.ok { background: rgba(48,209,88,0.08); border: 1px solid rgba(48,209,88,0.2); color: var(--success); }
 
+        /* TV ARRIVAL ANIMATION */
+        .vos-arrival-overlay {
+            position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            animation: vosArrivalPulse 2.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        .vos-arrival-text {
+            font-size: 3vw; font-weight: 800; color: white; text-align: center;
+            background: linear-gradient(135deg, rgba(48,209,88,0.9), rgba(10,132,255,0.9));
+            padding: 24px 60px; border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            transform: scale(0.5);
+            animation: vosTextPop 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes vosArrivalPulse {
+            0% { opacity: 0; backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
+            20% { opacity: 1; backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
+            80% { opacity: 1; backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
+            100% { opacity: 0; backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
+        }
+        @keyframes vosTextPop {
+            0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+            20% { transform: scale(1.1) translateY(0); opacity: 1; }
+            80% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(1.2) translateY(-20px); opacity: 0; }
+        }
+
     </style>
 </head>
 <body>
@@ -1577,8 +1606,24 @@
             renderWebRequests();
         });
 
-                       db.ref('patientIndex').on('value', function(snap) {
+                               var _firstPatientLoad = true;
+        var _knownPatientIds = {};
+        db.ref('patientIndex').on('value', function(snap) {
             ptIdx = snap.val() || {};
+            
+            var currentIds = Object.keys(ptIdx);
+            var newIds = [];
+            for (var i = 0; i < currentIds.length; i++) {
+                if (!_knownPatientIds[currentIds[i]]) newIds.push(currentIds[i]);
+            }
+            _knownPatientIds = {};
+            for (var j = 0; j < currentIds.length; j++) _knownPatientIds[currentIds[j]] = true;
+            
+            // Trigger TV Arrival Animation & Sound
+            if (!_firstPatientLoad && newIds.length > 0 && currentMainTab === 'waiting') {
+                triggerTVArrival();
+            }
+            _firstPatientLoad = false;
             
             // 🆕 CLEANUP: Clear waiting/inclinic statuses from previous days
             if (!window._clinicCleaned) {
@@ -1612,6 +1657,69 @@
             if (currentMainTab === 'monjaro') renderMJRemindersTab();
             if (activeId && currentSubTab === 'monjaro') renderMonjaroPatientFile(activeId);
         });
+    }
+    /* ================================================================
+       TV ARRIVAL SOUND & ANIMATION
+    ================================================================ */
+    var audioCtx = null;
+    function getAudioCtx() {
+        if (!audioCtx) {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+    // Unlock audio on first user interaction
+    document.addEventListener('click', function() { getAudioCtx(); }, { once: true });
+
+    function playChime() {
+        var ctx = getAudioCtx();
+        if (!ctx) return;
+        var now = ctx.currentTime;
+        
+        // Tone 1 (D5)
+        var osc1 = ctx.createOscillator();
+        var gain1 = ctx.createGain();
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.4, now + 0.05);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+        osc1.start(now);
+        osc1.stop(now + 1.5);
+        
+        // Tone 2 (A5)
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.15);
+        gain2.gain.setValueAtTime(0, now + 0.15);
+        gain2.gain.linearRampToValueAtTime(0.4, now + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.65);
+        osc2.start(now + 0.15);
+        osc2.stop(now + 1.65);
+    }
+
+    function triggerTVArrival() {
+        playChime();
+        var existing = document.getElementById('vosArrivalOverlay');
+        if (existing) existing.remove();
+        
+        var overlay = document.createElement('div');
+        overlay.id = 'vosArrivalOverlay';
+        overlay.className = 'vos-arrival-overlay';
+        overlay.innerHTML = '<div class="vos-arrival-text">New Patient Arrived</div>';
+        document.body.appendChild(overlay);
+        
+        setTimeout(function() { 
+            if (overlay.parentNode) overlay.remove(); 
+        }, 2500);
     }
 
     function handleFirebaseError(error) {
@@ -2025,12 +2133,11 @@
                 else if (waNum.indexOf('964') !== 0) waNum = '964' + waNum;
             }
             var safeName = (b.name || '').replace(/'/g, "\\'");
-                        var _labPending = ptIdx[id] && ptIdx[id].hasPendingLab;
+                                    var _labPending = ptIdx[id] && ptIdx[id].hasPendingLab;
             var _resetStyle = _labPending
                 ? 'background:rgba(255,159,10,0.2);color:var(--warning);border:1px solid rgba(255,159,10,0.4);'
                 : 'background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--color-separator);';
-            var _labResetBtn = '<button onclick="resetPendingLabs(\'' + id + '\')" style="' + _resetStyle + 'padding:8px 14px;border-radius:12px;cursor:pointer;font-size:11px;font-weight:600;width:auto;display:inline-block;margin-left:8px;">↻ Reset Lab Pending</button>';
-
+            var _labResetBtn = '<button onclick="clearLabPendingNotification(\'' + id + '\')" title="Hide from Lab Queue without touching tests" style="' + _resetStyle + 'padding:8px 14px;border-radius:12px;cursor:pointer;font-size:11px;font-weight:600;width:auto;display:inline-block;margin-left:8px;">✕ Clear Lab Notif.</button>';
             document.getElementById('waArea').innerHTML = (waNum
                 ? '<button onclick="sendWhatsApp(\'' + waNum + '\',\'' + safeName + '\')" style="background:#25d366;color:white;padding:8px 16px;border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 4px 10px rgba(37,211,102,0.3);width:auto;">WhatsApp Direct</button>'
                 : '') + _labResetBtn;
@@ -2397,7 +2504,21 @@
     }
     function deleteLabEntry(safeKey, idx) { if (confirm("Delete this entry?")) { var h = ptDetails[activeId].labs[safeKey].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError); } }
 
-  
+
+
+        /* ================================================================
+       CLEAR LAB NOTIFICATION (Ignores pending without touching tests)
+    ================================================================ */
+    function clearLabPendingNotification(ptId) {
+        ptId = ptId || activeId;
+        if (!ptId) return;
+        var ptName = ptIdx[ptId] ? ptIdx[ptId].name : 'this patient';
+        if (!confirm('Remove ' + ptName + ' from the Lab Waiting list on the display?\n(The actual test orders and results will not be affected.)')) return;
+        
+        db.ref('patientIndex/' + ptId).update({ hasPendingLab: false }).catch(handleFirebaseError);
+        showToast('✅ Lab pending notification cleared for ' + ptName + '.');
+    }
+
     /* ================================================================
    RESET PENDING LABS — manual fix for stuck flags
 ================================================================ */
@@ -3523,11 +3644,11 @@ function saveAll(manual, targetId) {
             var p = ptIdx[id];
             if (p.hasPendingLab) {
                 count++;
-                html += '<div class="lab-queue-item" onclick="loadFullData(\'' + id + '\')">' +
+                                html += '<div class="lab-queue-item" onclick="loadFullData(\'' + id + '\')">' +
                     '<div><div style="font-weight:600;font-size:14px;color:var(--text-primary);">' + escapeHtml(p.name) + '</div>' +
                     '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">' + escapeHtml(p.complaint || '--') + '</div></div>' +
                     '<div style="display:flex;gap:6px;align-items:center;">' +
-                    '<button onclick="event.stopPropagation();resetPendingLabs(\'' + id + '\')" style="background:rgba(255,159,10,0.15);color:var(--warning);border:1px solid rgba(255,159,10,0.3);padding:4px 8px;border-radius:8px;font-size:10px;cursor:pointer;width:auto;box-shadow:none;font-weight:600;">↻ Reset</button>' +
+                    '<button onclick="event.stopPropagation();clearLabPendingNotification(\'' + id + '\')" title="Hide from Lab Queue without touching tests" style="background:rgba(255,69,58,0.15);color:var(--danger);border:1px solid rgba(255,69,58,0.3);padding:4px 8px;border-radius:8px;font-size:10px;cursor:pointer;width:auto;box-shadow:none;font-weight:600;">✕ Clear</button>' +
                     '<span style="font-size:11px;color:var(--lab);font-weight:700;">PENDING</span>' +
                     '</div></div>';
             }
