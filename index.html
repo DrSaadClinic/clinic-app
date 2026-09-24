@@ -2407,20 +2407,48 @@
     /* ================================================================
        LAB ENGINE
     ================================================================ */
-    function genLabTags() {
+        function genLabTags() {
         var grid = document.getElementById('labSelector');
         if (!grid) return;
         grid.innerHTML = '';
+        
+        var categories = {};
         var keys = Object.keys(globalLabs);
         for (var i = 0; i < keys.length; i++) {
-            (function(safeKey) {
-                var data = globalLabs[safeKey];
-                var btn = document.createElement('div');
-                btn.className = 'lab-btn';
-                btn.innerText = data.n;
-                btn.onclick = function() { orderLab(safeKey, data.n, data.r, data.u); };
-                grid.appendChild(btn);
-            })(keys[i]);
+            var data = globalLabs[keys[i]];
+            var cat = data.c || 'General';
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push({ key: keys[i], data: data });
+        }
+        
+        var catOrder = ['Biochemistry', 'Hematology', 'Parasitology', 'Serology', 'Hormones', 'Celiac Disease', 'General'];
+        
+        for (var c = 0; c < catOrder.length; c++) {
+            var catName = catOrder[c];
+            if (!categories[catName]) continue;
+            
+            var header = document.createElement('div');
+            header.style.gridColumn = '1 / -1';
+            header.style.fontSize = '12px';
+            header.style.fontWeight = '800';
+            header.style.color = 'var(--lab)';
+            header.style.textTransform = 'uppercase';
+            header.style.letterSpacing = '0.08em';
+            header.style.marginTop = '8px';
+            header.style.marginBottom = '4px';
+            header.style.paddingLeft = '4px';
+            header.innerText = catName;
+            grid.appendChild(header);
+            
+            for (var j = 0; j < categories[catName].length; j++) {
+                (function(safeKey, data) {
+                    var btn = document.createElement('div');
+                    btn.className = 'lab-btn';
+                    btn.innerText = data.n;
+                    btn.onclick = function() { orderLab(safeKey, data.n, data.r, data.u); };
+                    grid.appendChild(btn);
+                })(categories[catName][j].key, categories[catName][j].data);
+            }
         }
     }
 
@@ -2433,15 +2461,15 @@
         db.ref('patientIndex/' + activeId).update({ hasPendingLab: true }).catch(handleFirebaseError);
     }
 
-    function addNewCustomLab() {
+        function addNewCustomLab() {
         var name = prompt("Enter New Test Name:");
-        if (name) {
-            var range = prompt("Enter Normal Range:") || "N/A";
-            var unit = prompt("Enter Unit:") || "";
-            var safeKey = name.replace(/[\.\#\$\[\]]/g, '_');
-            db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit }).catch(handleFirebaseError);
-            orderLab(safeKey, name, range, unit);
-        }
+        if (!name) return;
+        var range = prompt("Enter Normal Range:") || "N/A";
+        var unit = prompt("Enter Unit:") || "";
+        var cat = prompt("Enter Category (e.g., Biochemistry, Hematology, Serology, Hormones):") || "General";
+        var safeKey = name.replace(/[\.\#\$\[\]]/g, '_');
+        db.ref('globalLabs/' + safeKey).set({ n: name, r: range, u: unit, c: cat }).catch(handleFirebaseError);
+        orderLab(safeKey, name, range, unit);
     }
 
     function renderLabs(labs) {
@@ -3114,60 +3142,95 @@ function saveAll(manual, targetId) {
     /* ================================================================
        INITIAL DATA
     ================================================================ */
-    var initialLabs = {
-        "CBC_Male": { n: "CBC (Male)", u: "g/dL", r: "Hb: 13.5-17.5 | PCV: 41-50% | WBC: 4-11k | PLT: 150-450k" },
-        "CBC_Female": { n: "CBC (Female)", u: "g/dL", r: "Hb: 12.0-15.5 | PCV: 36-44% | WBC: 4-11k | PLT: 150-450k" },
-        "ESR": { n: "ESR", u: "mm/hr", r: "M: 0-15 | F: 0-20" },
-        "CRP_TITER": { n: "CRP TITER", u: "mg/L", r: "< 6" },
-        "ASO_TITER": { n: "ASO TITER", u: "IU/mL", r: "< 200" },
-        "LATEX_RF": { n: "LATEX (RF)", u: "IU/mL", r: "< 14" },
-        "ROSE_BENGAL": { n: "ROSE BENGAL", u: "", r: "Negative" },
-        "S_IRON": { n: "S.IRON", u: "\u00b5g/dL", r: "M: 65-175 | F: 50-170" },
-        "S_FERRITIN": { n: "S.FERRITIN", u: "ng/mL", r: "M: 30-400 | F: 15-150" },
-        "PT": { n: "PT", u: "sec", r: "11-13.5" },
-        "PTT": { n: "PTT", u: "sec", r: "25-35" },
-        "INR": { n: "INR", u: "", r: "0.8-1.2" },
-        "BT": { n: "BT", u: "min", r: "2-7" },
-        "D_DIMER": { n: "D-DIMER", u: "\u00b5g/mL (FEU)", r: "< 0.5" },
-        "S_CHOLESTEROL": { n: "S.CHOLESTEROL", u: "mg/dL", r: "< 200" },
-        "S_TRIGLYCERIDE": { n: "S.TRIGLYCERIDE", u: "mg/dL", r: "< 150" },
-        "TOTAL_LIPID": { n: "TOTAL LIPID PROFILE", u: "mg/dL", r: "400-800" },
-        "FBS": { n: "FBS", u: "mg/dL", r: "70-100" },
-        "HbA1C": { n: "HbA1C", u: "%", r: "4.0-5.6" },
-        "S_URIC_ACID": { n: "S.URIC ACID", u: "mg/dL", r: "M: 3.5-7.2 | F: 2.6-6.0" },
-        "B_UREA": { n: "B.UREA", u: "mg/dL", r: "15-45" },
-        "S_CREATININE": { n: "S.CREATININE", u: "mg/dL", r: "M: 0.7-1.3 | F: 0.6-1.1" },
-        "S_CALCIUM": { n: "S.CALCIUM", u: "mg/dL", r: "8.5-10.5" },
-        "S_AMYLASE": { n: "S.AMYLASE", u: "U/L", r: "30-110" },
-        "S_LIPASE": { n: "S.LIPASE", u: "U/L", r: "0-160" },
-        "LDH": { n: "LDH", u: "U/L", r: "140-280" },
-        "SGOT": { n: "SGOT (AST)", u: "U/L", r: "5-40" },
-        "SGPT": { n: "SGPT (ALT)", u: "U/L", r: "7-56" },
-        "ALP": { n: "ALP", u: "U/L", r: "44-147" },
-        "TSB": { n: "TSB", u: "mg/dL", r: "0.2-1.2" },
-        "DIRECT_BIL": { n: "DIRECT BILIRUBIN", u: "mg/dL", r: "< 0.3" },
-        "INDIRECT_BIL": { n: "INDIRECT BILIRUBIN", u: "mg/dL", r: "0.2-0.8" },
-        "TSH": { n: "TSH", u: "mIU/L", r: "0.4-4.5" },
-        "FREE_T3": { n: "FREE T3", u: "pg/mL", r: "2.3-4.2" },
-        "FREE_T4": { n: "FREE T4", u: "ng/dL", r: "0.8-1.8" },
-        "S_PROLACTIN": { n: "S.PROLACTIN", u: "ng/mL", r: "F: <25 | M: <15" },
-        "LH": { n: "LH", u: "mIU/mL", r: "M: 1.7-8.6 | F: 2.4-95" },
-        "FSH": { n: "FSH", u: "mIU/mL", r: "M: 1.5-12.4 | F: 3.5-21.5" },
-        "S_TESTOSTERONE": { n: "S.TESTOSTERONE", u: "ng/dL", r: "M: 300-1000 | F: 15-70" },
-        "PSA": { n: "PSA", u: "ng/mL", r: "< 4.0" },
-        "B_HCG": { n: "B-HCG", u: "mIU/mL", r: "< 5" },
-        "S_VIT_D": { n: "S.VIT D", u: "ng/mL", r: "30-100" },
-        "S_VIT_B12": { n: "S.VIT B12", u: "pg/mL", r: "200-900" },
-        "GUE": { n: "GUE", u: "", r: "Clear, pH 5-7, Sp.Gr 1.005-1.030" },
-        "URINE_C_S": { n: "URINE C+S", u: "", r: "No growth" },
-        "GSE": { n: "GSE", u: "", r: "No parasites/occult blood" },
-        "STOOL_H_PYLORI": { n: "STOOL H.PYLORI (Ag)", u: "", r: "Negative" },
-        "STOOL_CALPROTECTIN": { n: "STOOL CALPROTECTIN", u: "\u00b5g/g", r: "< 50" },
-        "S_H_PYLORI": { n: "S.H.PYLORI (Ab)", u: "", r: "Negative" },
-        "SALMONELLA": { n: "SALMONELLA", u: "", r: "Negative" },
-        "VIRAL_MARKER": { n: "VIRAL MARKER", u: "", r: "Non-reactive" },
-        "ANA": { n: "ANA", u: "", r: "Negative" },
-        "BL_GP_RH": { n: "BL.GP & RH", u: "", r: "Patient Specific" }
+        var initialLabs = {
+        // Biochemistry
+        "FBS": { n: "Blood Sugar", u: "mg/dL", r: "70-100", c: "Biochemistry" },
+        "HbA1C": { n: "HBA1C", u: "%", r: "4.0-5.6", c: "Biochemistry" },
+        "HOMA_IR": { n: "HOMA IR", u: "", r: "< 2.5", c: "Biochemistry" },
+        "FREE_INSULIN": { n: "Free Insulin", u: "µIU/mL", r: "2.6-24.9", c: "Biochemistry" },
+        "B_UREA": { n: "Blood Urea", u: "mg/dL", r: "15-45", c: "Biochemistry" },
+        "S_CREATININE": { n: "S. Creatinine", u: "mg/dL", r: "M: 0.7-1.3 | F: 0.6-1.1", c: "Biochemistry" },
+        "S_URIC_ACID": { n: "S. Uric Acid", u: "mg/dL", r: "M: 3.5-7.2 | F: 2.6-6.0", c: "Biochemistry" },
+        "S_CHOLESTEROL": { n: "S. Cholesterol", u: "mg/dL", r: "< 200", c: "Biochemistry" },
+        "S_TRIGLYCERIDE": { n: "S. Triglyceride", u: "mg/dL", r: "< 150", c: "Biochemistry" },
+        "S_HDL": { n: "S. HDL", u: "mg/dL", r: "M: >40 | F: >50", c: "Biochemistry" },
+        "S_LDL": { n: "S. LDL", u: "mg/dL", r: "< 100", c: "Biochemistry" },
+        "SGPT": { n: "GPT (ALT)", u: "U/L", r: "7-56", c: "Biochemistry" },
+        "SGOT": { n: "GOT (AST)", u: "U/L", r: "5-40", c: "Biochemistry" },
+        "ALP": { n: "ALP", u: "U/L", r: "44-147", c: "Biochemistry" },
+        "TSB": { n: "TSB", u: "mg/dL", r: "0.2-1.2", c: "Biochemistry" },
+        "DIRECT_BIL": { n: "D. Bilirubin", u: "mg/dL", r: "< 0.3", c: "Biochemistry" },
+        "INDIRECT_BIL": { n: "In. Bilirubin", u: "mg/dL", r: "0.2-0.8", c: "Biochemistry" },
+        "S_AMYLASE": { n: "Amylase", u: "U/L", r: "30-110", c: "Biochemistry" },
+        "S_LIPASE": { n: "Lipase", u: "U/L", r: "0-160", c: "Biochemistry" },
+        "S_ALBUMIN": { n: "S. Albumin", u: "g/dL", r: "3.5-5.5", c: "Biochemistry" },
+        "S_PROTEIN": { n: "S. Protein", u: "g/dL", r: "6.0-8.3", c: "Biochemistry" },
+        "S_CALCIUM": { n: "S. Calcium", u: "mg/dL", r: "8.5-10.5", c: "Biochemistry" },
+        "ZINC": { n: "Zinc", u: "µg/dL", r: "70-120", c: "Biochemistry" },
+        "LDH": { n: "LDH", u: "U/L", r: "140-280", c: "Biochemistry" },
+        "ELECTROLYTES": { n: "Electrolytes (Na+/K+)", u: "mmol/L", r: "Na: 135-145 | K: 3.5-5.0", c: "Biochemistry" },
+        "S_IRON": { n: "Iron", u: "µg/dL", r: "M: 65-175 | F: 50-170", c: "Biochemistry" },
+        "TIBC": { n: "TIBC", u: "µg/dL", r: "250-450", c: "Biochemistry" },
+        "S_CK": { n: "S. Creatinine Kinase", u: "U/L", r: "30-200", c: "Biochemistry" },
+
+        // Hematology
+        "CBC_Male": { n: "CBC (Male)", u: "g/dL", r: "Hb: 13.5-17.5 | PCV: 41-50% | WBC: 4-11k | PLT: 150-450k", c: "Hematology" },
+        "CBC_Female": { n: "CBC (Female)", u: "g/dL", r: "Hb: 12.0-15.5 | PCV: 36-44% | WBC: 4-11k | PLT: 150-450k", c: "Hematology" },
+        "PCV": { n: "PCV", u: "%", r: "M: 41-50 | F: 36-44", c: "Hematology" },
+        "WBC": { n: "WBC", u: "/µL", r: "4-11k", c: "Hematology" },
+        "ESR": { n: "ESR", u: "mm/hr", r: "M: 0-15 | F: 0-20", c: "Hematology" },
+        "BL_GP_RH": { n: "Blood Group", u: "", r: "Patient Specific", c: "Hematology" },
+        "COAG_PROFILE": { n: "PT, PTT, INR", u: "sec", r: "PT: 11-13.5 | PTT: 25-35 | INR: 0.8-1.2", c: "Hematology" },
+        "CLOTTING_TIME": { n: "Clotting Time", u: "min", r: "5-15", c: "Hematology" },
+        "BLEEDING_TIME": { n: "Bleeding Time", u: "min", r: "2-7", c: "Hematology" },
+        "D_DIMER": { n: "D.Dimer", u: "µg/mL (FEU)", r: "< 0.5", c: "Hematology" },
+
+        // Parasitology
+        "GUE": { n: "GUE", u: "", r: "Clear, pH 5-7, Sp.Gr 1.005-1.030", c: "Parasitology" },
+        "URINE_ALBUMIN": { n: "Urine for Albumin", u: "", r: "Negative", c: "Parasitology" },
+        "URINE_SUGAR": { n: "Urine for Sugar", u: "", r: "Negative", c: "Parasitology" },
+        "GSE": { n: "GSE", u: "", r: "No parasites/occult blood", c: "Parasitology" },
+        "STOOL_H_PYLORI": { n: "Stool for H. Pylori", u: "", r: "Negative", c: "Parasitology" },
+        "STOOL_OB": { n: "Stool for Occult Blood", u: "", r: "Negative", c: "Parasitology" },
+        "STOOL_CALPROTECTIN": { n: "Stool for Calprotectin", u: "µg/g", r: "< 50", c: "Parasitology" },
+        "URINE_C_S": { n: "Urine Culture", u: "", r: "No growth", c: "Parasitology" },
+        "SFA": { n: "SFA", u: "", r: "Patient Specific", c: "Parasitology" },
+
+        // Serology
+        "S_H_PYLORI": { n: "H. Pylori (Ab)", u: "", r: "Negative", c: "Serology" },
+        "LATEX_RF": { n: "Latex RF", u: "IU/mL", r: "< 14", c: "Serology" },
+        "CRP": { n: "CRP", u: "mg/L", r: "< 6", c: "Serology" },
+        "CRP_TITER": { n: "CRP Titer", u: "mg/L", r: "< 6", c: "Serology" },
+        "ASO_TITER": { n: "ASO Titer", u: "IU/mL", r: "< 200", c: "Serology" },
+        "ROSE_BENGAL": { n: "Rose Bengal", u: "", r: "Negative", c: "Serology" },
+        "ANA": { n: "ANA (ANF)", u: "", r: "Negative", c: "Serology" },
+        "SALMONELLA": { n: "Salmonella (IgG-IgM)", u: "", r: "Negative", c: "Serology" },
+        "PREG_TEST": { n: "Pregnancy Test", u: "", r: "Negative", c: "Serology" },
+
+        // Hormones
+        "S_VIT_D": { n: "Vit. D3", u: "ng/mL", r: "30-100", c: "Hormones" },
+        "S_VIT_B12": { n: "Vit. B12", u: "pg/mL", r: "200-900", c: "Hormones" },
+        "S_FERRITIN": { n: "Ferritin", u: "ng/mL", r: "M: 30-400 | F: 15-150", c: "Hormones" },
+        "T3": { n: "T3", u: "ng/dL", r: "80-200", c: "Hormones" },
+        "T4": { n: "T4", u: "µg/dL", r: "5-12", c: "Hormones" },
+        "ATPO": { n: "ATPO", u: "IU/mL", r: "< 35", c: "Hormones" },
+        "TSH": { n: "TSH", u: "mIU/L", r: "0.4-4.5", c: "Hormones" },
+        "FREE_T4": { n: "FT4", u: "ng/dL", r: "0.8-1.8", c: "Hormones" },
+        "FREE_T3": { n: "FT3", u: "pg/mL", r: "2.3-4.2", c: "Hormones" },
+        "S_PROLACTIN": { n: "Prolactin", u: "ng/mL", r: "F: <25 | M: <15", c: "Hormones" },
+        "LH": { n: "LH", u: "mIU/mL", r: "M: 1.7-8.6 | F: 2.4-95", c: "Hormones" },
+        "FSH": { n: "FSH", u: "mIU/mL", r: "M: 1.5-12.4 | F: 3.5-21.5", c: "Hormones" },
+        "S_TESTOSTERONE": { n: "Testosterone", u: "ng/dL", r: "M: 300-1000 | F: 15-70", c: "Hormones" },
+        "ESTRADIOL": { n: "Estradiol", u: "pg/mL", r: "Patient Specific", c: "Hormones" },
+        "PROGESTERONE": { n: "Progesterone", u: "ng/mL", r: "Patient Specific", c: "Hormones" },
+        "B_HCG": { n: "BHCG Titer", u: "mIU/mL", r: "< 5", c: "Hormones" },
+        "PSA": { n: "PSA", u: "ng/mL", r: "< 4.0", c: "Hormones" },
+        "IGF_1": { n: "IGF-1", u: "ng/mL", r: "Age Specific", c: "Hormones" },
+
+        // Celiac Disease
+        "ANTI_TTG": { n: "Anti-TTG (IgG-IgA)", u: "", r: "Negative", c: "Celiac Disease" },
+        "ANTI_GLIADIN": { n: "Anti-Gliadin (IgG-IgA)", u: "", r: "Negative", c: "Celiac Disease" },
+        "ANTI_ENDOMYSIAL": { n: "Anti-Endomysial (IgG-IgA)", u: "", r: "Negative", c: "Celiac Disease" }
     };
 
     var defaultImaging = ["Ultrasound", "X-Ray", "CT Scan", "MRI", "MRCP", "OGD", "Colonoscopy"];
