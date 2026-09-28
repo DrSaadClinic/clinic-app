@@ -2108,37 +2108,7 @@
         document.getElementById('vVisits').dataset.stamped = '';
         switchMainTab('patient');
         switchSubTab('clinical');
-        // 🆕 SMART STATUS: previous patient → seentoday, current → inclinic
-    if (previousId && previousId !== id) {
-        var prevPt = ptIdx[previousId];
-        if (prevPt && (prevPt.clinicStatus === 'inclinic' || prevPt.isWaiting)) {
-            var todayStr = new Date().toLocaleDateString('en-GB');
-            db.ref('patientIndex/' + previousId).update({
-                clinicStatus: 'seentoday',
-                isWaiting: false,
-                lastVisit: todayStr
-            }).catch(handleFirebaseError);
-            // Log visit date for previous patient
-            db.ref('patientDetails/' + previousId + '/visitDates').once('value').then(function(snap) {
-                var dates = snap.val() || [];
-                if (dates.indexOf(todayStr) === -1) {
-                    dates.push(todayStr);
-                    db.ref('patientDetails/' + previousId + '/visitDates').set(dates).catch(handleFirebaseError);
-                }
-            });
-        }
-    }
-               // Mark current patient as "in clinic"
-    if (ptIdx[id] && ptIdx[id].clinicStatus !== 'inclinic') {
-        db.ref('patientIndex/' + id).update({
-            clinicStatus: 'inclinic',
-            isWaiting: false,
-            queueTime: Date.now()  // 🆕 Set timestamp so display picks this patient first
-        }).catch(handleFirebaseError);
-    } else if (ptIdx[id] && ptIdx[id].clinicStatus === 'inclinic') {
-        // If already in clinic, just update the timestamp so they jump to the front of the display
-        db.ref('patientIndex/' + id).update({ queueTime: Date.now() }).catch(handleFirebaseError);
-    }
+   
     
         document.querySelectorAll('.pt-item').forEach(function(el) { el.classList.remove('active'); });
         var ptEl = document.getElementById('pt-' + id);
@@ -2462,13 +2432,17 @@
         }
     }
 
-    function orderLab(safeKey, dispName, range, unit) {
+        function orderLab(safeKey, dispName, range, unit) {
         if (!activeId) return;
         var labs = ptDetails[activeId].labs || {};
         if (!labs[safeKey]) labs[safeKey] = { name: dispName, history: [], range: range, unit: unit };
         labs[safeKey].pending = true;
         db.ref('patientDetails/' + activeId + '/labs/' + safeKey).set(labs[safeKey]).catch(handleFirebaseError);
         db.ref('patientIndex/' + activeId).update({ hasPendingLab: true }).catch(handleFirebaseError);
+        // 🆕 Trigger visit stamp & inclinic status
+        smartAutoStamp('vPres'); 
+        smartAutoStamp('vVisits');
+        autoSyncTrigger();
     }
 
         function addNewCustomLab() {
@@ -2674,13 +2648,17 @@ function resetPendingLabs(ptId) {
         }
     }
 
-    function orderImaging(name) {
+        function orderImaging(name) {
         if (!activeId) return;
         var key = name.replace(/[\.\#\$\[\]]/g, '_');
         var imgNode = ptDetails[activeId].imaging || {};
         if (!imgNode[key]) imgNode[key] = { name: name, history: [] };
         imgNode[key].pending = true;
         db.ref('patientDetails/' + activeId + '/imaging/' + key).set(imgNode[key]).catch(handleFirebaseError);
+        // 🆕 Trigger visit stamp & inclinic status
+        smartAutoStamp('vPres'); 
+        smartAutoStamp('vVisits');
+        autoSyncTrigger();
     }
 
     function renderImaging(images) {
@@ -3010,7 +2988,6 @@ function autoSyncTrigger() {
 }
 
 function saveAll(manual, targetId) {
-    // Use the captured targetId, NOT the current activeId
     targetId = targetId || activeId;
     if (!targetId) return;
     var today = new Date().toLocaleDateString('en-GB');
@@ -3018,7 +2995,9 @@ function saveAll(manual, targetId) {
     detailRef.once('value').then(function(snap) {
         var d = snap.val() || {};
         var dates = d.visitDates || [];
-        if (dates.indexOf(today) === -1) dates.push(today);
+        var isFirstEditToday = (dates.indexOf(today) === -1);
+        if (isFirstEditToday) dates.push(today);
+        
         detailRef.update({
             presentation: document.getElementById('vPres').value,
             visits: document.getElementById('vVisits').value,
@@ -3027,9 +3006,31 @@ function saveAll(manual, targetId) {
             opT: document.getElementById('vOpDetail').value,
             visitDates: dates
         }).catch(handleFirebaseError);
-        if (dates.length > 0) {
-            db.ref('patientIndex/' + targetId).update({ lastVisit: dates[dates.length-1] }).catch(handleFirebaseError);
+        
+        var idxUpdates = { lastVisit: dates.length > 0 ? dates[dates.length-1] : today };
+        
+        // 🆕 SMART STATUS: Only mark as inclinic when the doctor actually edits the file!
+        if (targetId === activeId && isFirstEditToday) {
+            idxUpdates.clinicStatus = 'inclinic';
+            idxUpdates.isWaiting = false;
+            idxUpdates.queueTime = Date.now();
         }
+        
+        db.ref('patientIndex/' + targetId).update(idxUpdates).catch(handleFirebaseError);
+        
+        // 🆕 If this patient just entered the clinic, mark any OTHER inclinic patients as seentoday
+        if (targetId === activeId && isFirstEditToday) {
+            for (var id in ptIdx) {
+                if (id !== targetId && ptIdx[id].clinicStatus === 'inclinic') {
+                    db.ref('patientIndex/' + id).update({
+                        clinicStatus: 'seentoday',
+                        isWaiting: false,
+                        lastVisit: today
+                    }).catch(handleFirebaseError);
+                }
+            }
+        }
+        
         if (targetId === activeId) {
             document.getElementById('syncIndicator').style.display = 'none';
         }
