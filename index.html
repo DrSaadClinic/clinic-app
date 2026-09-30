@@ -2106,10 +2106,34 @@
         activeId = id;
         document.getElementById('vPres').dataset.stamped = '';
         document.getElementById('vVisits').dataset.stamped = '';
-        switchMainTab('patient');
+                switchMainTab('patient');
         switchSubTab('clinical');
-   
-    
+
+        // 🆕 SMART STATUS: Only update queue if the patient was actually waiting
+        if (previousId && previousId !== id) {
+            var prevPt = ptIdx[previousId];
+            // If previous patient was in clinic, mark them as "Seen Today" to advance the queue
+            if (prevPt && prevPt.clinicStatus === 'inclinic') {
+                db.ref('patientIndex/' + previousId).update({
+                    clinicStatus: 'seentoday',
+                    isWaiting: false
+                }).catch(handleFirebaseError);
+            }
+        }
+        
+        var pt = ptIdx[id];
+        if (pt) {
+            // If the patient was WAITING, move them to "In Clinic" (Doctor is seeing)
+            if (pt.clinicStatus === 'waiting' || pt.isWaiting) {
+                db.ref('patientIndex/' + id).update({
+                    clinicStatus: 'inclinic',
+                    isWaiting: false,
+                    queueTime: Date.now()
+                }).catch(handleFirebaseError);
+            }
+            // If they were NOT waiting (e.g., just reviewing for a phone call), do nothing to the queue!
+        }
+
         document.querySelectorAll('.pt-item').forEach(function(el) { el.classList.remove('active'); });
         var ptEl = document.getElementById('pt-' + id);
         if (ptEl) ptEl.classList.add('active');
