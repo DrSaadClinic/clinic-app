@@ -2408,9 +2408,9 @@
     }
 
     /* ================================================================
-       LAB ENGINE
+       LAB ENGINE — STABLE VERSION
     ================================================================ */
-            function genLabTags() {
+    function genLabTags() {
         var grid = document.getElementById('labSelector');
         if (!grid) return;
         grid.innerHTML = '';
@@ -2419,7 +2419,7 @@
         var keys = Object.keys(globalLabs);
         for (var i = 0; i < keys.length; i++) {
             var data = globalLabs[keys[i]];
-            if (!data || !data.n) continue; // Skip invalid entries
+            if (!data || !data.n) continue;
             var cat = data.c || 'General';
             if (!categories[cat]) categories[cat] = [];
             categories[cat].push({ key: keys[i], data: data });
@@ -2456,20 +2456,21 @@
         }
     }
 
-        function orderLab(safeKey, dispName, range, unit) {
+    function orderLab(safeKey, dispName, range, unit) {
         if (!activeId) return;
-        var labs = ptDetails[activeId].labs || {};
-        if (!labs[safeKey]) labs[safeKey] = { name: dispName, history: [], range: range, unit: unit };
-        labs[safeKey].pending = true;
-        db.ref('patientDetails/' + activeId + '/labs/' + safeKey).set(labs[safeKey]).catch(handleFirebaseError);
+        var labRef = db.ref('patientDetails/' + activeId + '/labs/' + safeKey);
+        labRef.once('value').then(function(snap) {
+            var labData = snap.val() || { name: dispName, history: [], range: range, unit: unit };
+            labData.pending = true;
+            labRef.set(labData).catch(handleFirebaseError);
+        });
         db.ref('patientIndex/' + activeId).update({ hasPendingLab: true }).catch(handleFirebaseError);
-        // 🆕 Trigger visit stamp & inclinic status
         smartAutoStamp('vPres'); 
         smartAutoStamp('vVisits');
         autoSyncTrigger();
     }
 
-        function addNewCustomLab() {
+    function addNewCustomLab() {
         var name = prompt("Enter New Test Name:");
         if (!name) return;
         var range = prompt("Enter Normal Range:") || "N/A";
@@ -2488,6 +2489,8 @@
         for (var i = 0; i < labKeys.length; i++) {
             var safeKey = labKeys[i];
             var data = labs[safeKey];
+            if (!data) continue;
+            
             var dispName = data.name || safeKey;
             var sparkHtml = '';
             if (data.history && data.history.length > 1) {
@@ -2536,21 +2539,24 @@
         var flag = prompt('Flag result:\nLeave blank = Normal\n"H" = High\n"L" = Low');
         if (flag) { if (flag.toLowerCase() === 'h') status = "High"; if (flag.toLowerCase() === 'l') status = "Low"; }
         var dt = prompt("Date:", new Date().toLocaleDateString('en-GB')) || new Date().toLocaleDateString('en-GB');
-        var h = ptDetails[activeId].labs[safeKey].history || [];
-        h.push({ val: v, dt: dt, stat: status });
-        db.ref('patientDetails/' + activeId + '/labs/' + safeKey).update({ pending: false, history: h }).catch(handleFirebaseError);
-
-        /* If this was the last lab still pending for this patient, clear the
-           index-level flag so he drops out of "Labs Waiting" on the display. */
-        var allLabs = ptDetails[activeId].labs || {};
-        var stillPending = false;
-        for (var lk in allLabs) {
-            if (lk === safeKey) continue;
-            if (allLabs[lk] && allLabs[lk].pending) { stillPending = true; break; }
-        }
-        if (!stillPending) {
-            db.ref('patientIndex/' + activeId).update({ hasPendingLab: false }).catch(handleFirebaseError);
-        }
+        
+        var labRef = db.ref('patientDetails/' + activeId + '/labs/' + safeKey);
+        labRef.once('value').then(function(snap) {
+            var data = snap.val() || {};
+            var h = data.history || [];
+            h.push({ val: v, dt: dt, stat: status });
+            labRef.update({ pending: false, history: h }).catch(handleFirebaseError);
+            
+            var allLabs = ptDetails[activeId].labs || {};
+            var stillPending = false;
+            for (var lk in allLabs) {
+                if (lk === safeKey) continue;
+                if (allLabs[lk] && allLabs[lk].pending) { stillPending = true; break; }
+            }
+            if (!stillPending) {
+                db.ref('patientIndex/' + activeId).update({ hasPendingLab: false }).catch(handleFirebaseError);
+            }
+        }).catch(handleFirebaseError);
     }
 
     function editLabEntry(safeKey, idx) {
@@ -2577,10 +2583,9 @@
         }
     }
 
-        function deleteFullLab(safeKey) {
+    function deleteFullLab(safeKey) {
         if (confirm("Permanently delete all records for this test?")) {
             db.ref('patientDetails/' + activeId + '/labs/' + safeKey).remove().catch(handleFirebaseError);
-            // 🆕 Check if any other labs are still pending
             var allLabs = ptDetails[activeId].labs || {};
             var stillPending = false;
             for (var lk in allLabs) {
@@ -2592,7 +2597,14 @@
             }
         }
     }
-    function deleteLabEntry(safeKey, idx) { if (confirm("Delete this entry?")) { var h = ptDetails[activeId].labs[safeKey].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError); } }
+
+    function deleteLabEntry(safeKey, idx) {
+        if (confirm("Delete this entry?")) {
+            var h = ptDetails[activeId].labs[safeKey].history;
+            h.splice(idx, 1);
+            db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError);
+        }
+    }
 
 
 
