@@ -2121,17 +2121,17 @@
             }
         }
         
-        var pt = ptIdx[id];
+                var pt = ptIdx[id];
         if (pt) {
-            // If the patient was WAITING, move them to "In Clinic" (Doctor is seeing)
-            if (pt.clinicStatus === 'waiting' || pt.isWaiting) {
+            // 🆕 FIX: ALWAYS set the patient to 'inclinic' when their file is opened.
+            // This ensures the TV display updates immediately to show who the doctor is looking at.
+            if (pt.clinicStatus !== 'inclinic') {
                 db.ref('patientIndex/' + id).update({
                     clinicStatus: 'inclinic',
                     isWaiting: false,
                     queueTime: Date.now()
                 }).catch(handleFirebaseError);
             }
-            // If they were NOT waiting (e.g., just reviewing for a phone call), do nothing to the queue!
         }
 
         document.querySelectorAll('.pt-item').forEach(function(el) { el.classList.remove('active'); });
