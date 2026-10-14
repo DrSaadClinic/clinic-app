@@ -2121,7 +2121,7 @@
             }
         }
         
-                var pt = ptIdx[id];
+                 var pt = ptIdx[id];
         if (pt) {
             // 🆕 FIX: ALWAYS set the patient to 'inclinic' when their file is opened.
             // This ensures the TV display updates immediately to show who the doctor is looking at.
@@ -3601,11 +3601,15 @@ function saveAll(manual, targetId) {
             renderCalendarFromDB();
             clearTimeout(ssTimer);
             if (typeof dismissScreensaver === 'function') dismissScreensaver();
-                } else if (tab === 'waiting') {
+                
+               } else if (tab === 'waiting') {
             appHeader.style.display = 'none';
             tabBar.style.display = 'none';
             if (exitBtn) exitBtn.style.display = 'block';
             document.body.style.overflow = 'hidden';
+            
+            // 🆕 FIX: Force the VisionOS display to render with the latest data as soon as we switch to this tab
+            if (typeof renderVisionOSDisplay === 'function') renderVisionOSDisplay();
             
             // 🆕 SHOW the widget screensaver IMMEDIATELY
             clearTimeout(ssTimer);
