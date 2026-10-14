@@ -2146,16 +2146,32 @@
             var b = ptIdx[id] || {};
             ptDetails[id] = d;
 
-            // 🆕 AUTO-REPAIR: Fix stuck hasPendingLab flag
+                        // 🛠 FIXED AUTO-REPAIR: Only clears TRULY stuck pending flags
             var _labs = d.labs || {};
             var _labKeys = Object.keys(_labs);
             var _hasRealPending = false;
             var _labFixes = {};
             for (var _li = 0; _li < _labKeys.length; _li++) {
-                if (_labs[_labKeys[_li]] && _labs[_labKeys[_li]].pending) {
-                    if (!_labs[_labKeys[_li]].history || _labs[_labKeys[_li]].history.length === 0) {
+                var _lab = _labs[_labKeys[_li]];
+                if (!_lab || !_lab.pending) continue;
+
+                var _hasHistory = _lab.history && _lab.history.length > 0;
+
+                if (!_hasHistory) {
+                    // No results yet → genuinely pending
+                    _hasRealPending = true;
+                } else {
+                    // Has results. Check if pending was set AFTER the last result.
+                    var _lastHistEntry = _lab.history[_lab.history.length - 1];
+                    var _lastHistTs = _lastHistEntry.ts || parseIraqiDate(_lastHistEntry.dt);
+                    var _pendingTs   = _lab.pendingSetAt || 0;
+
+                    if (_pendingTs > _lastHistTs) {
+                        // Pending was set AFTER last result → it's a re-order, keep it!
                         _hasRealPending = true;
                     } else {
+                        // pending is older than last result (or no timestamp = legacy data)
+                        // → truly stuck, safe to clear
                         _labFixes[_labKeys[_li] + '/pending'] = false;
                     }
                 }
@@ -2166,6 +2182,7 @@
             if (ptIdx[id] && ptIdx[id].hasPendingLab !== _hasRealPending) {
                 db.ref('patientIndex/' + id).update({ hasPendingLab: _hasRealPending }).catch(handleFirebaseError);
             }
+
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('fileView').style.display = 'block';
             document.getElementById('referralResult').style.display = 'none';
@@ -2190,7 +2207,7 @@
                 else if (waNum.indexOf('964') !== 0) waNum = '964' + waNum;
             }
             var safeName = (b.name || '').replace(/'/g, "\\'");
-                                    var _labPending = ptIdx[id] && ptIdx[id].hasPendingLab;
+            var _labPending = ptIdx[id] && ptIdx[id].hasPendingLab;
             var _resetStyle = _labPending
                 ? 'background:rgba(255,159,10,0.2);color:var(--warning);border:1px solid rgba(255,159,10,0.4);'
                 : 'background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--color-separator);';
@@ -2457,18 +2474,19 @@
     }
 
     function orderLab(safeKey, dispName, range, unit) {
-        if (!activeId) return;
-        var labRef = db.ref('patientDetails/' + activeId + '/labs/' + safeKey);
-        labRef.once('value').then(function(snap) {
-            var labData = snap.val() || { name: dispName, history: [], range: range, unit: unit };
-            labData.pending = true;
-            labRef.set(labData).catch(handleFirebaseError);
-        });
-        db.ref('patientIndex/' + activeId).update({ hasPendingLab: true }).catch(handleFirebaseError);
-        smartAutoStamp('vPres'); 
-        smartAutoStamp('vVisits');
-        autoSyncTrigger();
-    }
+    if (!activeId) return;
+    var labRef = db.ref('patientDetails/' + activeId + '/labs/' + safeKey);
+    labRef.once('value').then(function(snap) {
+        var labData = snap.val() || { name: dispName, history: [], range: range, unit: unit };
+        labData.pending = true;
+        labData.pendingSetAt = Date.now();   // 🆕 Track when pending was set
+        labRef.set(labData).catch(handleFirebaseError);
+    });
+    db.ref('patientIndex/' + activeId).update({ hasPendingLab: true }).catch(handleFirebaseError);
+    smartAutoStamp('vPres'); 
+    smartAutoStamp('vVisits');
+    autoSyncTrigger();
+}
 
     function addNewCustomLab() {
         var name = prompt("Enter New Test Name:");
@@ -2544,7 +2562,7 @@
         labRef.once('value').then(function(snap) {
             var data = snap.val() || {};
             var h = data.history || [];
-            h.push({ val: v, dt: dt, stat: status });
+            h.push({ val: v, dt: dt, stat: status, ts: Date.now() });  
             labRef.update({ pending: false, history: h }).catch(handleFirebaseError);
             
             var allLabs = ptDetails[activeId].labs || {};
@@ -2569,7 +2587,7 @@
             if (newFlag && newFlag.toLowerCase() === 'h') status = "High";
             if (newFlag && newFlag.toLowerCase() === 'l') status = "Low";
             var h = ptDetails[activeId].labs[safeKey].history;
-            h[idx] = { val: newVal, dt: newDt, stat: status };
+            h[idx] = { val: newVal, dt: newDt, stat: status, ts: entry.ts || Date.now() };
             db.ref('patientDetails/' + activeId + '/labs/' + safeKey + '/history').set(h).catch(handleFirebaseError);
         }
     }
