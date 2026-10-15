@@ -1177,23 +1177,8 @@
 
             </div><!-- /subClinical -->
 
-            <!-- ===== INVESTIGATIONS SUB-TAB ===== -->
-            <!-- FIX 4+5: Removed orphaned unclosed div and duplicate Procedures section -->
+                        <!-- ===== INVESTIGATIONS SUB-TAB ===== -->
             <div id="subInvestigations" class="sub-panel">
-
-
-                            <!-- ===== IMAGES SUB-TAB ===== -->
-            <div id="subImages" class="sub-panel">
-                <div class="section-block" style="border-left:4px solid var(--img); background:rgba(191,90,242,0.04);">
-                    <span class="section-label" style="color:var(--img);">Patient Images & Documents</span>
-                    <input type="file" id="imageUploadInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
-                    <button onclick="document.getElementById('imageUploadInput').click()" style="background:var(--img); width:auto; padding:12px 24px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
-                        📤 Upload Image / Scan
-                    </button>
-                    <div id="imageGalleryList" style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;"></div>
-                </div>
-            </div>
-                
                 <!-- Pathology -->
                 <div class="section-block section-lab" style="border-left:4px solid var(--lab); background:rgba(100,210,255,0.04);">
                     <span class="section-label" style="color:var(--lab);">Advanced Pathology (Global Network)</span>
@@ -1208,9 +1193,21 @@
                     <div class="lab-tag-box" id="imagingSelector"></div>
                     <div id="imagingResultsList" style="margin-top:18px;"></div>
                 </div>
-
             </div><!-- /subInvestigations -->
 
+            <!-- ===== IMAGES SUB-TAB ===== -->
+            <div id="subImages" class="sub-panel">
+                <div class="section-block" style="border-left:4px solid var(--img); background:rgba(191,90,242,0.04);">
+                    <span class="section-label" style="color:var(--img);">Patient Images & Documents</span>
+                    <input type="file" id="imageUploadInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+                    <button onclick="document.getElementById('imageUploadInput').click()" style="background:var(--img); width:auto; padding:12px 24px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
+                        📤 Upload Image / Scan
+                    </button>
+                    <div id="imageGalleryList" style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;"></div>
+                </div>
+            </div><!-- /subImages -->
+                
+        
             <!-- ===== HISTORY SUB-TAB ===== -->
             <div id="subHistory" class="sub-panel">
 
