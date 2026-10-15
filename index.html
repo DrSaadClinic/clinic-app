@@ -2826,8 +2826,8 @@ function resetPendingLabs(ptId) {
     function deleteFullImg(key) { if (confirm("Delete this entire imaging modality?")) db.ref('patientDetails/' + activeId + '/imaging/' + key).remove().catch(handleFirebaseError); }
     function deleteImgEntry(key, idx) { if (confirm("Delete this report?")) { var h = ptDetails[activeId].imaging[key].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/imaging/' + key + '/history').set(h).catch(handleFirebaseError); } }
 
-        /* ================================================================
-       IMGBB IMAGE UPLOAD ENGINE (with Paste & Loading)
+    /* ================================================================
+       IMGBB IMAGE UPLOAD ENGINE (Bulletproof version)
     ================================================================ */
     var IMGBB_API_KEY = "c9b40b48279f41c337ea931de0a16ab1"; 
 
@@ -2843,22 +2843,36 @@ function resetPendingLabs(ptId) {
         statusEl.innerHTML = '⏳ Reading clipboard...';
         statusEl.style.color = 'var(--text-secondary)';
 
+        if (!navigator.clipboard || !navigator.clipboard.read) {
+            statusEl.innerHTML = '⚠️ Clipboard API not supported. Use Upload instead.';
+            statusEl.style.color = 'var(--danger)';
+            return;
+        }
+
         navigator.clipboard.read().then(function(clipboardItems) {
+            var imageFound = false;
             for (var i = 0; i < clipboardItems.length; i++) {
                 for (var j = 0; j < clipboardItems[i].types.length; j++) {
                     if (clipboardItems[i].types[j].indexOf('image') !== -1) {
-                        var blob = clipboardItems[i].getType(clipboardItems[i].types[j]);
-                        var file = new File([blob], 'pasted_image.png', { type: blob.type });
-                        processAndUploadImage(file);
-                        return;
+                        imageFound = true;
+                        clipboardItems[i].getType(clipboardItems[i].types[j]).then(function(blob) {
+                            var file = new File([blob], 'pasted_image.png', { type: blob.type });
+                            processAndUploadImage(file);
+                        }).catch(function(err) {
+                            statusEl.innerHTML = '⚠️ Failed to extract image from clipboard.';
+                            statusEl.style.color = 'var(--danger)';
+                        });
+                        return; 
                     }
                 }
             }
-            statusEl.innerHTML = '⚠️ No image found in clipboard. Copy an image first.';
-            statusEl.style.color = 'var(--danger)';
+            if (!imageFound) {
+                statusEl.innerHTML = '⚠️ No image found in clipboard. Copy an image first.';
+                statusEl.style.color = 'var(--danger)';
+            }
         }).catch(function(err) {
             console.error('Clipboard read error:', err);
-            statusEl.innerHTML = '⚠️ Clipboard access denied. Please use the Upload button instead.';
+            statusEl.innerHTML = '⚠️ Clipboard access denied. Use the Upload button.';
             statusEl.style.color = 'var(--danger)';
         });
     }
@@ -2867,6 +2881,7 @@ function resetPendingLabs(ptId) {
         if (!activeId) return;
         
         var statusEl = document.getElementById('imageUploadStatus');
+        if (!statusEl) return;
         statusEl.style.display = 'block';
         statusEl.style.color = 'var(--text-secondary)';
         
@@ -2877,74 +2892,98 @@ function resetPendingLabs(ptId) {
         }
 
         statusEl.innerHTML = '⏳ Compressing image...';
-        var reader = new FileReader();
         
-        reader.onload = function(e) {
-            var img = new Image();
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                
-                var MAX_WIDTH = 1200; 
-                var scale = MAX_WIDTH / img.width;
-                if (scale > 1) scale = 1; 
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
-                
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                var base64 = canvas.toDataURL('image/jpeg', 0.8);
-                var cleanBase64 = base64.split(',')[1];
-                
-                statusEl.innerHTML = '☁️ Uploading to ImgBB (0%)...';
-                
-                var formData = new FormData();
-                formData.append('image', cleanBase64);
-                
-                fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function(response) {
-                    statusEl.innerHTML = '☁️ Upload successful, processing response...';
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.success) {
-                        var imgUrl = data.data.url;
-                        var thumbUrl = data.data.thumb ? data.data.thumb.url : imgUrl;
-                        
-                        statusEl.innerHTML = '💾 Saving to patient file...';
-                        var newImgRef = db.ref('patientDetails/' + activeId + '/images').push();
-                        newImgRef.set({
-                            url: imgUrl,
-                            thumb: thumbUrl,
-                            date: new Date().toLocaleDateString('en-GB'),
-                            ts: Date.now()
-                        }).then(function() {
-                            statusEl.innerHTML = '✅ Image uploaded successfully!';
-                            statusEl.style.color = 'var(--success)';
-                            setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
-                            var input = document.getElementById('imageUploadInput');
-                            if (input) input.value = ''; // reset input
-                        }).catch(function(err) {
-                            statusEl.innerHTML = '⚠️ Firebase save failed: ' + err.message;
-                            statusEl.style.color = 'var(--danger)';
-                        });
-                    } else {
-                        throw new Error('ImgBB API returned failure');
-                    }
-                })
-                .catch(function(error) {
-                    console.error("ImgBB Error:", error);
-                    statusEl.innerHTML = '⚠️ Upload failed. Check API Key or Network connection.';
-                    statusEl.style.color = 'var(--danger)';
-                });
+        try {
+            var reader = new FileReader();
+            
+            reader.onerror = function() {
+                statusEl.innerHTML = '⚠️ Failed to read the file.';
+                statusEl.style.color = 'var(--danger)';
             };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+            
+            reader.onload = function(e) {
+                statusEl.innerHTML = '⏳ Processing image data...';
+                try {
+                    var img = new Image();
+                    img.onerror = function() {
+                        statusEl.innerHTML = '⚠️ Invalid or corrupted image file.';
+                        statusEl.style.color = 'var(--danger)';
+                    };
+                    img.onload = function() {
+                        try {
+                            var canvas = document.createElement('canvas');
+                            var ctx = canvas.getContext('2d');
+                            
+                            var MAX_WIDTH = 1200; 
+                            var scale = MAX_WIDTH / img.width;
+                            if (scale > 1) scale = 1; 
+                            canvas.width = img.width * scale;
+                            canvas.height = img.height * scale;
+                            
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
+                            statusEl.innerHTML = '☁️ Uploading to ImgBB...';
+                            var base64 = canvas.toDataURL('image/jpeg', 0.8);
+                            var cleanBase64 = base64.split(',')[1];
+                            
+                            var formData = new FormData();
+                            formData.append('image', cleanBase64);
+                            
+                            fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(function(response) {
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.json();
+                            })
+                            .then(function(data) {
+                                if (data.success) {
+                                    statusEl.innerHTML = '💾 Saving to patient file...';
+                                    var newImgRef = db.ref('patientDetails/' + activeId + '/images').push();
+                                    newImgRef.set({
+                                        url: data.data.url,
+                                        thumb: data.data.thumb ? data.data.thumb.url : data.data.url,
+                                        date: new Date().toLocaleDateString('en-GB'),
+                                        ts: Date.now()
+                                    }).then(function() {
+                                        statusEl.innerHTML = '✅ Image uploaded successfully!';
+                                        statusEl.style.color = 'var(--success)';
+                                        setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+                                        var input = document.getElementById('imageUploadInput');
+                                        if (input) input.value = ''; 
+                                    }).catch(function(err) {
+                                        statusEl.innerHTML = '⚠️ Firebase save failed: ' + err.message;
+                                        statusEl.style.color = 'var(--danger)';
+                                    });
+                                } else {
+                                    throw new Error('ImgBB API returned failure');
+                                }
+                            })
+                            .catch(function(error) {
+                                console.error("ImgBB Error:", error);
+                                statusEl.innerHTML = '⚠️ Upload failed. Check API Key or Network.';
+                                statusEl.style.color = 'var(--danger)';
+                            });
+                        } catch (canvasErr) {
+                            console.error("Canvas Error:", canvasErr);
+                            statusEl.innerHTML = '⚠️ Error processing image: ' + canvasErr.message;
+                            statusEl.style.color = 'var(--danger)';
+                        }
+                    };
+                    img.src = e.target.result;
+                } catch (imgErr) {
+                     console.error("Image object error:", imgErr);
+                     statusEl.innerHTML = '⚠️ Error loading image into memory.';
+                     statusEl.style.color = 'var(--danger)';
+                }
+            };
+            reader.readAsDataURL(file);
+        } catch (readErr) {
+            console.error("FileReader Error:", readErr);
+            statusEl.innerHTML = '⚠️ Error reading file.';
+            statusEl.style.color = 'var(--danger)';
+        }
     }
 
     function renderImages(images) {
@@ -2980,7 +3019,6 @@ function resetPendingLabs(ptId) {
         db.ref('patientDetails/' + activeId + '/images/' + key).remove().catch(handleFirebaseError);
         showToast("Image removed from file.");
     }
-
     
     /* ================================================================
        VITALS
