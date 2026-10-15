@@ -892,6 +892,14 @@
         color: #1a1a1a; width: 100%; max-width: 800px; margin: 0 auto;
         background: #fff; padding: 40px 50px; box-sizing: border-box;
         position: relative; border-top: 8px solid #0A84FF;
+        direction: ltr;
+    }
+    .pdf-arabic {
+        font-family: 'Noto Naskh Arabic', 'Cairo', serif;
+        direction: rtl;
+        text-align: right;
+        unicode-bidi: plaintext;
+        line-height: 1.9;
     }
     .pdf-watermark {
         position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
@@ -926,7 +934,7 @@
     .pdf-sign-line { border-top: 1px solid #1a1a1a; width: 200px; margin-bottom: 8px; }
     .pdf-sign-doc { font-weight: bold; font-size: 14px; color: #1a1a1a; }
     .pdf-sign-title { font-size: 12px; color: #555; margin-bottom: 10px; }
-    .pdf-sign-stamp { width: 90px; height: 90px; border: 3px solid #d9534f; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; color: #d9534f; font-weight: bold; font-size: 10px; line-height: 1.2; transform: rotate(-15deg); opacity: 0.9; }
+    .pdf-sign-stamp { width: 90px; height: 90px; border: 3px solid #d9534f; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; color: #d9534f; font-weight: bold; font-size: 10px; line-height: 1.2; transform: rotate(-15deg); opacity: 0.9; box-shadow: inset 0 0 0 3px rgba(217,83,79,0.16); }
                 
         /* TV ARRIVAL ANIMATION - CENTER POPUP TO NOTIFICATION */
         .vos-arrival-overlay {
@@ -2482,179 +2490,215 @@
     presBox.setSelectionRange(presBox.value.length, presBox.value.length);
     autoSyncTrigger();
     showToast('Clinical sheet + visit stamp inserted.');
-}    /* ================================================================
-       7-STAR PDF REFERRAL GENERATOR (UPDATED)
-    ================================================================ */
+}    function normalizeReferralText(rawText) {
+        if (!rawText) return '';
+        return String(rawText)
+            .replace(/--- Visit:.*?---/gi, ' ')
+            .replace(/\r/g, '')
+            .split(/\n+/)
+            .map(function(line) { return line.trim(); })
+            .filter(function(line) {
+                if (!line || line.length < 6) return false;
+                if (/^(Hx|CC|HPI|PMHx|PSHx|Drugs|Allergy|FHx|SHx|ROS|O\/E|Dx|DDx|Assessment|Plan|Management|Investigations|Follow-up|Summary)\s*:/i.test(line)) return false;
+                return true;
+            })
+            .slice(0, 8)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function getStrongReferralSummary(ptName, patient, detail, monjaro) {
+        var complaint = (patient && patient.complaint) ? String(patient.complaint).trim() : 'a surgical condition';
+        var age = patient && patient.age ? String(patient.age) : 'adult';
+        var presentation = normalizeReferralText(detail && detail.presentation);
+        var visits = normalizeReferralText(detail && detail.visits);
+        var findings = normalizeReferralText(detail && detail.labFindings);
+        var historyLead = presentation || 'Clinical history is brief and limited in the current notes.';
+        var planLead = visits || 'The current management plan remains open for specialist review.';
+        var resultLead = findings || 'No additional recent external laboratory summary was entered.';
+
+        var sentences = [];
+        sentences.push('This referral is for ' + ptName + ', a ' + age + '-year-old patient presenting with ' + complaint + '.');
+        sentences.push('The documented history indicates ' + historyLead + '.');
+        sentences.push('Current management and assessment suggest ' + planLead + '.');
+        if (monjaro && monjaro.currentDose) {
+            var doses = monjaro.doses || [];
+            var lastDose = doses[doses.length - 1] || {};
+            var currentWeight = lastDose.weight || monjaro.startWeight || 'recent weight';
+            var totalLost = monjaro.startWeight && currentWeight ? Math.max(0, Number(monjaro.startWeight) - Number(currentWeight)) : 0;
+            sentences.push('The patient is under our Monjaro program with a current dose of ' + monjaro.currentDose + ' mg and has recorded weight change of approximately ' + Number(totalLost).toFixed(1) + ' kg.');
+        }
+        if (resultLead && resultLead !== 'No additional recent external laboratory summary was entered.') {
+            sentences.push('Relevant supporting information includes: ' + resultLead + '.');
+        }
+        sentences.push('We would appreciate your expert opinion regarding further workup, surgical planning, and ongoing co-management as appropriate.');
+
+        return sentences.join(' ');
+    }
+
+    function getArabicReferralSummary(ptName, patient, detail) {
+        var complaint = (patient && patient.complaint) ? String(patient.complaint).trim() : 'حالة جراحية';
+        var historyText = normalizeReferralText(detail && detail.presentation);
+        var planText = normalizeReferralText(detail && detail.visits);
+        var historyArabic = historyText ? historyText : 'توجد ملاحظات سريرية محدودة في الملف الحالي.';
+        var planArabic = planText ? planText : 'لا توجد خطة علاجية مكتملة في الملف الحالي.';
+
+        return 'نود إحالة المريض ' + ptName + '، ويعاني من ' + complaint + '. كما أن السجل السريري يوضح أن ' + historyArabic + '. أما الخطة الحالية فتشمل ' + planArabic + '. نطلب الاستشارة المختصة لتقييم المريض بشكل كامل وبناء خطة علاجية مناسبة ومتابعة مستمرة.';
+    }
+
+    function buildLabRowsFromPatient(detail) {
+        var labData = detail && detail.labs ? detail.labs : {};
+        var labKeys = Object.keys(labData);
+        if (!labKeys.length) return '<p style="font-size:12px; color:#555;">No laboratory investigations recorded.</p>';
+
+        var html = '<table class="pdf-table"><thead><tr><th>Test</th><th>Value</th><th>Range</th><th>Status</th></tr></thead><tbody>';
+        for (var i = 0; i < labKeys.length; i++) {
+            var key = labKeys[i];
+            var lab = labData[key] || {};
+            var history = Array.isArray(lab.history) ? lab.history : [];
+            var lastHist = history.length ? history[history.length - 1] : null;
+            if (!lastHist) continue;
+            var statusClass = (lastHist.stat === 'High' || lastHist.stat === 'Low') ? 'pdf-abnormal' : '';
+            var statusText = lastHist.stat === 'Normal' ? '✓ Normal' : (lastHist.stat === 'High' ? '↑ High' : (lastHist.stat === 'Low' ? '↓ Low' : lastHist.stat));
+            html += '<tr><td><strong>' + escapeHtml(lab.name || key) + '</strong></td>' +
+                '<td class="' + statusClass + '">' + escapeHtml(lastHist.val) + ' ' + escapeHtml(lab.unit || '') + '</td>' +
+                '<td style="color:#777;">' + escapeHtml(lab.range || 'N/A') + '</td>' +
+                '<td class="' + statusClass + '">' + statusText + '</td></tr>';
+        }
+        html += '</tbody></table>';
+        return html;
+    }
+
+    function buildImagingHtml(detail) {
+        var imaging = detail && detail.imaging ? detail.imaging : {};
+        var imagingKeys = Object.keys(imaging);
+        if (!imagingKeys.length) return '';
+
+        var html = '<div class="pdf-section"><div class="pdf-section-title">Imaging & Endoscopy Reports</div><ul style="font-size:12px; line-height:1.6; margin:0; padding-left:20px;">';
+        for (var i = 0; i < imagingKeys.length; i++) {
+            var key = imagingKeys[i];
+            var img = imaging[key] || {};
+            var history = Array.isArray(img.history) ? img.history : [];
+            var lastRep = history.length ? history[history.length - 1] : null;
+            if (!lastRep) continue;
+            html += '<li><strong>' + escapeHtml(img.name) + ' (' + escapeHtml(lastRep.dt) + '):</strong> ' + escapeHtml(lastRep.val) + '</li>';
+        }
+        html += '</ul></div>';
+        return html;
+    }
+
+    function buildImageGalleryHtml(detail) {
+        var images = detail && detail.images ? detail.images : {};
+        var imageKeys = Object.keys(images);
+        if (!imageKeys.length) return '';
+
+        var html = '<div class="pdf-section"><div class="pdf-section-title">Attached Clinical Images / Scans</div><div class="pdf-img-grid">';
+        for (var i = 0; i < imageKeys.length; i++) {
+            var key = imageKeys[i];
+            var img = images[key] || {};
+            if (!img.url) continue;
+            html += '<div class="pdf-img-card"><img src="' + img.url + '" crossorigin="anonymous"><p>📅 ' + escapeHtml(img.date || '') + '</p></div>';
+        }
+        html += '</div></div>';
+        return html;
+    }
+
+    function buildMonjaroHtml(monjaro) {
+        if (!monjaro) return '';
+        var doses = monjaro.doses || [];
+        var currentW = doses.length > 0 && doses[doses.length - 1].weight ? doses[doses.length - 1].weight : monjaro.startWeight;
+        var lostKg = monjaro.startWeight && currentW ? (Number(monjaro.startWeight) - Number(currentW)) : 0;
+        var lostPct = monjaro.startWeight && Number(monjaro.startWeight) ? ((Math.abs(lostKg) / Number(monjaro.startWeight)) * 100).toFixed(1) : 0;
+        return '<div class="pdf-section"><div class="pdf-section-title">Monjaro (Tirzepatide) Progress</div>' +
+            '<div class="pdf-monjaro-box">' +
+            '<div class="pdf-monjaro-title">💉 Weight Management Program</div>' +
+            '<p style="font-size:12px; margin:0 0 5px 0;"><strong>Current Dose:</strong> ' + monjaro.currentDose + ' mg | <strong>Total Doses:</strong> ' + doses.length + ' | <strong>Enrolled:</strong> ' + escapeHtml(monjaro.enrollDate || monjaro.startDate || 'N/A') + '</p>' +
+            '<p style="font-size:12px; margin:0 0 5px 0;"><strong>Start Weight:</strong> ' + monjaro.startWeight + ' kg → <strong>Current Weight:</strong> ' + currentW + ' kg</p>' +
+            '<p style="font-size:12px; margin:0; color:#7C3AED;"><strong>Total Lost:</strong> ' + Math.abs(lostKg).toFixed(1) + ' kg (' + lostPct + '%)</p>' +
+            '</div></div>';
+    }
+
     function generateReferral() {
         if (!activeId) return;
-        var b = ptIdx[activeId] || {};
-        var d = ptDetails[activeId] || {};
-        var m = monjaroData[activeId] || null;
+        var patientIndex = ptIdx[activeId] || {};
+        var patientDetail = ptDetails[activeId] || {};
+        var monjaro = monjaroData && monjaroData[activeId] ? monjaroData[activeId] : null;
         var date = new Date().toLocaleDateString('en-GB');
         var refId = 'REF-' + Date.now().toString().slice(-6);
+        var ptName = patientIndex.name || patientDetail.name || 'Unknown Patient';
 
-        showToast("⏳ Generating Premium PDF...");
+        var englishSummary = getStrongReferralSummary(ptName, patientIndex, patientDetail, monjaro);
+        var arabicSummary = getArabicReferralSummary(ptName, patientIndex, patientDetail);
 
-        // 1. Ensure the name is pulled correctly
-        var ptName = b.name || ptDetails[activeId].name || "Unknown Patient";
-
-        // 2. Smart AI Summary Logic (Dr. Saad referring OUT)
-        var presentation = d.presentation || "[No specific clinical history recorded in system.]";
-        var visits = d.visits || "[No management plan recorded in system.]";
-        
-        // Clean up template noise if present
-        presentation = presentation.replace(/--- Visit:.*?---\n/g, '').trim();
-        visits = visits.replace(/--- Visit:.*?---\n/g, '').trim();
-
-        var aiSummary = "Dear Colleague,\n\nI am referring " + ptName + " to your esteemed clinic for specialist evaluation and potential co-management. ";
-        aiSummary += "The patient presents with " + (b.complaint || 'a condition requiring specialist surgical evaluation') + ". ";
-        
-        if (m) {
-            var doses = m.doses || [];
-            var lastDose = doses.length > 0 ? doses[doses.length-1] : null;
-            var currentW = lastDose && lastDose.weight ? lastDose.weight : m.startWeight;
-            var wLost = m.startWeight ? (parseFloat(m.startWeight) - parseFloat(currentW)) : 0;
-            aiSummary += "Notably, the patient is currently enrolled in our Monjaro (Tirzepatide) weight management program, currently at " + m.currentDose + "mg, having achieved a weight reduction of " + wLost.toFixed(1) + " kg. ";
-        }
-        
-        aiSummary += "Below is a comprehensive, structured summary of the patient's clinical history, investigations, and management to date to facilitate your expert assessment. I would greatly appreciate your expert opinion and feedback regarding further intervention.";
-
-        // 3. Build Labs Table
-        var labsHtml = '<p style="font-size:12px; color:#555;">No laboratory investigations recorded.</p>';
-        if (d.labs) {
-            var labKeys = Object.keys(d.labs);
-            if (labKeys.length > 0) {
-                labsHtml = '<table class="pdf-table"><thead><tr><th>Test</th><th>Value</th><th>Range</th><th>Status</th></tr></thead><tbody>';
-                labKeys.forEach(function(key) {
-                    var lab = d.labs[key];
-                    var lastHist = lab.history && lab.history.length > 0 ? lab.history[lab.history.length-1] : null;
-                    if (lastHist) {
-                        var statusClass = (lastHist.stat === "High" || lastHist.stat === "Low") ? "pdf-abnormal" : "";
-                        var statusText = lastHist.stat === "Normal" ? "✓ Normal" : (lastHist.stat === "High" ? "↑ High" : (lastHist.stat === "Low" ? "↓ Low" : lastHist.stat));
-                        labsHtml += '<tr><td><strong>' + escapeHtml(lab.name || key) + '</strong></td>' +
-                                    '<td class="' + statusClass + '">' + escapeHtml(lastHist.val) + ' ' + escapeHtml(lab.unit || '') + '</td>' +
-                                    '<td style="color:#777;">' + escapeHtml(lab.range || 'N/A') + '</td>' +
-                                    '<td class="' + statusClass + '">' + statusText + '</td></tr>';
-                    }
-                });
-                labsHtml += '</tbody></table>';
-            }
+        var referralPreview = '<div style="white-space:pre-wrap; line-height:1.7; font-family:Tahoma, Arial, sans-serif;">' +
+            '<div style="font-size:15px; font-weight:700; color:#0A84FF; margin-bottom:10px;">Referral Summary</div>' +
+            '<div style="margin-bottom:14px;">' + escapeHtml(englishSummary) + '</div>' +
+            '<div style="margin-top:12px; font-size:14px; font-weight:700; color:#0A84FF;">ملخص الإحالة</div>' +
+            '<div class="pdf-arabic" style="margin-top:8px;">' + escapeHtml(arabicSummary) + '</div>' +
+            '</div>';
+        var resultBox = document.getElementById('referralResult');
+        if (resultBox) {
+            resultBox.innerHTML = referralPreview;
+            resultBox.style.display = 'block';
         }
 
-        // 4. Build Imaging List
-        var imagingHtml = '';
-        if (d.imaging) {
-            var imgKeys = Object.keys(d.imaging);
-            if (imgKeys.length > 0) {
-                imagingHtml = '<div class="pdf-section"><div class="pdf-section-title">Imaging & Endoscopy Reports</div><ul style="font-size:12px; line-height:1.6; margin:0; padding-left:20px;">';
-                imgKeys.forEach(function(key) {
-                    var img = d.imaging[key];
-                    var lastRep = img.history && img.history.length > 0 ? img.history[img.history.length-1] : null;
-                    if (lastRep) {
-                        imagingHtml += '<li><strong>' + escapeHtml(img.name) + ' (' + escapeHtml(lastRep.dt) + '):</strong> ' + escapeHtml(lastRep.val) + '</li>';
-                    }
-                });
-                imagingHtml += '</ul></div>';
-            }
-        }
+        showToast('⏳ Generating specialist referral...');
 
-        // 5. Build Monjaro Section
-        var monjaroHtml = '';
-        if (m) {
-            var doses = m.doses || [];
-            var currentW = doses.length > 0 && doses[doses.length-1].weight ? doses[doses.length-1].weight : m.startWeight;
-            var lostKg = m.startWeight ? (parseFloat(m.startWeight) - parseFloat(currentW)) : 0;
-            var lostPct = m.startWeight ? ((lostKg / parseFloat(m.startWeight)) * 100).toFixed(1) : 0;
-            monjaroHtml = '<div class="pdf-section"><div class="pdf-section-title">Monjaro (Tirzepatide) Progress</div>' +
-                           '<div class="pdf-monjaro-box">' +
-                           '<div class="pdf-monjaro-title">💉 Weight Management Program</div>' +
-                           '<p style="font-size:12px; margin:0 0 5px 0;"><strong>Current Dose:</strong> ' + m.currentDose + ' mg | <strong>Total Doses:</strong> ' + doses.length + ' | <strong>Enrolled:</strong> ' + escapeHtml(m.enrollDate || m.startDate || 'N/A') + '</p>' +
-                           '<p style="font-size:12px; margin:0 0 5px 0;"><strong>Start Weight:</strong> ' + m.startWeight + ' kg → <strong>Current Weight:</strong> ' + currentW + ' kg</p>' +
-                           '<p style="font-size:12px; margin:0; color:#7C3AED;"><strong>Total Lost:</strong> ' + Math.abs(lostKg).toFixed(1) + ' kg (' + lostPct + '%)</p>' +
-                           '</div></div>';
-        }
+        var labsHtml = buildLabRowsFromPatient(patientDetail);
+        var imagingHtml = buildImagingHtml(patientDetail);
+        var galleryHtml = buildImageGalleryHtml(patientDetail);
+        var monjaroHtml = buildMonjaroHtml(monjaro);
+        var presentation = normalizeReferralText(patientDetail.presentation) || 'No specific clinical history is recorded in the system yet.';
+        var visits = normalizeReferralText(patientDetail.visits) || 'No management plan is recorded in the system yet.';
 
-        // 6. Build Image Gallery (with crossorigin to force render in PDF)
-        var galleryHtml = '';
-        if (d.images) {
-            var imgGalKeys = Object.keys(d.images);
-            if (imgGalKeys.length > 0) {
-                galleryHtml = '<div class="pdf-section"><div class="pdf-section-title">Attached Clinical Images / Scans</div><div class="pdf-img-grid">';
-                imgGalKeys.forEach(function(key) {
-                    var img = d.images[key];
-                    galleryHtml += '<div class="pdf-img-card">' +
-                                   '<img src="' + img.url + '" crossorigin="anonymous">' +
-                                   '<p>📅 ' + escapeHtml(img.date || '') + '</p>' +
-                                   '</div>';
-                });
-                galleryHtml += '</div></div>';
-            }
-        }
+        var htmlContent = '<div class="pdf-letter" id="pdfCaptureArea">' +
+            '<div class="pdf-watermark">SAAD CLINIC</div>' +
+            '<div class="pdf-header">' +
+            '<img src="logo.jpg" class="pdf-logo" crossorigin="anonymous" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/3304/3304567.png\'">' +
+            '<div class="pdf-clinic-info">' +
+            '<h1>Dr. Saad Sabry Alzubaidy</h1>' +
+            '<p>Consultant General Surgeon | Surgical Clinic</p>' +
+            '<p>بغداد/ حي الجامعه شارع الإدارة والاقتصاد مقابل سنتر الجامعه عمارة مختبر الدوحة</p>' +
+            '<p>صيدلية ورق الريحان - الطابق الاول</p>' +
+            '<p>رقم الحجز عبر الواتس اب: 07707684499</p>' +
+            '</div>' +
+            '<div class="pdf-meta">' +
+            '<strong>Date</strong><p>' + escapeHtml(date) + '</p><strong style="margin-top:5px;">Ref ID</strong><p>' + escapeHtml(refId) + '</p></div>' +
+            '</div>' +
+            '<div class="pdf-pt-banner">' +
+            '<div><strong>Patient:</strong> ' + escapeHtml(ptName) + '</div>' +
+            '<div><strong>Age:</strong> ' + escapeHtml(patientIndex.age || '--') + ' years</div>' +
+            '<div><strong>Phone:</strong> ' + escapeHtml(patientIndex.phone || '--') + '</div>' +
+            '</div>' +
+            '<div class="pdf-section">' +
+            '<div class="pdf-section-title">Subject: Comprehensive Surgical Referral</div>' +
+            '<p class="pdf-text" style="white-space: pre-wrap;">' + escapeHtml(englishSummary) + '</p>' +
+            '<div class="pdf-arabic" style="margin-top:12px; white-space: pre-wrap;">' + escapeHtml(arabicSummary) + '</div>' +
+            '</div>' +
+            '<div class="pdf-section">' +
+            '<div class="pdf-section-title">Clinical History & Presentation</div>' +
+            '<p class="pdf-text" style="white-space: pre-wrap;">' + escapeHtml(presentation) + '</p>' +
+            '</div>' +
+            '<div class="pdf-section">' +
+            '<div class="pdf-section-title">Management & Investigations Plan</div>' +
+            '<p class="pdf-text" style="white-space: pre-wrap;">' + escapeHtml(visits) + '</p>' +
+            '</div>' +
+            '<div class="pdf-section">' +
+            '<div class="pdf-section-title">Laboratory Investigations</div>' + labsHtml +
+            '</div>' +
+            imagingHtml +
+            monjaroHtml +
+            galleryHtml +
+            '<div class="pdf-signature">' +
+            '<div class="pdf-sign-name">Dr. Saad S. Alzubaidy</div>' +
+            '<div class="pdf-sign-line"></div>' +
+            '<div class="pdf-sign-doc">Dr. Saad Sabry Alzubaidy</div>' +
+            '<div class="pdf-sign-title">MBChB, FICS - Consultant General Surgeon</div>' +
+            '<div class="pdf-sign-stamp">OFFICIAL<br>MEDICAL<br>STAMP</div>' +
+            '</div>' +
+            '</div>';
 
-        // 7. Assemble Full HTML
-        var htmlContent = `
-        <div class="pdf-letter" id="pdfCaptureArea">
-            <div class="pdf-watermark">SAAD CLINIC</div>
-            
-            <div class="pdf-header">
-                <img src="logo.jpg" class="pdf-logo" crossorigin="anonymous" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
-                <div class="pdf-clinic-info">
-                    <h1>Dr. Saad Sabry Alzubaidy</h1>
-                    <p>Consultant General Surgeon | Surgical Clinic</p>
-                    <p>بغداد/ حي الجامعه شارع الإدارة والاقتصاد مقابل سنتر الجامعه عمارة مختبر الدوحة</p>
-                    <p>صيدلية ورق الريحان - الطابق الاول</p>
-                    <p>رقم الحجز عبر الواتس اب: 07707684499</p>
-                </div>
-                <div class="pdf-meta">
-                    <strong>Date</strong>
-                    <p>${date}</p>
-                    <strong style="margin-top:5px;">Ref ID</strong>
-                    <p>${refId}</p>
-                </div>
-            </div>
-
-            <div class="pdf-pt-banner">
-                <div><strong>Patient:</strong> ${escapeHtml(ptName)}</div>
-                <div><strong>Age:</strong> ${escapeHtml(b.age || '--')} years</div>
-                <div><strong>Phone:</strong> ${escapeHtml(b.phone || '--')}</div>
-            </div>
-
-            <div class="pdf-section">
-                <div class="pdf-section-title">Subject: Comprehensive Surgical Referral</div>
-                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(aiSummary)}</p>
-            </div>
-
-            <div class="pdf-section">
-                <div class="pdf-section-title">Clinical History & Presentation</div>
-                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(presentation)}</p>
-            </div>
-
-            <div class="pdf-section">
-                <div class="pdf-section-title">Management & Investigations Plan</div>
-                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(visits)}</p>
-            </div>
-
-            <div class="pdf-section">
-                <div class="pdf-section-title">Laboratory Investigations</div>
-                ${labsHtml}
-            </div>
-
-            ${imagingHtml}
-            ${monjaroHtml}
-            ${galleryHtml}
-
-            <div class="pdf-signature">
-                <div class="pdf-sign-name">Dr. Saad S. Alzubaidy</div>
-                <div class="pdf-sign-line"></div>
-                <div class="pdf-sign-doc">Dr. Saad Sabry Alzubaidy</div>
-                <div class="pdf-sign-title">MBChB, FICS - Consultant General Surgeon</div>
-                <div class="pdf-sign-stamp">
-                    OFFICIAL<br>MEDICAL<br>STAMP
-                </div>
-            </div>
-        </div>`;
-
-        // Add to DOM temporarily
         var tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute';
         tempDiv.style.left = '-9999px';
@@ -2664,24 +2708,22 @@
         document.body.appendChild(tempDiv);
 
         var element = tempDiv.firstElementChild;
-        
-        // Generate PDF
-        var opt = {
-            margin:       [10, 10, 10, 10], // Top, Left, Bottom, Right margins in mm
-            filename:     'Referral_' + ptName.replace(/\s/g, '_') + '_' + date.replace(/\//g, '-') + '.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['css', 'legacy'] }
+        var pdfOptions = {
+            margin: [10, 10, 10, 10],
+            filename: 'Referral_' + ptName.replace(/\s/g, '_') + '_' + date.replace(/\//g, '-') + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
         };
 
-        html2pdf().set(opt).from(element).save().then(function() {
+        html2pdf().set(pdfOptions).from(element).save().then(function() {
             document.body.removeChild(tempDiv);
-            showToast("✅ Premium PDF Referral Generated!");
+            showToast('✅ Specialist referral generated.');
         }).catch(function(err) {
-            console.error("PDF Generation Error:", err);
-            showToast("⚠️ PDF generation failed.");
+            console.error('PDF Generation Error:', err);
             document.body.removeChild(tempDiv);
+            showToast('⚠️ PDF generation failed — the draft has been prepared on screen.');
         });
     }
     
