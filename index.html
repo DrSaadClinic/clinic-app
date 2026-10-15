@@ -2450,10 +2450,7 @@
             db.ref('patientIndex/' + activeId).update({ lastVisit: lastV }).catch(handleFirebaseError);
         }
     }
-    /* ================================================================
-       insert clinical template
-    ================================================================ */
-     function insertClinicalTemplate() {
+         function insertClinicalTemplate() {
     if (!activeId) return;
     var today = new Date().toLocaleDateString('en-GB');
     var stamp = '\n--- Visit: ' + today + ' ---\n';
@@ -2480,6 +2477,7 @@
     presBox.setSelectionRange(presBox.value.length, presBox.value.length);
     autoSyncTrigger();
     showToast('Clinical sheet + visit stamp inserted.');
+}
     /* ================================================================
        7-STAR PDF REFERRAL GENERATOR (BULLETPROOF)
     ================================================================ */
