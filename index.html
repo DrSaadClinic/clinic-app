@@ -1177,11 +1177,14 @@
 
             </div><!-- /subClinical -->
 
-                        <!-- ===== INVESTIGATIONS SUB-TAB ===== -->
+                                   <!-- ===== INVESTIGATIONS SUB-TAB ===== -->
             <div id="subInvestigations" class="sub-panel">
                 <!-- Pathology -->
                 <div class="section-block section-lab" style="border-left:4px solid var(--lab); background:rgba(100,210,255,0.04);">
-                    <span class="section-label" style="color:var(--lab);">Advanced Pathology (Global Network)</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+                        <span class="section-label" style="color:var(--lab); margin-bottom:0;">Advanced Pathology (Global Network)</span>
+                        <input type="text" id="labSearchBox" placeholder="🔍 Search labs..." oninput="filterLabTags()" style="width:180px; font-size:13px; padding:8px 12px; margin:0; border-radius:10px; background:var(--color-fill-tertiary); border:1px solid var(--color-separator); color:var(--text-primary);">
+                    </div>
                     <div class="lab-tag-box" id="labSelector"></div>
                     <button onclick="addNewCustomLab()" style="background:rgba(255,255,255,0.07); margin-top:14px; padding:11px; font-size:13px; width:auto; border-radius:14px; border:1px solid var(--card-border); color:var(--text-primary); box-shadow:none;">+ Create Custom Test</button>
                     <div id="labResultsList" style="margin-top:18px;"></div>
@@ -1200,13 +1203,22 @@
                 <div class="section-block" style="border-left:4px solid var(--img); background:rgba(191,90,242,0.04);">
                     <span class="section-label" style="color:var(--img);">Patient Images & Documents</span>
                     <input type="file" id="imageUploadInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
-                    <button onclick="document.getElementById('imageUploadInput').click()" style="background:var(--img); width:auto; padding:12px 24px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
-                        📤 Upload Image / Scan
-                    </button>
-                    <div id="imageGalleryList" style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;"></div>
+                    
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                        <button onclick="document.getElementById('imageUploadInput').click()" style="background:var(--img); width:auto; padding:12px 20px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
+                            📤 Upload
+                        </button>
+                        <button onclick="handlePasteImage()" style="background:rgba(255,255,255,0.08); width:auto; padding:12px 20px; border:1px solid var(--color-separator); border-radius:14px; color:var(--text-primary); font-weight:bold; cursor:pointer; box-shadow:none;">
+                            📋 Paste Image
+                        </button>
+                    </div>
+                    
+                    <div id="imageUploadStatus" style="font-size:13px; color:var(--text-secondary); margin-bottom:12px; display:none; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"></div>
+                    
+                    <div id="imageGalleryList" style="margin-top:10px; display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;"></div>
                 </div>
             </div><!-- /subImages -->
-                
+            
         
             <!-- ===== HISTORY SUB-TAB ===== -->
             <div id="subHistory" class="sub-panel">
@@ -2442,7 +2454,7 @@
     /* ================================================================
        LAB ENGINE — STABLE VERSION
     ================================================================ */
-    function genLabTags() {
+        function genLabTags() {
         var grid = document.getElementById('labSelector');
         if (!grid) return;
         grid.innerHTML = '';
@@ -2473,6 +2485,7 @@
             header.style.marginTop = '8px';
             header.style.marginBottom = '4px';
             header.style.paddingLeft = '4px';
+            header.setAttribute('data-cat-header', 'true'); // 🆕 Mark as header for search
             header.innerText = catName;
             grid.appendChild(header);
             
@@ -2480,12 +2493,41 @@
                 (function(safeKey, data) {
                     var btn = document.createElement('div');
                     btn.className = 'lab-btn';
+                    btn.setAttribute('data-name', data.n.toLowerCase()); // 🆕 Add name for searching
                     btn.innerText = data.n;
                     btn.onclick = function() { orderLab(safeKey, data.n, data.r, data.u); };
                     grid.appendChild(btn);
                 })(categories[catName][j].key, categories[catName][j].data);
             }
         }
+    }
+
+    // 🆕 SMART MINIMAL SEARCH FOR LABS
+    function filterLabTags() {
+        var query = (document.getElementById('labSearchBox').value || '').toLowerCase().trim();
+        var grid = document.getElementById('labSelector');
+        if (!grid) return;
+        
+        var children = grid.children;
+        var currentHeader = null;
+        var hasVisibleInCat = false;
+        
+        for (var i = 0; i < children.length; i++) {
+            var el = children[i];
+            if (el.getAttribute('data-cat-header') === 'true') {
+                if (currentHeader && !hasVisibleInCat) currentHeader.style.display = 'none';
+                currentHeader = el;
+                hasVisibleInCat = false;
+                currentHeader.style.display = 'block'; // Reset header visibility
+            } else {
+                var name = (el.getAttribute('data-name') || '');
+                var match = query === '' || name.indexOf(query) !== -1;
+                el.style.display = match ? 'block' : 'none';
+                if (match) hasVisibleInCat = true;
+            }
+        }
+        // Check the last header
+        if (currentHeader && !hasVisibleInCat) currentHeader.style.display = 'none';
     }
 
     function orderLab(safeKey, dispName, range, unit) {
@@ -2784,44 +2826,78 @@ function resetPendingLabs(ptId) {
     function deleteFullImg(key) { if (confirm("Delete this entire imaging modality?")) db.ref('patientDetails/' + activeId + '/imaging/' + key).remove().catch(handleFirebaseError); }
     function deleteImgEntry(key, idx) { if (confirm("Delete this report?")) { var h = ptDetails[activeId].imaging[key].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/imaging/' + key + '/history').set(h).catch(handleFirebaseError); } }
 
-     /* ================================================================
-       IMGBB IMAGE UPLOAD ENGINE
+        /* ================================================================
+       IMGBB IMAGE UPLOAD ENGINE (with Paste & Loading)
     ================================================================ */
     var IMGBB_API_KEY = "c9b40b48279f41c337ea931de0a16ab1"; 
 
     function handleImageUpload(input) {
         if (!activeId || !input.files || !input.files[0]) return;
-        var file = input.files[0];
+        processAndUploadImage(input.files[0]);
+    }
+
+    function handlePasteImage() {
+        if (!activeId) return;
+        var statusEl = document.getElementById('imageUploadStatus');
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = '⏳ Reading clipboard...';
+        statusEl.style.color = 'var(--text-secondary)';
+
+        navigator.clipboard.read().then(function(clipboardItems) {
+            for (var i = 0; i < clipboardItems.length; i++) {
+                for (var j = 0; j < clipboardItems[i].types.length; j++) {
+                    if (clipboardItems[i].types[j].indexOf('image') !== -1) {
+                        var blob = clipboardItems[i].getType(clipboardItems[i].types[j]);
+                        var file = new File([blob], 'pasted_image.png', { type: blob.type });
+                        processAndUploadImage(file);
+                        return;
+                    }
+                }
+            }
+            statusEl.innerHTML = '⚠️ No image found in clipboard. Copy an image first.';
+            statusEl.style.color = 'var(--danger)';
+        }).catch(function(err) {
+            console.error('Clipboard read error:', err);
+            statusEl.innerHTML = '⚠️ Clipboard access denied. Please use the Upload button instead.';
+            statusEl.style.color = 'var(--danger)';
+        });
+    }
+
+    function processAndUploadImage(file) {
+        if (!activeId) return;
         
-        // Validate file size (max 10MB before compression)
+        var statusEl = document.getElementById('imageUploadStatus');
+        statusEl.style.display = 'block';
+        statusEl.style.color = 'var(--text-secondary)';
+        
         if (file.size > 10 * 1024 * 1024) {
-            showToast("⚠️ Image too large (Max 10MB).");
+            statusEl.innerHTML = '⚠️ Image too large (Max 10MB).';
+            statusEl.style.color = 'var(--danger)';
             return;
         }
 
-        showToast("⏳ Compressing & Uploading image...");
+        statusEl.innerHTML = '⏳ Compressing image...';
         var reader = new FileReader();
         
         reader.onload = function(e) {
             var img = new Image();
             img.onload = function() {
-                // 1. Compress using Canvas
                 var canvas = document.createElement('canvas');
                 var ctx = canvas.getContext('2d');
                 
-                var MAX_WIDTH = 1200; // Resize to max 1200px width to save space
+                var MAX_WIDTH = 1200; 
                 var scale = MAX_WIDTH / img.width;
-                if (scale > 1) scale = 1; // Don't upscale
+                if (scale > 1) scale = 1; 
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
                 
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 
-                // Convert to JPEG 0.8 quality for compression
                 var base64 = canvas.toDataURL('image/jpeg', 0.8);
-                var cleanBase64 = base64.split(',')[1]; // Remove "data:image/jpeg;base64,"
+                var cleanBase64 = base64.split(',')[1];
                 
-                // 2. Upload to ImgBB
+                statusEl.innerHTML = '☁️ Uploading to ImgBB (0%)...';
+                
                 var formData = new FormData();
                 formData.append('image', cleanBase64);
                 
@@ -2829,13 +2905,17 @@ function resetPendingLabs(ptId) {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(function(response) {
+                    statusEl.innerHTML = '☁️ Upload successful, processing response...';
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(function(data) {
                     if (data.success) {
                         var imgUrl = data.data.url;
-                        var thumbUrl = data.data.thumb ? data.data.thumb.url : imgUrl; // ImgBB provides a small thumbnail URL
+                        var thumbUrl = data.data.thumb ? data.data.thumb.url : imgUrl;
                         
-                        // 3. Save URL to Firebase
+                        statusEl.innerHTML = '💾 Saving to patient file...';
                         var newImgRef = db.ref('patientDetails/' + activeId + '/images').push();
                         newImgRef.set({
                             url: imgUrl,
@@ -2843,16 +2923,23 @@ function resetPendingLabs(ptId) {
                             date: new Date().toLocaleDateString('en-GB'),
                             ts: Date.now()
                         }).then(function() {
-                            showToast("✅ Image uploaded successfully!");
-                            input.value = ''; // reset input
-                        }).catch(handleFirebaseError);
+                            statusEl.innerHTML = '✅ Image uploaded successfully!';
+                            statusEl.style.color = 'var(--success)';
+                            setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+                            var input = document.getElementById('imageUploadInput');
+                            if (input) input.value = ''; // reset input
+                        }).catch(function(err) {
+                            statusEl.innerHTML = '⚠️ Firebase save failed: ' + err.message;
+                            statusEl.style.color = 'var(--danger)';
+                        });
                     } else {
-                        showToast("⚠️ Upload failed. Check API Key.");
+                        throw new Error('ImgBB API returned failure');
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error("ImgBB Error:", error);
-                    showToast("⚠️ Network error during upload.");
+                    statusEl.innerHTML = '⚠️ Upload failed. Check API Key or Network connection.';
+                    statusEl.style.color = 'var(--danger)';
                 });
             };
             img.src = e.target.result;
