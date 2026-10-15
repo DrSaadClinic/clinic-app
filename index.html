@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root, [data-theme="dark"] {
             --primary: #0A84FF;
@@ -883,8 +884,51 @@
         .mj-protocol-hint.escalate { background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.25); color: var(--warning); }
         .mj-protocol-hint.overdue { background: rgba(255,69,58,0.1); border: 1px solid rgba(255,69,58,0.25); color: var(--danger); }
         .mj-protocol-hint.ok { background: rgba(48,209,88,0.08); border: 1px solid rgba(48,209,88,0.2); color: var(--success); }
-
-                /* TV ARRIVAL ANIMATION - CENTER POPUP TO NOTIFICATION */
+        
+    /* ================================================================
+       7-STAR PDF REFERRAL STYLES
+    ================================================================ */
+    .pdf-letter {
+        font-family: 'Times New Roman', serif;
+        color: #1a1a1a; max-width: 800px; margin: 0 auto;
+        background: #fff; padding: 60px; box-sizing: border-box;
+        position: relative; border-top: 8px solid #0A84FF;
+    }
+    .pdf-watermark {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 120px; font-weight: bold; color: rgba(10, 132, 255, 0.03);
+        z-index: 0; pointer-events: none; white-space: nowrap;
+    }
+    .pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0A84FF; padding-bottom: 20px; margin-bottom: 40px; position: relative; z-index: 1; }
+    .pdf-logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #0A84FF; }
+    .pdf-clinic-info h1 { font-size: 28px; color: #0A84FF; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
+    .pdf-clinic-info p { margin: 5px 0 0 0; font-size: 14px; color: #555; }
+    .pdf-meta { text-align: right; font-size: 14px; color: #555; }
+    .pdf-meta strong { color: #1a1a1a; }
+    .pdf-section { margin-bottom: 30px; position: relative; z-index: 1; }
+    .pdf-section-title { font-size: 16px; font-weight: bold; color: #0A84FF; text-transform: uppercase; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; letter-spacing: 1px; }
+    .pdf-pt-banner { background: #f8f9fa; padding: 15px; border-left: 4px solid #0A84FF; border-radius: 4px; margin-bottom: 30px; font-size: 15px; }
+    .pdf-pt-banner strong { color: #0A84FF; }
+    .pdf-text { font-size: 15px; line-height: 1.8; text-align: justify; }
+    .pdf-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+    .pdf-table th { background: #0A84FF; color: white; padding: 10px; text-align: left; font-weight: 600; }
+    .pdf-table td { border-bottom: 1px solid #ddd; padding: 10px; }
+    .pdf-table tr:nth-child(even) { background: #f9f9f9; }
+    .pdf-abnormal { color: #d9534f; font-weight: bold; }
+    .pdf-img-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+    .pdf-img-card { border: 1px solid #ddd; padding: 5px; border-radius: 4px; text-align: center; }
+    .pdf-img-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
+    .pdf-img-card p { margin: 5px 0 0 0; font-size: 12px; color: #666; }
+    .pdf-monjaro-box { background: #f4f0ff; border: 1px solid #7C3AED; border-radius: 8px; padding: 15px; margin-top: 10px; }
+    .pdf-monjaro-title { color: #7C3AED; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
+    .pdf-signature { margin-top: 60px; text-align: right; position: relative; z-index: 1; }
+    .pdf-sign-name { font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0A84FF; margin-bottom: 5px; transform: rotate(-5deg); display: inline-block; }
+    .pdf-sign-line { border-top: 1px solid #1a1a1a; width: 250px; margin-left: auto; margin-bottom: 10px; }
+    .pdf-sign-stamp { width: 100px; height: 100px; border: 3px solid #d9534f; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; color: #d9534f; font-weight: bold; font-size: 12px; line-height: 1.2; margin-left: auto; transform: rotate(-15deg); opacity: 0.8; margin-top: -40px; margin-right: 20px; }
+    .pdf-sign-doc { font-weight: bold; font-size: 16px; color: #1a1a1a; }
+    .pdf-sign-title { font-size: 14px; color: #555; }
+                
+        /* TV ARRIVAL ANIMATION - CENTER POPUP TO NOTIFICATION */
         .vos-arrival-overlay {
             position: fixed; inset: 0; z-index: 99999; pointer-events: none;
             display: flex; align-items: center; justify-content: center;
@@ -1203,7 +1247,7 @@
             <div id="subImages" class="sub-panel">
                 <div class="section-block" style="border-left:4px solid var(--img); background:rgba(191,90,242,0.04);">
                     <span class="section-label" style="color:var(--img);">Patient Images & Documents</span>
-                    <input type="file" id="imageUploadInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+                    <input type="file" id="imageUploadInput" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(this)">
                     
                     <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
                         <button onclick="document.getElementById('imageUploadInput').click()" style="background:var(--img); width:auto; padding:12px 20px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
@@ -2439,18 +2483,192 @@
     autoSyncTrigger();
     showToast('Clinical sheet + visit stamp inserted.');
 }
-    /* ================================================================
-       REFERRAL
+        /* ================================================================
+       7-STAR PDF REFERRAL GENERATOR
     ================================================================ */
     function generateReferral() {
+        if (!activeId) return;
         var b = ptIdx[activeId] || {};
         var d = ptDetails[activeId] || {};
+        var m = monjaroData[activeId] || null;
         var date = new Date().toLocaleDateString('en-GB');
-        var ageStr = b.age ? b.age + ' years old' : "Unknown age";
-        var text = 'DATE: ' + date + '\nTO: Specialist Colleague\nFROM: Dr. Saad Sabry Alzubaidy (General Surgeon)\n\nSUBJECT: Comprehensive Surgical Referral for ' + b.name + ' (' + ageStr + ')\n\n---\n\nCHIEF COMPLAINT / REASON FOR REFERRAL:\n' + (b.complaint || "Referred for specialist surgical evaluation.") + '\n\nHISTORY OF PRESENT ILLNESS & OBJECTIVE FINDINGS:\n' + (d.presentation || "[No specific history recorded in system.]") + '\n\nPROPOSED MANAGEMENT & INVESTIGATIONS TO DATE:\n' + (d.visits || "[No management recorded in system.]") + '\n\nCLINICAL REQUEST:\nDear Colleague,\nI am referring this patient to your esteemed clinic for specialist evaluation and potential co-management. Please review the clinical summary detailed above. I would greatly appreciate your expert opinion and feedback regarding further intervention.\n\nBest Regards,\n\nDr. Saad Sabry Alzubaidy\nGeneral Surgeon';
-        document.getElementById('referralResult').innerText = text;
-        document.getElementById('referralResult').style.display = 'block';
+        var refId = 'REF-' + Date.now().toString().slice(-6);
+
+        showToast("⏳ Generating 7-star PDF... Please wait.");
+
+        // 1. Smart AI Summary Logic
+        var presentation = d.presentation || "[No specific clinical history recorded in system.]";
+        var visits = d.visits || "[No management plan recorded in system.]";
+        var aiSummary = "Dear Colleague,\n\nThank you for referring " + (b.name || 'this patient') + " to our surgical clinic. ";
+        aiSummary += "The patient presents with " + (b.complaint || 'a condition requiring specialist surgical evaluation') + ". ";
+        if (m) {
+            var wLost = (parseFloat(m.startWeight) - parseFloat(m.doses && m.doses.length>0 ? (m.doses[m.doses.length-1].weight || m.startWeight) : m.startWeight)).toFixed(1);
+            aiSummary += "Notably, the patient is currently enrolled in the Monjaro (Tirzepatide) weight management program, currently at " + m.currentDose + "mg, having achieved a weight reduction of " + wLost + " kg. ";
+        }
+        aiSummary += "Below is a comprehensive, structured summary of the patient's clinical history, investigations, and management to date to facilitate your expert evaluation.";
+
+        // 2. Build Labs Table
+        var labsHtml = '<p style="font-size:14px; color:#555;">No laboratory investigations recorded.</p>';
+        if (d.labs) {
+            var labKeys = Object.keys(d.labs);
+            if (labKeys.length > 0) {
+                labsHtml = '<table class="pdf-table"><thead><tr><th>Test</th><th>Value</th><th>Range</th><th>Status</th></tr></thead><tbody>';
+                labKeys.forEach(function(key) {
+                    var lab = d.labs[key];
+                    var lastHist = lab.history && lab.history.length > 0 ? lab.history[lab.history.length-1] : null;
+                    if (lastHist) {
+                        var statusClass = (lastHist.stat === "High" || lastHist.stat === "Low") ? "pdf-abnormal" : "";
+                        var statusText = lastHist.stat === "Normal" ? "✓ Normal" : (lastHist.stat === "High" ? "↑ High" : (lastHist.stat === "Low" ? "↓ Low" : lastHist.stat));
+                        labsHtml += '<tr><td><strong>' + escapeHtml(lab.name || key) + '</strong></td>' +
+                                    '<td class="' + statusClass + '">' + escapeHtml(lastHist.val) + ' ' + escapeHtml(lab.unit || '') + '</td>' +
+                                    '<td style="color:#777;">' + escapeHtml(lab.range || 'N/A') + '</td>' +
+                                    '<td class="' + statusClass + '">' + statusText + '</td></tr>';
+                    }
+                });
+                labsHtml += '</tbody></table>';
+            }
+        }
+
+        // 3. Build Imaging List
+        var imagingHtml = '';
+        if (d.imaging) {
+            var imgKeys = Object.keys(d.imaging);
+            if (imgKeys.length > 0) {
+                imagingHtml = '<div class="pdf-section"><div class="pdf-section-title">Imaging & Endoscopy Reports</div><ul style="font-size:14px; line-height:1.8;">';
+                imgKeys.forEach(function(key) {
+                    var img = d.imaging[key];
+                    var lastRep = img.history && img.history.length > 0 ? img.history[img.history.length-1] : null;
+                    if (lastRep) {
+                        imagingHtml += '<li><strong>' + escapeHtml(img.name) + ' (' + escapeHtml(lastRep.dt) + '):</strong> ' + escapeHtml(lastRep.val) + '</li>';
+                    }
+                });
+                imagingHtml += '</ul></div>';
+            }
+        }
+
+        // 4. Build Monjaro Section
+        var monjaroHtml = '';
+        if (m) {
+            var doses = m.doses || [];
+            var currentW = doses.length > 0 && doses[doses.length-1].weight ? doses[doses.length-1].weight : m.startWeight;
+            var lostKg = m.startWeight ? (parseFloat(m.startWeight) - parseFloat(currentW)) : 0;
+            var lostPct = m.startWeight ? ((lostKg / parseFloat(m.startWeight)) * 100).toFixed(1) : 0;
+            monjaroHtml = '<div class="pdf-section"><div class="pdf-section-title">Monjaro (Tirzepatide) Progress</div>' +
+                           '<div class="pdf-monjaro-box">' +
+                           '<div class="pdf-monjaro-title">💉 Weight Management Program</div>' +
+                           '<p style="font-size:14px;"><strong>Current Dose:</strong> ' + m.currentDose + ' mg | <strong>Total Doses:</strong> ' + doses.length + ' | <strong>Enrolled:</strong> ' + escapeHtml(m.enrollDate || m.startDate || 'N/A') + '</p>' +
+                           '<p style="font-size:14px;"><strong>Start Weight:</strong> ' + m.startWeight + ' kg → <strong>Current Weight:</strong> ' + currentW + ' kg</p>' +
+                           '<p style="font-size:14px; color:#7C3AED;"><strong>Total Lost:</strong> ' + Math.abs(lostKg).toFixed(1) + ' kg (' + lostPct + '%)</p>' +
+                           '</div></div>';
+        }
+
+        // 5. Build Image Gallery
+        var galleryHtml = '';
+        if (d.images) {
+            var imgGalKeys = Object.keys(d.images);
+            if (imgGalKeys.length > 0) {
+                galleryHtml = '<div class="pdf-section"><div class="pdf-section-title">Attached Clinical Images / Scans</div><div class="pdf-img-grid">';
+                imgGalKeys.forEach(function(key) {
+                    var img = d.images[key];
+                    galleryHtml += '<div class="pdf-img-card">' +
+                                   '<img src="' + img.url + '">' +
+                                   '<p>📅 ' + escapeHtml(img.date || '') + '</p>' +
+                                   '</div>';
+                });
+                galleryHtml += '</div></div>';
+            }
+        }
+
+        // 6. Assemble Full HTML
+        var htmlContent = `
+        <div class="pdf-letter" id="pdfCaptureArea">
+            <div class="pdf-watermark">SAAD CLINIC</div>
+            
+            <div class="pdf-header">
+                <img src="logo.jpg" class="pdf-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+                <div class="pdf-clinic-info" style="text-align:center; flex:1; margin: 0 20px;">
+                    <h1>Dr. Saad Sabry Alzubaidy</h1>
+                    <p>Consultant General Surgeon | Surgical Clinic</p>
+                    <p>📞 +964 770 000 0000 | ✉️ clinic@saadsabry.com</p>
+                </div>
+                <div class="pdf-meta">
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Ref ID:</strong> ${refId}</p>
+                </div>
+            </div>
+
+            <div class="pdf-pt-banner">
+                <strong>Patient:</strong> ${escapeHtml(b.name || 'Unknown')} &nbsp; | &nbsp; 
+                <strong>Age:</strong> ${escapeHtml(b.age || '--')} years &nbsp; | &nbsp; 
+                <strong>Gender:</strong> ${m && m.gender ? escapeHtml(m.gender) : 'N/A'} &nbsp; | &nbsp;
+                <strong>Phone:</strong> ${escapeHtml(b.phone || '--')}
+            </div>
+
+            <div class="pdf-section">
+                <div class="pdf-section-title">Subject: Comprehensive Surgical Referral</div>
+                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(aiSummary)}</p>
+            </div>
+
+            <div class="pdf-section">
+                <div class="pdf-section-title">Clinical History & Presentation</div>
+                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(presentation)}</p>
+            </div>
+
+            <div class="pdf-section">
+                <div class="pdf-section-title">Management & Investigations Plan</div>
+                <p class="pdf-text" style="white-space: pre-wrap;">${escapeHtml(visits)}</p>
+            </div>
+
+            <div class="pdf-section">
+                <div class="pdf-section-title">Laboratory Investigations</div>
+                ${labsHtml}
+            </div>
+
+            ${imagingHtml}
+            ${monjaroHtml}
+            ${galleryHtml}
+
+            <div class="pdf-signature">
+                <div class="pdf-sign-name">Dr. Saad S. Alzubaidy</div>
+                <div class="pdf-sign-line"></div>
+                <div class="pdf-sign-doc">Dr. Saad Sabry Alzubaidy</div>
+                <div class="pdf-sign-title">MBChB, FICS - Consultant General Surgeon</div>
+                <div class="pdf-sign-stamp">
+                    OFFICIAL<br>MEDICAL<br>STAMP
+                </div>
+            </div>
+        </div>`;
+
+        // Add to DOM temporarily
+        var tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
+        tempDiv.innerHTML = htmlContent;
+        document.body.appendChild(tempDiv);
+
+        var element = tempDiv.firstElementChild;
+        
+        // Generate PDF
+        var opt = {
+            margin:       0,
+            filename:     'Referral_' + (b.name || 'Patient') + '_' + date.replace(/\//g, '-') + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: true, backgroundColor: '#ffffff' },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(element).save().then(function() {
+            document.body.removeChild(tempDiv);
+            showToast("✅ Premium PDF Referral Generated!");
+        }).catch(function(err) {
+            console.error("PDF Generation Error:", err);
+            showToast("⚠️ PDF generation failed.");
+            document.body.removeChild(tempDiv);
+        });
     }
+    
 
     /* ================================================================
        LAB ENGINE — STABLE VERSION
@@ -2827,14 +3045,44 @@ function resetPendingLabs(ptId) {
     function deleteFullImg(key) { if (confirm("Delete this entire imaging modality?")) db.ref('patientDetails/' + activeId + '/imaging/' + key).remove().catch(handleFirebaseError); }
     function deleteImgEntry(key, idx) { if (confirm("Delete this report?")) { var h = ptDetails[activeId].imaging[key].history; h.splice(idx, 1); db.ref('patientDetails/' + activeId + '/imaging/' + key + '/history').set(h).catch(handleFirebaseError); } }
 
-    /* ================================================================
-       IMGBB IMAGE UPLOAD ENGINE (Bulletproof version)
+        /* ================================================================
+       IMGBB IMAGE UPLOAD ENGINE (Multi-File Queue & HEIC Support)
     ================================================================ */
     var IMGBB_API_KEY = "c9b40b48279f41c337ea931de0a16ab1"; 
 
     function handleImageUpload(input) {
-        if (!activeId || !input.files || !input.files[0]) return;
-        processAndUploadImage(input.files[0]);
+        if (!activeId || !input.files || input.files.length === 0) return;
+        
+        // Convert FileList to Array and clear input immediately
+        var files = Array.from(input.files);
+        input.value = ''; 
+        
+        var currentIndex = 0;
+        
+        function processNext() {
+            if (currentIndex >= files.length) {
+                var statusEl = document.getElementById('imageUploadStatus');
+                if (statusEl) {
+                    statusEl.innerHTML = '✅ All ' + files.length + ' image(s) uploaded successfully!';
+                    statusEl.style.color = 'var(--success)';
+                    setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+                }
+                return;
+            }
+            
+            var file = files[currentIndex];
+            var statusEl = document.getElementById('imageUploadStatus');
+            statusEl.style.display = 'block';
+            statusEl.style.color = 'var(--text-secondary)';
+            statusEl.innerHTML = '🖼️ Uploading ' + (currentIndex + 1) + ' of ' + files.length + '...';
+            
+            processAndUploadImage(file, function() {
+                currentIndex++;
+                processNext(); // Move to next file when this one finishes
+            });
+        }
+        
+        processNext(); // Start the queue
     }
 
     function handlePasteImage() {
@@ -2858,7 +3106,11 @@ function resetPendingLabs(ptId) {
                         imageFound = true;
                         clipboardItems[i].getType(clipboardItems[i].types[j]).then(function(blob) {
                             var file = new File([blob], 'pasted_image.png', { type: blob.type });
-                            processAndUploadImage(file);
+                            processAndUploadImage(file, function() {
+                                statusEl.innerHTML = '✅ Image uploaded successfully!';
+                                statusEl.style.color = 'var(--success)';
+                                setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
+                            });
                         }).catch(function(err) {
                             statusEl.innerHTML = '⚠️ Failed to extract image from clipboard.';
                             statusEl.style.color = 'var(--danger)';
@@ -2878,13 +3130,11 @@ function resetPendingLabs(ptId) {
         });
     }
 
-            function processAndUploadImage(file) {
-        if (!activeId) return;
+    function processAndUploadImage(file, onComplete) {
+        if (!activeId) { if(onComplete) onComplete(); return; }
         
         var statusEl = document.getElementById('imageUploadStatus');
-        if (!statusEl) return;
-        statusEl.style.display = 'block';
-        statusEl.style.color = 'var(--text-secondary)';
+        if (!statusEl) { if(onComplete) onComplete(); return; }
         
         var isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
         
@@ -2892,6 +3142,7 @@ function resetPendingLabs(ptId) {
             if (typeof heic2any === 'undefined') {
                 statusEl.innerHTML = '⚠️ HEIC converter failed to load. Please use JPG or PNG.';
                 statusEl.style.color = 'var(--danger)';
+                if(onComplete) onComplete();
                 return;
             }
             
@@ -2904,22 +3155,24 @@ function resetPendingLabs(ptId) {
             })
             .then(function(convertedBlob) {
                 var newFile = new File([convertedBlob], file.name.replace(/\.heic$|\.heif$/i, '.jpg'), { type: 'image/jpeg' });
-                startImageProcessing(newFile, statusEl);
+                startImageProcessing(newFile, statusEl, onComplete);
             })
             .catch(function(err) {
                 console.error("HEIC Conversion Error:", err);
                 statusEl.innerHTML = '⚠️ Failed to convert HEIC. Please try a standard JPG or PNG.';
                 statusEl.style.color = 'var(--danger)';
+                if(onComplete) onComplete();
             });
         } else {
-            startImageProcessing(file, statusEl);
+            startImageProcessing(file, statusEl, onComplete);
         }
     }
 
-    function startImageProcessing(file, statusEl) {
+    function startImageProcessing(file, statusEl, onComplete) {
         if (file.size > 10 * 1024 * 1024) {
-            statusEl.innerHTML = '⚠️ Image too large (Max 10MB).';
+            statusEl.innerHTML = '⚠️ Image ' + file.name + ' too large (Max 10MB). Skipping.';
             statusEl.style.color = 'var(--danger)';
+            if(onComplete) onComplete();
             return;
         }
 
@@ -2929,8 +3182,9 @@ function resetPendingLabs(ptId) {
             var reader = new FileReader();
             
             reader.onerror = function() {
-                statusEl.innerHTML = '⚠️ Failed to read the file.';
+                statusEl.innerHTML = '⚠️ Failed to read the file: ' + file.name;
                 statusEl.style.color = 'var(--danger)';
+                if(onComplete) onComplete();
             };
             
             reader.onload = function(e) {
@@ -2938,8 +3192,9 @@ function resetPendingLabs(ptId) {
                 try {
                     var img = new Image();
                     img.onerror = function() {
-                        statusEl.innerHTML = '⚠️ Invalid or corrupted image file.';
+                        statusEl.innerHTML = '⚠️ Invalid or corrupted image file: ' + file.name;
                         statusEl.style.color = 'var(--danger)';
+                        if(onComplete) onComplete();
                     };
                     img.onload = function() {
                         try {
@@ -2979,14 +3234,11 @@ function resetPendingLabs(ptId) {
                                         date: new Date().toLocaleDateString('en-GB'),
                                         ts: Date.now()
                                     }).then(function() {
-                                        statusEl.innerHTML = '✅ Image uploaded successfully!';
-                                        statusEl.style.color = 'var(--success)';
-                                        setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
-                                        var input = document.getElementById('imageUploadInput');
-                                        if (input) input.value = ''; 
+                                        if(onComplete) onComplete();
                                     }).catch(function(err) {
                                         statusEl.innerHTML = '⚠️ Firebase save failed: ' + err.message;
                                         statusEl.style.color = 'var(--danger)';
+                                        if(onComplete) onComplete();
                                     });
                                 } else {
                                     throw new Error('ImgBB API returned failure');
@@ -2996,11 +3248,13 @@ function resetPendingLabs(ptId) {
                                 console.error("ImgBB Error:", error);
                                 statusEl.innerHTML = '⚠️ Upload failed. Check API Key or Network.';
                                 statusEl.style.color = 'var(--danger)';
+                                if(onComplete) onComplete();
                             });
                         } catch (canvasErr) {
                             console.error("Canvas Error:", canvasErr);
                             statusEl.innerHTML = '⚠️ Error processing image: ' + canvasErr.message;
                             statusEl.style.color = 'var(--danger)';
+                            if(onComplete) onComplete();
                         }
                     };
                     img.src = e.target.result;
@@ -3008,6 +3262,7 @@ function resetPendingLabs(ptId) {
                      console.error("Image object error:", imgErr);
                      statusEl.innerHTML = '⚠️ Error loading image into memory.';
                      statusEl.style.color = 'var(--danger)';
+                     if(onComplete) onComplete();
                 }
             };
             reader.readAsDataURL(file);
@@ -3015,6 +3270,7 @@ function resetPendingLabs(ptId) {
             console.error("FileReader Error:", readErr);
             statusEl.innerHTML = '⚠️ Error reading file.';
             statusEl.style.color = 'var(--danger)';
+            if(onComplete) onComplete();
         }
     }
 
