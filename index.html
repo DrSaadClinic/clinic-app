@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root, [data-theme="dark"] {
             --primary: #0A84FF;
@@ -886,27 +885,34 @@
         .mj-protocol-hint.ok { background: rgba(48,209,88,0.08); border: 1px solid rgba(48,209,88,0.2); color: var(--success); }
            
     /* ================================================================
-       7-STAR PDF REFERRAL STYLES (BULLETPROOF)
+       7-STAR NATIVE PRINT STYLES (Flawless Arabic & Vector Text)
     ================================================================ */
+    @media print {
+        body * { visibility: hidden; }
+        #printReferralArea, #printReferralArea * { visibility: visible; }
+        #printReferralArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+        @page { margin: 15mm; }
+    }
+
     .pdf-letter {
-        font-family: Arial, 'Tahoma', sans-serif; /* Critical for Arabic support */
-        color: #1a1a1a; width: 793px; margin: 0; background: #fff; 
-        padding: 50px; box-sizing: border-box; position: relative;
+        font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif; 
+        color: #1a1a1a; width: 100%; max-width: 800px; margin: 0 auto; background: #fff; 
+        padding: 40px; box-sizing: border-box; position: relative;
     }
     .pdf-watermark {
         position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
-        font-size: 110px; font-weight: bold; color: rgba(10, 132, 255, 0.04);
+        font-size: 120px; font-weight: bold; color: rgba(10, 132, 255, 0.04);
         z-index: 0; pointer-events: none; white-space: nowrap;
     }
     .pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0A84FF; padding-bottom: 20px; margin-bottom: 30px; position: relative; z-index: 1; }
     .pdf-logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #0A84FF; }
     .pdf-clinic-info { text-align: center; flex: 1; margin: 0 20px; }
     .pdf-clinic-info h1 { font-size: 26px; color: #0A84FF; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    .pdf-clinic-info p { margin: 3px 0 0 0; font-size: 12px; color: #444; line-height: 1.5; }
-    .pdf-arabic { direction: rtl; font-size: 13px; color: #333; }
+    .pdf-clinic-info p { margin: 3px 0 0 0; font-size: 13px; color: #444; line-height: 1.5; }
+    .pdf-arabic { direction: rtl; font-size: 14px; color: #333; font-weight: 600; }
     .pdf-meta { text-align: right; font-size: 12px; color: #555; min-width: 90px; }
     .pdf-meta strong { color: #1a1a1a; display: block; }
-    .pdf-section { margin-bottom: 25px; position: relative; z-index: 1; }
+    .pdf-section { margin-bottom: 25px; position: relative; z-index: 1; page-break-inside: avoid; }
     .pdf-section-title { font-size: 15px; font-weight: bold; color: #0A84FF; text-transform: uppercase; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 0.5px; }
     .pdf-pt-banner { background: #f0f7ff; padding: 15px; border-left: 5px solid #0A84FF; border-radius: 4px; margin-bottom: 25px; font-size: 14px; font-weight: bold; color: #0A84FF; }
     .pdf-text { font-size: 13px; line-height: 1.8; text-align: justify; white-space: pre-wrap; color: #000; }
@@ -919,13 +925,13 @@
     .pdf-monjaro-title { color: #7C3AED; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
     .pdf-img-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
     .pdf-img-td { width: 50%; border: 1px solid #ddd; padding: 8px; text-align: center; vertical-align: top; }
-    .pdf-img-td img { max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 4px; }
-    .pdf-signature { margin-top: 50px; text-align: right; position: relative; z-index: 1; }
-    .pdf-sign-name { font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0A84FF; margin-bottom: 5px; display: inline-block; transform: rotate(-5deg); }
+    .pdf-img-td img { max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 4px; }
+    .pdf-signature { margin-top: 60px; text-align: right; position: relative; z-index: 1; page-break-inside: avoid; }
+    .pdf-sign-name { font-family: 'Brush Script MT', cursive; font-size: 36px; color: #0A84FF; margin-bottom: 5px; display: inline-block; transform: rotate(-5deg); }
     .pdf-sign-line { border-top: 1px solid #1a1a1a; width: 220px; margin-left: auto; margin-bottom: 8px; }
     .pdf-sign-doc { font-weight: bold; font-size: 15px; color: #1a1a1a; }
     .pdf-sign-title { font-size: 12px; color: #555; margin-bottom: 15px; }
-    .pdf-sign-stamp { width: 100px; height: 100px; border: 4px solid #d9534f; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-align: center; color: #d9534f; font-weight: bold; font-size: 11px; line-height: 1.2; transform: rotate(-15deg); opacity: 0.9; }           
+    .pdf-sign-stamp { width: 110px; height: 110px; border: 4px solid #d9534f; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-align: center; color: #d9534f; font-weight: bold; font-size: 12px; line-height: 1.2; transform: rotate(-15deg); opacity: 0.9; margin-right: 20px; }        
         /* TV ARRIVAL ANIMATION - CENTER POPUP TO NOTIFICATION */
         .vos-arrival-overlay {
             position: fixed; inset: 0; z-index: 99999; pointer-events: none;
@@ -2479,7 +2485,7 @@
     showToast('Clinical sheet + visit stamp inserted.');
 }
     /* ================================================================
-       7-STAR PDF REFERRAL GENERATOR (BULLETPROOF)
+       7-STAR NATIVE PRINT GENERATOR (Flawless Quality)
     ================================================================ */
     function generateReferral() {
         if (!activeId) return;
@@ -2489,14 +2495,12 @@
         var date = new Date().toLocaleDateString('en-GB');
         var refId = 'REF-' + Date.now().toString().slice(-6);
 
-        showToast("⏳ Generating Premium PDF...");
+        showToast("⏳ Preparing Premium Referral...");
 
-        // 1. Ensure Name & Texts are correct
         var ptName = b.name || (ptDetails[activeId] && ptDetails[activeId].name) || "Unknown Patient";
         var presentation = (d.presentation || "[No specific clinical history recorded in system.]").replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var visits = (d.visits || "[No management plan recorded in system.]").replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        // 2. Smart AI Summary (Dr. Saad referring OUT)
         var aiSummary = "Dear Colleague,\n\nI am referring " + ptName + " to your esteemed clinic for specialist evaluation and potential co-management. ";
         aiSummary += "The patient presents with " + (b.complaint || 'a condition requiring specialist surgical evaluation') + ". ";
         if (m) {
@@ -2507,7 +2511,6 @@
         }
         aiSummary += "Below is a comprehensive, structured summary of the patient's clinical history, investigations, and management to date to facilitate your expert assessment. I would greatly appreciate your expert opinion and feedback regarding further intervention.";
 
-        // 3. Build Labs Table
         var labsHtml = '<p style="font-size:13px; color:#555;">No laboratory investigations recorded.</p>';
         if (d.labs) {
             var labKeys = Object.keys(d.labs);
@@ -2529,7 +2532,6 @@
             }
         }
 
-        // 4. Build Imaging List
         var imagingHtml = '';
         if (d.imaging) {
             var imgKeys = Object.keys(d.imaging);
@@ -2546,7 +2548,6 @@
             }
         }
 
-        // 5. Build Monjaro Section
         var monjaroHtml = '';
         if (m) {
             var doses = m.doses || [];
@@ -2562,7 +2563,6 @@
                            '</div></div>';
         }
 
-        // 6. Build Image Gallery using standard Table layout
         var galleryHtml = '';
         if (d.images) {
             var imgGalKeys = Object.keys(d.images);
@@ -2571,13 +2571,12 @@
                 var count = 0;
                 imgGalKeys.forEach(function(key) {
                     var img = d.images[key];
-                    galleryHtml += '<td class="pdf-img-td"><img src="' + img.url + '" crossorigin="anonymous"><p style="font-size:11px; color:#666; margin-top:5px;">📅 ' + (img.date || '') + '</p></td>';
+                    galleryHtml += '<td class="pdf-img-td"><img src="' + img.url + '"><p style="font-size:11px; color:#666; margin-top:5px;">📅 ' + (img.date || '') + '</p></td>';
                     count++;
                     if (count % 2 === 0 && count < imgGalKeys.length) {
-                        galleryHtml += '</tr><tr>'; // New row every 2 images
+                        galleryHtml += '</tr><tr>';
                     }
                 });
-                // Fill empty cell if odd number of images
                 if (count % 2 !== 0) {
                     galleryHtml += '<td class="pdf-img-td"></td>';
                 }
@@ -2585,13 +2584,12 @@
             }
         }
 
-        // 7. Assemble Full HTML
         var htmlContent = `
         <div class="pdf-letter" id="pdfCaptureArea">
             <div class="pdf-watermark">SAAD CLINIC</div>
             
             <div class="pdf-header">
-                <img src="logo.jpg" class="pdf-logo" crossorigin="anonymous" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+                <img src="logo.jpg" class="pdf-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
                 <div class="pdf-clinic-info">
                     <h1>Dr. Saad Sabry Alzubaidy</h1>
                     <p>Consultant General Surgeon | Surgical Clinic</p>
@@ -2648,36 +2646,27 @@
             </div>
         </div>`;
 
-        // Add to DOM temporarily
-        var tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '0';
-        tempDiv.style.width = '793px';
-        tempDiv.style.background = '#fff';
-        tempDiv.innerHTML = htmlContent;
-        document.body.appendChild(tempDiv);
-
-        var element = tempDiv.firstElementChild;
+        // 🆕 AUTOMATICALLY create hidden print area if it doesn't exist
+        var printArea = document.getElementById('printReferralArea');
+        if (!printArea) {
+            printArea = document.createElement('div');
+            printArea.id = 'printReferralArea';
+            printArea.style.display = 'none';
+            document.body.appendChild(printArea);
+        }
         
-        // Generate PDF
-        var opt = {
-            margin:       [10, 10, 10, 10], 
-            filename:     'Referral_' + ptName.replace(/\s/g, '_') + '_' + date.replace(/\//g, '-') + '.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opt).from(element).save().then(function() {
-            document.body.removeChild(tempDiv);
-            showToast("✅ Premium PDF Referral Generated!");
-        }).catch(function(err) {
-            console.error("PDF Generation Error:", err);
-            showToast("⚠️ PDF generation failed.");
-            document.body.removeChild(tempDiv);
-        });
+        // Inject into hidden print area
+        printArea.innerHTML = htmlContent;
+        printArea.style.display = 'block';
+        
+        // Trigger Native Browser Print Dialog
+        setTimeout(function() {
+            window.print();
+            // Clean up after print dialog closes
+            printArea.style.display = 'none';
+            printArea.innerHTML = '';
+            showToast("✅ Premium Referral Ready!");
+        }, 250);
     }
     
 
