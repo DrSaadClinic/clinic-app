@@ -3658,7 +3658,7 @@ function saveAll(manual, targetId) {
     var currentMainTab = 'home';
     var currentSubTab = 'clinical';
 
-        function switchSubTab(tab) {
+            function switchSubTab(tab) {
         currentSubTab = tab;
         var tabs = ['stClinical','stInvestigations','stImages','stHistory','stMonjaro'];
         var names = ['clinical','investigations','images','history','monjaro'];
@@ -3675,6 +3675,17 @@ function saveAll(manual, targetId) {
                 else { p.classList.remove('active'); p.style.display = 'none'; }
             }
         }
+        
+        // 🆕 FIX: Hide the Monjaro enroll button unless we are on the Clinical or Monjaro tab
+        var enrollBtn = document.getElementById('mjEnrollBtnWrap');
+        if (enrollBtn) {
+            if ((tab === 'clinical' || tab === 'monjaro') && activeId && !monjaroData[activeId]) {
+                enrollBtn.style.display = 'block';
+            } else {
+                enrollBtn.style.display = 'none';
+            }
+        }
+
         /* If switching to monjaro sub-tab, render it */
         if (tab === 'monjaro' && activeId) renderMonjaroPatientFile(activeId);
     }
