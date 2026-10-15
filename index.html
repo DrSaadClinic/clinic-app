@@ -2877,7 +2877,7 @@ function resetPendingLabs(ptId) {
         });
     }
 
-    function processAndUploadImage(file) {
+        function processAndUploadImage(file) {
         if (!activeId) return;
         
         var statusEl = document.getElementById('imageUploadStatus');
@@ -2885,6 +2885,40 @@ function resetPendingLabs(ptId) {
         statusEl.style.display = 'block';
         statusEl.style.color = 'var(--text-secondary)';
         
+        var isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+        
+        if (isHeic) {
+            statusEl.innerHTML = '⏳ Converting HEIC to JPEG... (may take a few seconds)';
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/heic2any.min.js';
+            script.onload = function() {
+                if (typeof heic2any === 'function') {
+                    heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 })
+                    .then(function(convertedBlob) {
+                        var newFile = new File([convertedBlob], file.name.replace(/\.heic$|\.heif$/i, '.jpg'), { type: 'image/jpeg' });
+                        startImageProcessing(newFile, statusEl);
+                    })
+                    .catch(function(err) {
+                        console.error("HEIC Conversion Error:", err);
+                        statusEl.innerHTML = '⚠️ Failed to convert HEIC. Please try a standard JPG or PNG.';
+                        statusEl.style.color = 'var(--danger)';
+                    });
+                } else {
+                    statusEl.innerHTML = '⚠️ HEIC converter failed to load. Please use JPG.';
+                    statusEl.style.color = 'var(--danger)';
+                }
+            };
+            script.onerror = function() {
+                statusEl.innerHTML = '⚠️ Network error loading HEIC converter.';
+                statusEl.style.color = 'var(--danger)';
+            };
+            document.head.appendChild(script);
+        } else {
+            startImageProcessing(file, statusEl);
+        }
+    }
+
+    function startImageProcessing(file, statusEl) {
         if (file.size > 10 * 1024 * 1024) {
             statusEl.innerHTML = '⚠️ Image too large (Max 10MB).';
             statusEl.style.color = 'var(--danger)';
