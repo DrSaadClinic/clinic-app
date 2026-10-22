@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Put your HTML text here<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -969,6 +969,163 @@
             100% { transform: scale(0.5) translate(40vw, -38vh); opacity: 0; } /* Disappears */
         }
 
+/* ================================================================
+   DISPLAY SETTINGS + NEW SCREENSAVER LAYOUT
+=============================================================== */
+
+/* Settings Button in Sidebar */
+.display-settings-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--color-separator);
+    width: auto; padding: 8px 14px;
+    border-radius: 10px; font-size: 12px;
+    cursor: pointer; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: none; font-weight: 600;
+    transition: all 0.2s; font-family: inherit;
+}
+.display-settings-btn:hover {
+    background: var(--primary); color: white;
+    border-color: var(--primary);
+}
+
+/* Display Photos Modal */
+.display-photos-modal {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+}
+.display-photos-content {
+    background: #1c1c1e; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 28px; width: 600px; max-width: 95vw;
+    max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    color: #f2f2f7; animation: panelPopIn 0.3s ease;
+}
+.display-photos-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-top: 8px;
+}
+.display-photo-item {
+    position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.display-photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.display-photo-caption-tag {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    color: white; font-size: 11px; padding: 16px 8px 6px;
+    text-align: center; line-height: 1.3;
+}
+.display-photo-delete {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(255,69,58,0.9); color: white;
+    border: none; border-radius: 50%; width: 26px; height: 26px;
+    cursor: pointer; font-size: 16px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: none; padding: 0;
+}
+
+/* ===== NEW SCREENSAVER LAYOUT ===== */
+.ss-content-new {
+    position: relative; z-index: 1;
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas: "topbar" "main" "bottom" "footer";
+    gap: 16px; padding: 24px 32px; box-sizing: border-box; overflow: hidden;
+}
+.ss-content-new .ss-top-bar { grid-area: topbar; }
+.ss-clock-display {
+    margin-left: auto;
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 22px; border-radius: 18px;
+}
+.ss-time-big {
+    font-size: 32px; font-weight: 200; color: white;
+    letter-spacing: -0.03em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 40px rgba(10,132,255,0.2);
+}
+.ss-main-grid {
+    grid-area: main; display: grid;
+    grid-template-columns: 1.4fr 1fr; gap: 16px; min-height: 0;
+}
+.ss-photo-section {
+    position: relative; border-radius: 24px; overflow: hidden;
+    background: #050510; border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.ss-photo-slideshow { position: absolute; inset: 0; }
+.ss-photo-slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; transition: opacity 1.5s ease-in-out;
+}
+.ss-photo-slide.active {
+    opacity: 1; animation: kenBurns 8s ease-out forwards;
+}
+@keyframes kenBurns {
+    0% { transform: scale(1.0); }
+    100% { transform: scale(1.12); }
+}
+.ss-photo-empty {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 18px; gap: 12px;
+    background: linear-gradient(135deg, #0a0a15, #1a1a2e); text-align: center; padding: 20px;
+}
+.ss-photo-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    padding: 60px 24px 18px; z-index: 2; pointer-events: none;
+}
+.ss-photo-caption {
+    font-size: 22px; font-weight: 600; color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8); line-height: 1.3;
+}
+.ss-photo-dots {
+    position: absolute; top: 16px; right: 16px; z-index: 3;
+    display: flex; gap: 6px;
+}
+.ss-photo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.4); transition: all 0.3s;
+}
+.ss-photo-dot.active { background: white; width: 24px; border-radius: 4px; }
+.ss-info-stack { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.ss-doctor-panel, .ss-queue-panel {
+    background: rgba(20,20,30,0.45); backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+    padding: 20px 24px; display: flex; flex-direction: column; min-height: 0;
+}
+.ss-doctor-panel {
+    flex: 0 0 auto;
+    background: linear-gradient(135deg, rgba(10,132,255,0.12), rgba(94,92,230,0.08));
+    border-color: rgba(10,132,255,0.25);
+}
+.ss-panel-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+}
+.ss-doctor-name {
+    font-size: clamp(28px, 4vw, 42px); font-weight: 700; color: white;
+    letter-spacing: -0.02em; line-height: 1.1;
+    text-shadow: 0 0 30px rgba(10,132,255,0.5); word-break: break-word;
+}
+.ss-queue-panel { flex: 1; min-height: 0; }
+.ss-queue-panel .ss-mini-list { flex: 1; overflow-y: auto; }
+.ss-bottom-row {
+    grid-area: bottom; display: grid;
+    grid-template-columns: 1fr 1fr; gap: 16px; min-height: 110px;
+}
+.ss-date-footer { grid-area: footer; text-align: center; padding: 6px 0; }
+@media (max-width: 900px) {
+    .ss-main-grid { grid-template-columns: 1fr; }
+    .ss-photo-section { min-height: 200px; }
+    .ss-bottom-row { grid-template-columns: 1fr; }
+}
     </style>
 </head>
 <body>
@@ -1036,6 +1193,11 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebarPanel">
+                <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <button class="display-settings-btn" onclick="openDisplaySettings()">
+                ⚙️ Display Settings
+            </button>
+        </div>
 
         <!-- Web Booking Inbox -->
         <div class="card" id="webInboxCard" style="display:none; background:rgba(255,159,10,0.08); border-color:rgba(255,159,10,0.35);">
@@ -1553,7 +1715,7 @@
         </div>
     </div>
 
-    <!-- ═══ APPLE SCREENSAVER OVERLAY ═══ -->
+       <!-- ═══ APPLE SCREENSAVER OVERLAY (REDESIGNED) ═══ -->
     <div id="appleSS" onclick="if (currentMainTab === 'waiting') { switchMainTab('home'); } else { dismissScreensaver(); }">
         <div class="ss-aurora">
             <div class="ss-aurora-blob ss-blob-1"></div>
@@ -1561,49 +1723,61 @@
             <div class="ss-aurora-blob ss-blob-3"></div>
             <div class="ss-aurora-blob ss-blob-4"></div>
         </div>
-        <div class="ss-content">
+        <div class="ss-content-new">
+            <!-- Top Bar -->
             <div class="ss-top-bar">
                 <img src="logo.jpg" class="ss-logo" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
                 <span class="ss-clinic-title">Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</span>
-            </div>
-            <div class="ss-current-wrap" id="ssCurrentWrap">
-                <div class="ss-current-label">Doctor is seeing</div>
-                <div class="ss-current-name" id="ssCurrentName">&mdash;</div>
-            </div>
-            <div class="ss-clock-wrap">
-                <div class="ss-time" id="ssTime">00:00</div>
-                <div class="ss-sub-row">
-                    <span class="ss-secs" id="ssSecs">00</span>
-                    <span class="ss-ampm" id="ssAmpm">AM</span>
-                </div>
-                <div class="ss-date-en" id="ssDateEn">Saturday, 1 January 2026</div>
-                <div class="ss-date-hijri" id="ssDateHijri">&#x661; ذو القعدة ١٤٤٧ هـ</div>
-            </div>
-            <div class="ss-info-row">
-                <div class="ss-card">
-                    <span class="ss-card-label">&#128197; Calendar</span>
-                    <div id="ssCalendar"></div>
-                </div>
-                <div class="ss-card">
-                    <span class="ss-card-label">&#x1F54C; Prayer Times &mdash; Baghdad</span>
-                    <div class="ss-prayer-list" id="ssPrayers">
-                        <div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:16px 0;">Loading...</div>
+                <div class="ss-clock-display">
+                    <div class="ss-time-big" id="ssTime">00:00</div>
+                    <div class="ss-sub-row" style="margin-top:4px;">
+                        <span class="ss-secs" id="ssSecs">00</span>
+                        <span class="ss-ampm" id="ssAmpm">AM</span>
                     </div>
                 </div>
             </div>
-            <div class="ss-queue-row">
-                <div class="ss-card">
-                    <span class="ss-card-label">&#8987; Waiting (<span id="ssWaitingCount">0</span>)</span>
-                    <div class="ss-mini-list" id="ssWaitingList"><div class="ss-mini-empty">No one else waiting</div></div>
+            <!-- Main Grid -->
+            <div class="ss-main-grid">
+                <!-- Left: Photo Slideshow -->
+                <div class="ss-photo-section">
+                    <div class="ss-photo-slideshow" id="ssPhotoSlideshow">
+                        <div class="ss-photo-empty">
+                            <div style="font-size:48px;">📸</div>
+                            <div>Upload photos from Home ⚙️ Settings</div>
+                        </div>
+                    </div>
+                    <div class="ss-photo-overlay" id="ssPhotoOverlay" style="display:none;">
+                        <div class="ss-photo-caption" id="ssPhotoCaption"></div>
+                    </div>
+                    <div class="ss-photo-dots" id="ssPhotoDots"></div>
                 </div>
-                <div class="ss-card">
-                    <span class="ss-card-label">&#9989; Seen Today (<span id="ssSeenCount">0</span>)</span>
-                    <div class="ss-mini-list" id="ssSeenList"><div class="ss-mini-empty">No patients finished yet</div></div>
+                <!-- Right: Info Panels -->
+                <div class="ss-info-stack">
+                    <div class="ss-doctor-panel">
+                        <div class="ss-panel-label">DOCTOR IS SEEING</div>
+                        <div class="ss-doctor-name" id="ssDoctorName">—</div>
+                    </div>
+                    <div class="ss-queue-panel">
+                        <div class="ss-panel-label">⏳ WAITING (<span id="ssWaitingCount">0</span>)</div>
+                        <div class="ss-mini-list" id="ssWaitingList"><div class="ss-mini-empty">No one waiting</div></div>
+                    </div>
                 </div>
-                <div class="ss-card">
-                    <span class="ss-card-label">&#129514; Labs Waiting (<span id="ssLabCount">0</span>)</span>
+            </div>
+            <!-- Bottom Row -->
+            <div class="ss-bottom-row">
+                <div class="ss-queue-panel">
+                    <div class="ss-panel-label">✅ SEEN TODAY (<span id="ssSeenCount">0</span>)</div>
+                    <div class="ss-mini-list" id="ssSeenList"><div class="ss-mini-empty">No patients yet</div></div>
+                </div>
+                <div class="ss-queue-panel">
+                    <div class="ss-panel-label">🧪 LABS WAITING (<span id="ssLabCount">0</span>)</div>
                     <div class="ss-mini-list" id="ssLabList"><div class="ss-mini-empty">No tests pending</div></div>
                 </div>
+            </div>
+            <!-- Date Footer -->
+            <div class="ss-date-footer">
+                <div class="ss-date-en" id="ssDateEn">Saturday, 1 January 2026</div>
+                <div class="ss-date-hijri" id="ssDateHijri">١ ذو القعدة ١٤٤٧ هـ</div>
             </div>
         </div>
         <div class="ss-tap-hint">Tap anywhere to exit</div>
@@ -1636,6 +1810,10 @@
     var allReminders = {};
     var globalLabs = {};
     var pendingBookings = {};
+    var displayPhotos = {};
+    var displaySettingsOpen = false;
+    var ssSlideIndex = 0;
+    var ssSlideTimer = null;
     var activeId = null;
     var syncTimeout = null;
     var activeListener = null;
@@ -1692,6 +1870,11 @@
         db.ref('pendingBookings').on('value', function(snap) {
             pendingBookings = snap.val() || {};
             renderWebRequests();
+        });
+                db.ref('displayPhotos').on('value', function(snap) {
+            displayPhotos = snap.val() || {};
+            if (ssVisible) updateSSPhotos();
+            if (displaySettingsOpen) renderDisplayPhotosList();
         });
 
              var _firstPatientLoad = true;
@@ -4740,25 +4923,25 @@ function _renderVisionOSDisplay() {
         }
     }
 
-    function showScreensaver() {
+        function showScreensaver() {
         var el = document.getElementById('appleSS');
         if (!el || ssVisible) return;
         ssVisible = true;
         el.classList.add('ss-visible');
-        buildSSCalendar();
-        loadSSPrayers();
+        startSSSlideshow();
         updateSSStats();
         clearInterval(ssClockInterval);
         updateSSClock();
         ssClockInterval = setInterval(updateSSClock, 1000);
     }
 
-    function dismissScreensaver() {
+        function dismissScreensaver() {
         var el = document.getElementById('appleSS');
         if (!el || !ssVisible) return;
         ssVisible = false;
         el.classList.remove('ss-visible');
         clearInterval(ssClockInterval);
+        stopSSSlideshow();
         if (currentMainTab === 'waiting') {
             ssTimer = setTimeout(showScreensaver, SS_DELAY);
         }
@@ -4783,7 +4966,6 @@ function _renderVisionOSDisplay() {
         var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
         if (dEn) dEn.textContent = dayNames[now.getDay()] + ', ' + now.getDate() + ' ' + monthNames[now.getMonth()] + ' ' + now.getFullYear();
         if (dHijri) dHijri.textContent = getHijriStr(now);
-        if (ssPrayerCache) highlightCurrentPrayer();
     }
 
     function getHijriStr(date) {
@@ -4941,13 +5123,9 @@ function _renderVisionOSDisplay() {
         var currentPt = inClinic.length > 0 ? inClinic[0] : (qQueue.length > 0 ? qQueue[0] : null);
         var restOfQueue = inClinic.length > 0 ? qQueue : qQueue.slice(1);
 
-        var curWrap = document.getElementById('ssCurrentWrap');
-        var curName = document.getElementById('ssCurrentName');
-        if (currentPt) {
-            curWrap.classList.add('ss-has-patient');
-            curName.textContent = currentPt.name;
-        } else {
-            curWrap.classList.remove('ss-has-patient');
+                var docName = document.getElementById('ssDoctorName');
+        if (docName) {
+            docName.textContent = currentPt ? currentPt.name : '—';
         }
 
         var waitingCountEl = document.getElementById('ssWaitingCount');
@@ -4990,6 +5168,220 @@ function _renderVisionOSDisplay() {
         }
     }
 
+
+    /* ================================================================
+       DISPLAY PHOTOS & SLIDESHOW ENGINE
+    ================================================================ */
+    function openDisplaySettings() {
+        displaySettingsOpen = true;
+        document.getElementById('displaySettingsModal').style.display = 'flex';
+        renderDisplayPhotosList();
+    }
+    function closeDisplaySettings() {
+        displaySettingsOpen = false;
+        document.getElementById('displaySettingsModal').style.display = 'none';
+    }
+
+    function handleDisplayPhotoUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+        var files = Array.from(input.files);
+        input.value = '';
+        var idx = 0;
+        function next() {
+            if (idx >= files.length) {
+                var st = document.getElementById('displayPhotoStatus');
+                st.innerHTML = '✅ All ' + files.length + ' photo(s) uploaded!';
+                st.style.color = '#30D158';
+                setTimeout(function() { st.style.display = 'none'; }, 3000);
+                return;
+            }
+            processDisplayPhoto(files[idx], next);
+            idx++;
+        }
+        next();
+    }
+
+    function processDisplayPhoto(file, onComplete) {
+        var statusEl = document.getElementById('displayPhotoStatus');
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#8E8E93';
+        var isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+        
+        function doUpload(actualFile) {
+            statusEl.innerHTML = '⏳ Processing ' + actualFile.name + '...';
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    var MAX = 1600;
+                    var scale = MAX / img.width;
+                    if (scale > 1) scale = 1;
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    var b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+                    
+                    statusEl.innerHTML = '☁️ Uploading...';
+                    var fd = new FormData();
+                    fd.append('image', b64);
+                    fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, { method: 'POST', body: fd })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            statusEl.innerHTML = '✅ Uploaded! Add a caption (optional)...';
+                            statusEl.style.color = '#30D158';
+                            var caption = prompt('Add a caption for this photo? (Leave empty for none)\ne.g. "Laparoscopic Cholecystectomy Result"', '');
+                            if (caption === null) caption = '';
+                            db.ref('displayPhotos').push({
+                                url: data.data.url,
+                                caption: caption,
+                                ts: Date.now()
+                            }).then(function() {
+                                if (onComplete) onComplete();
+                            }).catch(function() { if (onComplete) onComplete(); });
+                        } else {
+                            statusEl.innerHTML = '⚠️ Upload failed';
+                            statusEl.style.color = '#FF453A';
+                            if (onComplete) onComplete();
+                        }
+                    })
+                    .catch(function() {
+                        statusEl.innerHTML = '⚠️ Network error';
+                        statusEl.style.color = '#FF453A';
+                        if (onComplete) onComplete();
+                    });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(actualFile);
+        }
+        
+        if (isHeic) {
+            if (typeof heic2any === 'undefined') {
+                statusEl.innerHTML = '⚠️ HEIC converter not loaded';
+                statusEl.style.color = '#FF453A';
+                if (onComplete) onComplete();
+                return;
+            }
+            statusEl.innerHTML = '⏳ Converting HEIC...';
+            heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
+            .then(function(blob) {
+                doUpload(new File([blob], file.name.replace(/\.heic$|\.heif$/i, '.jpg'), { type: 'image/jpeg' }));
+            })
+            .catch(function() {
+                statusEl.innerHTML = '⚠️ HEIC conversion failed';
+                statusEl.style.color = '#FF453A';
+                if (onComplete) onComplete();
+            });
+        } else {
+            doUpload(file);
+        }
+    }
+
+    function renderDisplayPhotosList() {
+        var container = document.getElementById('displayPhotosGrid');
+        if (!container) return;
+        container.innerHTML = '';
+        var keys = Object.keys(displayPhotos).sort(function(a, b) {
+            return (displayPhotos[b].ts || 0) - (displayPhotos[a].ts || 0);
+        });
+        if (keys.length === 0) {
+            container.innerHTML = '<p style="color:#8E8E93; text-align:center; grid-column:1/-1; padding:20px;">No photos uploaded yet. Click Upload to add.</p>';
+            return;
+        }
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var photo = displayPhotos[key];
+            container.innerHTML += '<div class="display-photo-item">' +
+                '<img src="' + photo.url + '">' +
+                (photo.caption ? '<div class="display-photo-caption-tag">' + escapeHtml(photo.caption) + '</div>' : '') +
+                '<button class="display-photo-delete" onclick="deleteDisplayPhoto(\'' + key + '\')">&times;</button>' +
+                '</div>';
+        }
+    }
+
+    function deleteDisplayPhoto(key) {
+        if (!confirm('Remove this photo from the display?')) return;
+        db.ref('displayPhotos/' + key).remove().catch(handleFirebaseError);
+    }
+
+    /* ===== SLIDESHOW ENGINE ===== */
+    function updateSSPhotos() {
+        var slideshow = document.getElementById('ssPhotoSlideshow');
+        var dotsContainer = document.getElementById('ssPhotoDots');
+        var overlay = document.getElementById('ssPhotoOverlay');
+        var captionEl = document.getElementById('ssPhotoCaption');
+        if (!slideshow) return;
+        
+        var keys = Object.keys(displayPhotos).sort(function(a, b) {
+            return (displayPhotos[a].ts || 0) - (displayPhotos[b].ts || 0);
+        });
+        
+        if (keys.length === 0) {
+            slideshow.innerHTML = '<div class="ss-photo-empty"><div style="font-size:48px;">📸</div><div>Upload photos from Home ⚙️ Settings</div></div>';
+            if (dotsContainer) dotsContainer.innerHTML = '';
+            if (overlay) overlay.style.display = 'none';
+            return;
+        }
+        
+        // Rebuild slides
+        slideshow.innerHTML = '';
+        var dotsHtml = '';
+        for (var i = 0; i < keys.length; i++) {
+            var photo = displayPhotos[keys[i]];
+            slideshow.innerHTML += '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + escapeHtml(photo.caption || '') + '" style="background-image:url(\'' + photo.url + '\')"></div>';
+            dotsHtml += '<div class="ss-photo-dot' + (i === 0 ? ' active' : '') + '"></div>';
+        }
+        if (dotsContainer) dotsContainer.innerHTML = dotsHtml;
+        ssSlideIndex = 0;
+        showSlide(0);
+    }
+
+    function showSlide(idx) {
+        var slides = document.querySelectorAll('.ss-photo-slide');
+        var dots = document.querySelectorAll('.ss-photo-dot');
+        var overlay = document.getElementById('ssPhotoOverlay');
+        var captionEl = document.getElementById('ssPhotoCaption');
+        if (slides.length === 0) return;
+        
+        for (var i = 0; i < slides.length; i++) slides[i].classList.remove('active');
+        for (var j = 0; j < dots.length; j++) dots[j].classList.remove('active');
+        
+        ssSlideIndex = idx % slides.length;
+        if (slides[ssSlideIndex]) slides[ssSlideIndex].classList.add('active');
+        if (dots[ssSlideIndex]) dots[ssSlideIndex].classList.add('active');
+        
+        // Update caption
+        if (overlay && captionEl) {
+            var cap = slides[ssSlideIndex] ? slides[ssSlideIndex].getAttribute('data-caption') : '';
+            if (cap && cap.trim()) {
+                captionEl.textContent = cap;
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+    }
+
+    function nextSlide() {
+        var slides = document.querySelectorAll('.ss-photo-slide');
+        if (slides.length === 0) return;
+        showSlide((ssSlideIndex + 1) % slides.length);
+    }
+
+    function startSSSlideshow() {
+        updateSSPhotos();
+        clearInterval(ssSlideTimer);
+        ssSlideTimer = setInterval(nextSlide, 6000);
+    }
+
+    function stopSSSlideshow() {
+        clearInterval(ssSlideTimer);
+        ssSlideTimer = null;
+    }
+    
     /* ================================================================
        MONJARO JAVASCRIPT ENGINE
     ================================================================ */
@@ -5994,5 +6386,22 @@ function autoSyncMJNotes() {
     };
 
 </script>
+<!-- Display Photos Settings Modal -->
+<div id="displaySettingsModal" class="display-photos-modal" style="display:none;" onclick="if(event.target===this)closeDisplaySettings()">
+    <div class="display-photos-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <h3 style="color:#0A84FF; margin:0; font-size:20px; border:none;">🖼️ Display Photos</h3>
+            <button onclick="closeDisplaySettings()" style="background:none; border:none; color:#8E8E93; font-size:28px; cursor:pointer; width:auto; padding:0; box-shadow:none;">&times;</button>
+        </div>
+        <p style="color:#8E8E93; font-size:13px; margin-bottom:16px; line-height:1.6;">Upload photos that will play as a slideshow on the clinic TV. Patients can see operation results while waiting. You can add an optional caption for each photo.</p>
+        <input type="file" id="displayPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleDisplayPhotoUpload(this)">
+        <button onclick="document.getElementById('displayPhotoInput').click()" style="background:#BF5AF2; width:auto; padding:12px 24px; border:none; border-radius:14px; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(191,90,242,0.3);">
+            📤 Upload Photos
+        </button>
+        <div id="displayPhotoStatus" style="font-size:13px; color:#8E8E93; margin-top:12px; display:none; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"></div>
+        <h4 style="color:#F2F2F7; font-size:14px; margin:20px 0 8px;">Current Photos:</h4>
+        <div class="display-photos-grid" id="displayPhotosGrid"></div>
+    </div>
+</div>
 </body>
 </html>
