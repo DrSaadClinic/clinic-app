@@ -1,4 +1,4 @@
-Put your HTML text here<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -1126,6 +1126,28 @@ Put your HTML text here<!DOCTYPE html>
     .ss-photo-section { min-height: 200px; }
     .ss-bottom-row { grid-template-columns: 1fr; }
 }
+
+        /* Broken Image Placeholder */
+.ss-photo-slide img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.ss-photo-slide.ss-slide-error {
+    display: flex !important; opacity: 1 !important; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+.ss-photo-slide.ss-slide-error::after {
+    content: '⚠️ Image unavailable'; color: rgba(255,255,255,0.4);
+    font-size: 16px; font-weight: 600;
+}
+.pt-image-broken {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 140px; background: rgba(255,69,58,0.08); color: #FF453A;
+    font-size: 11px; text-align: center; padding: 10px; gap: 6px;
+    border-radius: 14px; border: 1px dashed rgba(255,69,58,0.3);
+}
+.pt-image-broken-icon { font-size: 28px; }
+
+        
     </style>
 </head>
 <body>
@@ -3409,11 +3431,23 @@ function resetPendingLabs(ptId) {
                             })
                             .then(function(data) {
                                 if (data.success) {
-                                    statusEl.innerHTML = '💾 Saving to patient file...';
+                                statusEl.innerHTML = '💾 Saving to patient file...';
+                                    // 🛡️ Defensive URL extraction
+                                    var finalUrl = data.data.url || 
+                                                  (data.data.image && data.data.image.url) || 
+                                                  data.data.display_url || '';
+                                    var finalThumb = (data.data.thumb && data.data.thumb.url) || finalUrl;
+                                    console.log('Patient image URL stored:', finalUrl); // Debug
+                                    if (!finalUrl) {
+                                        statusEl.innerHTML = '⚠️ Upload succeeded but no URL returned';
+                                        statusEl.style.color = 'var(--danger)';
+                                        if(onComplete) onComplete();
+                                        return;
+                                    }
                                     var newImgRef = db.ref('patientDetails/' + activeId + '/images').push();
                                     newImgRef.set({
-                                        url: data.data.url,
-                                        thumb: data.data.thumb ? data.data.thumb.url : data.data.url,
+                                        url: finalUrl,
+                                        thumb: finalThumb,
                                         date: new Date().toLocaleDateString('en-GB'),
                                         ts: Date.now()
                                     }).then(function() {
@@ -3457,7 +3491,7 @@ function resetPendingLabs(ptId) {
         }
     }
 
-    function renderImages(images) {
+        function renderImages(images) {
         var list = document.getElementById('imageGalleryList');
         if (!list) return;
         list.innerHTML = '';
@@ -3474,9 +3508,13 @@ function resetPendingLabs(ptId) {
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
             var img = images[key];
+            var safeUrl = (img.url || '').replace(/'/g, '&#39;');
+            var safeThumb = (img.thumb || img.url || '').replace(/'/g, '&#39;');
             
-            list.innerHTML += '<div style="position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--card-border); background:var(--color-fill-tertiary);">' +
-                '<a href="' + img.url + '" target="_blank" style="display:block; width:100%; height:140px; background-size:cover; background-position:center; background-image:url(\'' + (img.thumb || img.url) + '\');"></a>' +
+            list.innerHTML += '<div style="position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--card-border); background:var(--color-fill-tertiary);" id="ptimg-' + key + '">' +
+                '<a href="' + safeUrl + '" target="_blank" style="display:block; width:100%; height:140px; background-size:cover; background-position:center; background-image:url(\'' + safeThumb + '\');" ' +
+                'onerror="this.style.backgroundImage=\'none\';this.innerHTML=\'<div class=\\\'pt-image-broken\\\' style=\\\'width:100%;height:100%;\\\'><div class=\\\'pt-image-broken-icon\\\'>⚠️</div><div>Image expired</div><div style=font-size:9px;color:var(--text-tertiary);\\'>Re-upload needed</div></div>\';">' +
+                '</a>' +
                 '<div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); padding:18px 8px 6px; display:flex; justify-content:space-between; align-items:center;">' +
                     '<span style="font-size:10px; color:white; font-weight:600;">📅 ' + escapeHtml(img.date || '') + '</span>' +
                     '<button onclick="deleteImage(\'' + key + '\')" style="background:var(--danger); color:white; border:none; border-radius:6px; padding:2px 6px; font-size:11px; cursor:pointer; width:auto; box-shadow:none; line-height:1;">&times;</button>' +
@@ -5228,14 +5266,25 @@ function _renderVisionOSDisplay() {
                     fd.append('image', b64);
                     fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, { method: 'POST', body: fd })
                     .then(function(r) { return r.json(); })
-                    .then(function(data) {
+                                        .then(function(data) {
                         if (data.success) {
                             statusEl.innerHTML = '✅ Uploaded! Add a caption (optional)...';
                             statusEl.style.color = '#30D158';
                             var caption = prompt('Add a caption for this photo? (Leave empty for none)\ne.g. "Laparoscopic Cholecystectomy Result"', '');
                             if (caption === null) caption = '';
+                            // 🛡️ Defensive URL extraction (try multiple fields)
+                            var finalUrl = data.data.url || 
+                                          (data.data.image && data.data.image.url) || 
+                                          data.data.display_url || '';
+                            console.log('Display photo URL stored:', finalUrl); // Debug log
+                            if (!finalUrl) {
+                                statusEl.innerHTML = '⚠️ Upload succeeded but no URL returned';
+                                statusEl.style.color = '#FF453A';
+                                if (onComplete) onComplete();
+                                return;
+                            }
                             db.ref('displayPhotos').push({
-                                url: data.data.url,
+                                url: finalUrl,
                                 caption: caption,
                                 ts: Date.now()
                             }).then(function() {
@@ -5308,7 +5357,7 @@ function _renderVisionOSDisplay() {
     }
 
     /* ===== SLIDESHOW ENGINE ===== */
-    function updateSSPhotos() {
+       function updateSSPhotos() {
         var slideshow = document.getElementById('ssPhotoSlideshow');
         var dotsContainer = document.getElementById('ssPhotoDots');
         var overlay = document.getElementById('ssPhotoOverlay');
@@ -5326,12 +5375,19 @@ function _renderVisionOSDisplay() {
             return;
         }
         
-        // Rebuild slides
+        // Rebuild slides using <img> tags with error handling
         slideshow.innerHTML = '';
         var dotsHtml = '';
         for (var i = 0; i < keys.length; i++) {
             var photo = displayPhotos[keys[i]];
-            slideshow.innerHTML += '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + escapeHtml(photo.caption || '') + '" style="background-image:url(\'' + photo.url + '\')"></div>';
+            var safeUrl = (photo.url || '').replace(/'/g, '&#39;');
+            var safeCaption = (photo.caption || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            var slideHtml = '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + safeCaption + '">' +
+                '<img src="' + safeUrl + '" alt="" ' +
+                'onerror="this.parentNode.classList.add(\'ss-slide-error\');this.style.display=\'none\';" ' +
+                'onload="this.style.opacity=1;">' +
+                '</div>';
+            slideshow.innerHTML += slideHtml;
             dotsHtml += '<div class="ss-photo-dot' + (i === 0 ? ' active' : '') + '"></div>';
         }
         if (dotsContainer) dotsContainer.innerHTML = dotsHtml;
@@ -5339,7 +5395,7 @@ function _renderVisionOSDisplay() {
         showSlide(0);
     }
 
-    function showSlide(idx) {
+        function showSlide(idx) {
         var slides = document.querySelectorAll('.ss-photo-slide');
         var dots = document.querySelectorAll('.ss-photo-dot');
         var overlay = document.getElementById('ssPhotoOverlay');
@@ -5353,11 +5409,14 @@ function _renderVisionOSDisplay() {
         if (slides[ssSlideIndex]) slides[ssSlideIndex].classList.add('active');
         if (dots[ssSlideIndex]) dots[ssSlideIndex].classList.add('active');
         
-        // Update caption
+        // Update caption (read from attribute, decode entities)
         if (overlay && captionEl) {
-            var cap = slides[ssSlideIndex] ? slides[ssSlideIndex].getAttribute('data-caption') : '';
+            var cap = slides[ssSlideIndex] ? (slides[ssSlideIndex].getAttribute('data-caption') || '') : '';
             if (cap && cap.trim()) {
-                captionEl.textContent = cap;
+                // Decode HTML entities
+                var txt = document.createElement('textarea');
+                txt.innerHTML = cap;
+                captionEl.textContent = txt.value;
                 overlay.style.display = 'block';
             } else {
                 overlay.style.display = 'none';
