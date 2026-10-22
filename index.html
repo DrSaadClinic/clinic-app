@@ -969,166 +969,6 @@
             100% { transform: scale(0.5) translate(40vw, -38vh); opacity: 0; } /* Disappears */
         }
 
-        /* ══════════════════════════════════════════════════════
-   TV DISPLAY PHOTO SLIDESHOW & SETTINGS MODAL
-══════════════════════════════════════════════════════ */
-.ss-slider-container {
-    width: 100%;
-    max-width: 1100px;
-    height: 32vmin;
-    min-height: 220px;
-    max-height: 340px;
-    position: relative;
-    border-radius: 24px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ss-slide {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transform: scale(1.04);
-    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 6s ease-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-.ss-slide.active {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-}
-
-.ss-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-.ss-slide-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 16px 24px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.ss-slide-title {
-    font-size: clamp(14px, 2.2vmin, 22px);
-    font-weight: 700;
-    color: #FFFFFF;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-    letter-spacing: -0.01em;
-}
-
-.ss-slide-dots {
-    position: absolute;
-    bottom: 16px;
-    right: 24px;
-    display: flex;
-    gap: 6px;
-    z-index: 5;
-}
-
-.ss-slide-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.35);
-    transition: all 0.3s ease;
-}
-
-.ss-slide-dot.active {
-    width: 22px;
-    border-radius: 10px;
-    background: var(--primary);
-}
-
-.ss-slider-empty {
-    color: rgba(255, 255, 255, 0.4);
-    text-align: center;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-/* Home Tab Small TV Settings Button */
-.tv-settings-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: var(--text-primary);
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-}
-.tv-settings-btn:hover {
-    background: rgba(10, 132, 255, 0.2);
-    border-color: var(--primary);
-    transform: translateY(-1px);
-}
-
-/* TV Slides Management Modal */
-.tv-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.tv-modal-content {
-    background: var(--card-bg-solid);
-    border: 1px solid var(--card-border);
-    border-radius: 24px;
-    width: 100%;
-    max-width: 650px;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-}
-.tv-slide-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 10px 14px;
-    border-radius: 14px;
-    margin-bottom: 8px;
-}
-.tv-slide-thumb {
-    width: 60px;
-    height: 44px;
-    border-radius: 8px;
-    object-fit: cover;
-}
-        
     </style>
 </head>
 <body>
@@ -1204,14 +1044,6 @@
                 <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span>
             </h3>
             <div id="webReqList" style="max-height:280px; overflow-y:auto; padding-right:4px;"></div>
-        </div>
-
-                <!-- TV Display Quick Access -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 4px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.08em;">Clinic Reception</span>
-            <button class="tv-settings-btn" onclick="openTvSlidesModal()">
-                ⚙️ TV Display Photos
-            </button>
         </div>
 
         <!-- Registration & Check-in -->
@@ -1747,14 +1579,17 @@
                 <div class="ss-date-en" id="ssDateEn">Saturday, 1 January 2026</div>
                 <div class="ss-date-hijri" id="ssDateHijri">&#x661; ذو القعدة ١٤٤٧ هـ</div>
             </div>
-                       <!-- 📸 SURGICAL RESULTS & CLINIC PHOTO SLIDESHOW -->
-            <div class="ss-slider-container" id="ssPhotoSlider">
-                <div class="ss-slider-empty" id="ssSliderEmpty">
-                    <span style="font-size:28px; display:block; margin-bottom:8px;">✨</span>
-                    Dr. Saad Sabry Alzubaidy — Surgical Excellence &amp; Results
+            <div class="ss-info-row">
+                <div class="ss-card">
+                    <span class="ss-card-label">&#128197; Calendar</span>
+                    <div id="ssCalendar"></div>
                 </div>
-                <div id="ssSlidesList" style="width:100%; height:100%;"></div>
-                <div class="ss-slide-dots" id="ssSlideDots"></div>
+                <div class="ss-card">
+                    <span class="ss-card-label">&#x1F54C; Prayer Times &mdash; Baghdad</span>
+                    <div class="ss-prayer-list" id="ssPrayers">
+                        <div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:16px 0;">Loading...</div>
+                    </div>
+                </div>
             </div>
             <div class="ss-queue-row">
                 <div class="ss-card">
@@ -3888,198 +3723,6 @@ function saveAll(manual, targetId) {
         setTimeout(function() { toast.classList.remove('show'); }, 4000);
     }
 
-
-
-    /* ================================================================
-   TV DISPLAY SLIDESHOW & IMGBB SYNC ENGINE
-================================================================ */
-var tvSlidesData = [];
-var tvSlideIndex = 0;
-var tvSlideTimer = null;
-
-// Realtime Firebase Listener for TV Slides
-function initTvSlidesListener() {
-    db.ref('tvSlides').on('value', function(snapshot) {
-        var data = snapshot.val() || {};
-        tvSlidesData = [];
-        Object.keys(data).forEach(function(key) {
-            tvSlidesData.push({
-                id: key,
-                url: data[key].url,
-                caption: data[key].caption || '',
-                date: data[key].date || ''
-            });
-        });
-        
-        // Reverse so latest is first
-        tvSlidesData.reverse();
-        
-        renderTvModalList();
-        renderTvDisplaySlides();
-    });
-}
-initTvSlidesListener();
-
-function openTvSlidesModal() {
-    document.getElementById('tvSlidesModal').style.display = 'flex';
-    renderTvModalList();
-}
-
-function closeTvSlidesModal() {
-    document.getElementById('tvSlidesModal').style.display = 'none';
-}
-
-function renderTvModalList() {
-    var countEl = document.getElementById('tvSlideCount');
-    var listEl = document.getElementById('tvModalSlidesList');
-    if (!listEl) return;
-    
-    if (countEl) countEl.textContent = tvSlidesData.length;
-    
-    if (tvSlidesData.length === 0) {
-        listEl.innerHTML = '<div style="color:var(--text-secondary); text-align:center; padding:24px;">No photos uploaded yet. Click Upload to add your first surgery result.</div>';
-        return;
-    }
-    
-    var html = '';
-    tvSlidesData.forEach(function(s) {
-        html += '<div class="tv-slide-item">' +
-            '<img src="' + s.url + '" class="tv-slide-thumb" alt="Result">' +
-            '<div style="flex:1; min-width:0;">' +
-                '<div style="font-weight:600; font-size:14px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (s.caption || 'Clinic Result') + '</div>' +
-                '<div style="font-size:11px; color:var(--text-secondary);">' + (s.date || '') + '</div>' +
-            '</div>' +
-            '<button onclick="deleteTvSlide(\'' + s.id + '\')" style="background:rgba(255,69,58,0.15); color:var(--danger); border:1px solid rgba(255,69,58,0.3); border-radius:10px; padding:6px 12px; font-size:12px; margin:0; width:auto;">Delete</button>' +
-        '</div>';
-    });
-    listEl.innerHTML = html;
-}
-
-// Upload using existing ImgBB Integration
-function handleTvSlideUpload(input) {
-    if (!input.files || input.files.length === 0) return;
-    var file = input.files[0];
-    var captionInput = document.getElementById('tvSlideCaptionInput');
-    var caption = captionInput ? captionInput.value.trim() : '';
-    var statusEl = document.getElementById('tvSlideUploadStatus');
-    
-    statusEl.style.display = 'block';
-    statusEl.style.color = 'var(--text-secondary)';
-    statusEl.innerHTML = '⏳ Optimizing &amp; uploading to ImgBB...';
-    
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var img = new Image();
-        img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-            var MAX_WIDTH = 1600; // High resolution for TV
-            var scale = MAX_WIDTH / img.width;
-            if (scale > 1) scale = 1;
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            var base64 = canvas.toDataURL('image/jpeg', 0.85);
-            var cleanBase64 = base64.split(',')[1];
-            
-            var formData = new FormData();
-            formData.append('image', cleanBase64);
-            
-            fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, {
-                method: 'POST',
-                body: formData
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    statusEl.innerHTML = '💾 Saving to TV Display...';
-                    db.ref('tvSlides').push({
-                        url: data.data.url,
-                        caption: caption,
-                        date: new Date().toLocaleDateString('en-GB'),
-                        ts: Date.now()
-                    }).then(function() {
-                        statusEl.innerHTML = '✅ Photo uploaded and live on TV!';
-                        statusEl.style.color = 'var(--success)';
-                        input.value = '';
-                        if (captionInput) captionInput.value = '';
-                        setTimeout(function() { statusEl.style.display = 'none'; }, 3000);
-                    });
-                } else {
-                    throw new Error('ImgBB upload error');
-                }
-            })
-            .catch(function(err) {
-                statusEl.innerHTML = '⚠️ Upload failed: ' + err.message;
-                statusEl.style.color = 'var(--danger)';
-            });
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function deleteTvSlide(slideId) {
-    if (!confirm('Remove this photo from the TV display?')) return;
-    db.ref('tvSlides/' + slideId).remove();
-}
-
-// Render and Animate the Slideshow on the TV Screen
-function renderTvDisplaySlides() {
-    var slidesContainer = document.getElementById('ssSlidesList');
-    var dotsContainer = document.getElementById('ssSlideDots');
-    var emptyEl = document.getElementById('ssSliderEmpty');
-    if (!slidesContainer) return;
-    
-    if (tvSlidesData.length === 0) {
-        if (emptyEl) emptyEl.style.display = 'block';
-        slidesContainer.innerHTML = '';
-        if (dotsContainer) dotsContainer.innerHTML = '';
-        clearInterval(tvSlideTimer);
-        return;
-    }
-    
-    if (emptyEl) emptyEl.style.display = 'none';
-    
-    var slidesHtml = '';
-    var dotsHtml = '';
-    tvSlidesData.forEach(function(s, idx) {
-        var activeClass = idx === 0 ? ' active' : '';
-        slidesHtml += '<div class="ss-slide' + activeClass + '" id="ssSlide_' + idx + '">' +
-            '<img src="' + s.url + '" alt="Clinic Result">' +
-            (s.caption ? '<div class="ss-slide-caption"><span class="ss-slide-title">' + s.caption + '</span></div>' : '') +
-        '</div>';
-        dotsHtml += '<div class="ss-slide-dot' + activeClass + '" id="ssDot_' + idx + '"></div>';
-    });
-    
-    slidesContainer.innerHTML = slidesHtml;
-    if (dotsContainer) dotsContainer.innerHTML = dotsHtml;
-    
-    tvSlideIndex = 0;
-    startTvSlideShow();
-}
-
-function startTvSlideShow() {
-    clearInterval(tvSlideTimer);
-    if (tvSlidesData.length <= 1) return;
-    
-    tvSlideTimer = setInterval(function() {
-        var prevIndex = tvSlideIndex;
-        tvSlideIndex = (tvSlideIndex + 1) % tvSlidesData.length;
-        
-        var prevSlide = document.getElementById('ssSlide_' + prevIndex);
-        var nextSlide = document.getElementById('ssSlide_' + tvSlideIndex);
-        var prevDot = document.getElementById('ssDot_' + prevIndex);
-        var nextDot = document.getElementById('ssDot_' + tvSlideIndex);
-        
-        if (prevSlide) prevSlide.classList.remove('active');
-        if (nextSlide) nextSlide.classList.add('active');
-        if (prevDot) prevDot.classList.remove('active');
-        if (nextDot) nextDot.classList.add('active');
-    }, 6000); // Transitions smoothly every 6 seconds
-}
-    
     /* ================================================================
        STATS WINDOW
     ================================================================ */
@@ -6165,11 +5808,6 @@ function autoSyncMJNotes() {
         showToast('&#128276; Reminder set for ' + dateEl.value + '!');
     }
 
-
-
-
-    
-    
     /* ================================================================
        PATIENT VIEW MODAL
     ================================================================ */
@@ -6356,36 +5994,5 @@ function autoSyncMJNotes() {
     };
 
 </script>
-
-<!-- ═══ TV DISPLAY SLIDES MANAGER MODAL ═══ -->
-<div id="tvSlidesModal" class="tv-modal-overlay" style="display:none;" onclick="if(event.target===this)closeTvSlidesModal()">
-    <div class="tv-modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <h3 style="margin:0; font-size:18px; color:var(--text-primary); border:none;">📺 TV Display Photo Slides</h3>
-            <button onclick="closeTvSlidesModal()" style="background:none; border:none; font-size:22px; color:var(--text-secondary); cursor:pointer;">&times;</button>
-        </div>
-
-        <!-- Upload Form -->
-        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:16px; border-radius:16px; margin-bottom:18px;">
-            <input type="text" id="tvSlideCaptionInput" placeholder="Procedure or result title (e.g. Laparoscopic Surgery - Post-Op)" style="margin-bottom:10px;">
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="file" id="tvSlideFileInput" accept="image/*" multiple style="display:none;" onchange="handleTvSlideUpload(this)">
-                <button type="button" onclick="document.getElementById('tvSlideFileInput').click()" style="background:var(--primary); margin:0; flex:1;">
-                    📤 Choose Photo &amp; Upload
-                </button>
-            </div>
-            <div id="tvSlideUploadStatus" style="font-size:12px; margin-top:8px; display:none;"></div>
-        </div>
-
-        <!-- Slides List -->
-        <div style="font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:10px; text-transform:uppercase;">
-            Active Slides on TV (<span id="tvSlideCount">0</span>)
-        </div>
-        <div id="tvModalSlidesList" style="flex:1; overflow-y:auto; max-height:300px; padding-right:4px;">
-            <div style="color:var(--text-secondary); text-align:center; padding:20px;">No slides uploaded yet.</div>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>
