@@ -1127,23 +1127,42 @@
     .ss-bottom-row { grid-template-columns: 1fr; }
 }
 
-        /* Broken Image Placeholder */
-.ss-photo-slide img {
-    width: 100%; height: 100%; object-fit: contain; display: block;
-    background: #000;
-    transition: opacity 0.5s ease;
-}
+/* ===== NETFLIX-STYLE SMART PHOTO DISPLAY ===== */
 .ss-photo-slide {
-    background: #000;
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #050510; overflow: hidden;
 }
+/* Blurred background layer - fills entire screen */
+.ss-photo-slide .ss-blur-bg {
+    position: absolute; inset: -20px;
+    background-size: cover; background-position: center;
+    filter: blur(40px) brightness(0.45) saturate(1.3);
+    transform: scale(1.15);
+    z-index: 0;
+}
+/* Foreground image - shown full, centered, never cropped */
+.ss-photo-slide .ss-photo-img {
+    position: relative; z-index: 1;
+    max-width: 100%; max-height: 100%;
+    width: auto; height: auto;
+    object-fit: contain; display: block;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    transition: opacity 0.8s ease;
+}
+/* Error state */
 .ss-photo-slide.ss-slide-error {
-    display: flex !important; opacity: 1 !important; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+    display: flex !important; align-items: center; justify-content: center;
 }
 .ss-photo-slide.ss-slide-error::after {
-    content: '⚠️ Image unavailable'; color: rgba(255,255,255,0.4);
-    font-size: 16px; font-weight: 600;
+    content: '⚠️ Image unavailable';
+    color: rgba(255,255,255,0.4); font-size: 16px; font-weight: 600;
+    position: relative; z-index: 2;
 }
+
+/* Broken Image Placeholder (Patient Files) */
 .pt-image-broken {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     height: 140px; background: rgba(255,69,58,0.08); color: #FF453A;
@@ -5432,8 +5451,10 @@ function _renderVisionOSDisplay() {
             var safeUrl = (photo.url || '').replace(/'/g, '&#39;');
             var safeCaption = (photo.caption || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                         var slideHtml = '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + safeCaption + '">' +
-                '<img src="' + safeUrl + '" alt="" style="opacity:0;" ' +
-                'onerror="this.parentNode.classList.add(\'ss-slide-error\');this.style.display=\'none\';" ' +
+                '<div class="ss-blur-bg" style="background-image:url(\'' + safeUrl + '\');" ' +
+                'onerror="this.style.display=\'none\';"></div>' +
+                '<img class="ss-photo-img" src="' + safeUrl + '" alt="" style="opacity:0;" ' +
+                'onerror="this.style.display=\'none\';this.parentNode.classList.add(\'ss-slide-error\');" ' +
                 'onload="this.style.opacity=1;">' +
                 '</div>';
             slideshow.innerHTML += slideHtml;
