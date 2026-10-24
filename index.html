@@ -5275,8 +5275,8 @@ function _renderVisionOSDisplay() {
     }
 
 
-    /* ================================================================
-       DISPLAY PHOTOS & SLIDESHOW ENGINE
+        /* ================================================================
+       DISPLAY PHOTOS & SLIDESHOW ENGINE (UNIVERSAL BASE64 — NO IMGBB)
     ================================================================ */
     function openDisplaySettings() {
         displaySettingsOpen = true;
@@ -5296,9 +5296,11 @@ function _renderVisionOSDisplay() {
         function next() {
             if (idx >= files.length) {
                 var st = document.getElementById('displayPhotoStatus');
-                st.innerHTML = '✅ All ' + files.length + ' photo(s) uploaded!';
-                st.style.color = '#30D158';
-                setTimeout(function() { st.style.display = 'none'; }, 3000);
+                if (st) {
+                    st.innerHTML = '✅ All ' + files.length + ' photo(s) uploaded and live on all screens!';
+                    st.style.color = '#30D158';
+                    setTimeout(function() { st.style.display = 'none'; }, 3000);
+                }
                 return;
             }
             processDisplayPhoto(files[idx], next);
@@ -5309,66 +5311,66 @@ function _renderVisionOSDisplay() {
 
     function processDisplayPhoto(file, onComplete) {
         var statusEl = document.getElementById('displayPhotoStatus');
-        statusEl.style.display = 'block';
-        statusEl.style.color = '#8E8E93';
+        if (statusEl) {
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#8E8E93';
+        }
         var isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
         
         function doUpload(actualFile) {
-            statusEl.innerHTML = '⏳ Processing ' + actualFile.name + '...';
+            if (statusEl) statusEl.innerHTML = '⏳ Optimizing ' + actualFile.name + ' for all devices...';
             var reader = new FileReader();
             reader.onload = function(e) {
                 var img = new Image();
                 img.onload = function() {
-                    var canvas = document.createElement('canvas');
-                    var ctx = canvas.getContext('2d');
-                    var MAX = 1600;
-                    var scale = MAX / img.width;
-                    if (scale > 1) scale = 1;
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    var b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-                    
-                    statusEl.innerHTML = '☁️ Uploading...';
-                    var fd = new FormData();
-                    fd.append('image', b64);
-                    fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, { method: 'POST', body: fd })
-                    .then(function(r) { return r.json(); })
-                                        .then(function(data) {
-                        if (data.success) {
-                            statusEl.innerHTML = '✅ Uploaded! Add a caption (optional)...';
-                            statusEl.style.color = '#30D158';
-                            var caption = prompt('Add a caption for this photo? (Leave empty for none)\ne.g. "Laparoscopic Cholecystectomy Result"', '');
-                            if (caption === null) caption = '';
-                            // 🛡️ Defensive URL extraction (try multiple fields)
-                            var finalUrl = data.data.url || 
-                                          (data.data.image && data.data.image.url) || 
-                                          data.data.display_url || '';
-                            console.log('Display photo URL stored:', finalUrl); // Debug log
-                            if (!finalUrl) {
-                                statusEl.innerHTML = '⚠️ Upload succeeded but no URL returned';
-                                statusEl.style.color = '#FF453A';
-                                if (onComplete) onComplete();
-                                return;
+                    try {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        var MAX = 1280;
+                        var scale = MAX / Math.max(img.width, img.height);
+                        if (scale > 1) scale = 1;
+                        canvas.width = Math.round(img.width * scale);
+                        canvas.height = Math.round(img.height * scale);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Self-contained Base64 JPEG (~80-120KB) — loads on any TV/device without ImgBB
+                        var b64 = canvas.toDataURL('image/jpeg', 0.72);
+                        
+                        if (statusEl) statusEl.innerHTML = '☁️ Saving to cloud database...';
+                        var caption = prompt('Add a caption for this photo? (Leave empty for none)\ne.g. "Laparoscopic Cholecystectomy Result"', '');
+                        if (caption === null) caption = '';
+                        
+                        db.ref('displayPhotos').push({
+                            url: b64,
+                            caption: caption,
+                            ts: Date.now()
+                        }).then(function() {
+                            if (statusEl) {
+                                statusEl.innerHTML = '✅ Saved and synced!';
+                                statusEl.style.color = '#30D158';
                             }
-                            db.ref('displayPhotos').push({
-                                url: finalUrl,
-                                caption: caption,
-                                ts: Date.now()
-                            }).then(function() {
-                                if (onComplete) onComplete();
-                            }).catch(function() { if (onComplete) onComplete(); });
-                        } else {
-                            statusEl.innerHTML = '⚠️ Upload failed';
-                            statusEl.style.color = '#FF453A';
                             if (onComplete) onComplete();
+                        }).catch(function(err) {
+                            if (statusEl) {
+                                statusEl.innerHTML = '⚠️ Firebase write error: ' + err.message;
+                                statusEl.style.color = '#FF453A';
+                            }
+                            if (onComplete) onComplete();
+                        });
+                    } catch (err) {
+                        if (statusEl) {
+                            statusEl.innerHTML = '⚠️ Processing error: ' + err.message;
+                            statusEl.style.color = '#FF453A';
                         }
-                    })
-                    .catch(function() {
-                        statusEl.innerHTML = '⚠️ Network error';
-                        statusEl.style.color = '#FF453A';
                         if (onComplete) onComplete();
-                    });
+                    }
+                };
+                img.onerror = function() {
+                    if (statusEl) {
+                        statusEl.innerHTML = '⚠️ Invalid image file: ' + actualFile.name;
+                        statusEl.style.color = '#FF453A';
+                    }
+                    if (onComplete) onComplete();
                 };
                 img.src = e.target.result;
             };
@@ -5377,19 +5379,23 @@ function _renderVisionOSDisplay() {
         
         if (isHeic) {
             if (typeof heic2any === 'undefined') {
-                statusEl.innerHTML = '⚠️ HEIC converter not loaded';
-                statusEl.style.color = '#FF453A';
+                if (statusEl) {
+                    statusEl.innerHTML = '⚠️ HEIC converter not loaded';
+                    statusEl.style.color = '#FF453A';
+                }
                 if (onComplete) onComplete();
                 return;
             }
-            statusEl.innerHTML = '⏳ Converting HEIC...';
+            if (statusEl) statusEl.innerHTML = '⏳ Converting HEIC...';
             heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })
             .then(function(blob) {
                 doUpload(new File([blob], file.name.replace(/\.heic$|\.heif$/i, '.jpg'), { type: 'image/jpeg' }));
             })
             .catch(function() {
-                statusEl.innerHTML = '⚠️ HEIC conversion failed';
-                statusEl.style.color = '#FF453A';
+                if (statusEl) {
+                    statusEl.innerHTML = '⚠️ HEIC conversion failed';
+                    statusEl.style.color = '#FF453A';
+                }
                 if (onComplete) onComplete();
             });
         } else {
@@ -5400,32 +5406,39 @@ function _renderVisionOSDisplay() {
     function renderDisplayPhotosList() {
         var container = document.getElementById('displayPhotosGrid');
         if (!container) return;
-        container.innerHTML = '';
+        
         var keys = Object.keys(displayPhotos).sort(function(a, b) {
             return (displayPhotos[b].ts || 0) - (displayPhotos[a].ts || 0);
         });
+        
         if (keys.length === 0) {
-            container.innerHTML = '<p style="color:#8E8E93; text-align:center; grid-column:1/-1; padding:20px;">No photos uploaded yet. Click Upload to add.</p>';
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:#8E8E93; font-size:13px;">No photos uploaded yet.<br>Click "Choose Photos & Upload" above to add some.</div>';
             return;
         }
+        
+        var html = '';
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
             var photo = displayPhotos[key];
-            container.innerHTML += '<div class="display-photo-item">' +
-                '<img src="' + photo.url + '">' +
-                (photo.caption ? '<div class="display-photo-caption-tag">' + escapeHtml(photo.caption) + '</div>' : '') +
-                '<button class="display-photo-delete" onclick="deleteDisplayPhoto(\'' + key + '\')">&times;</button>' +
+            var safeUrl = (photo.url || '').replace(/'/g, '&#39;');
+            var safeCaption = escapeHtml(photo.caption || 'No caption');
+            
+            html += '<div class="display-photo-item">' +
+                '<img src="' + safeUrl + '" alt="" referrerpolicy="no-referrer">' +
+                '<button class="display-photo-delete" onclick="deleteDisplayPhoto(\'' + key + '\')" title="Delete photo">&times;</button>' +
+                '<div class="display-photo-caption-tag">' + safeCaption + '</div>' +
                 '</div>';
         }
+        container.innerHTML = html;
     }
 
     function deleteDisplayPhoto(key) {
-        if (!confirm('Remove this photo from the display?')) return;
+        if (!confirm('Delete this photo from the clinic display?')) return;
         db.ref('displayPhotos/' + key).remove().catch(handleFirebaseError);
     }
 
     /* ===== SLIDESHOW ENGINE ===== */
-       function updateSSPhotos() {
+    function updateSSPhotos() {
         var slideshow = document.getElementById('ssPhotoSlideshow');
         var dotsContainer = document.getElementById('ssPhotoDots');
         var overlay = document.getElementById('ssPhotoOverlay');
@@ -5443,17 +5456,16 @@ function _renderVisionOSDisplay() {
             return;
         }
         
-        // Rebuild slides using <img> tags with error handling
         slideshow.innerHTML = '';
         var dotsHtml = '';
         for (var i = 0; i < keys.length; i++) {
             var photo = displayPhotos[keys[i]];
             var safeUrl = (photo.url || '').replace(/'/g, '&#39;');
             var safeCaption = (photo.caption || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        var slideHtml = '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + safeCaption + '">' +
-                '<div class="ss-blur-bg" style="background-image:url(\'' + safeUrl + '\');" ' +
-                'onerror="this.style.display=\'none\';"></div>' +
-                '<img class="ss-photo-img" src="' + safeUrl + '" alt="" style="opacity:0;" ' +
+            
+            var slideHtml = '<div class="ss-photo-slide" data-idx="' + i + '" data-caption="' + safeCaption + '">' +
+                '<div class="ss-blur-bg" style="background-image:url(\'' + safeUrl + '\');"></div>' +
+                '<img class="ss-photo-img" src="' + safeUrl + '" alt="" referrerpolicy="no-referrer" crossorigin="anonymous" style="opacity:0;" ' +
                 'onerror="this.style.display=\'none\';this.parentNode.classList.add(\'ss-slide-error\');" ' +
                 'onload="this.style.opacity=1;">' +
                 '</div>';
@@ -5465,7 +5477,7 @@ function _renderVisionOSDisplay() {
         showSlide(0);
     }
 
-        function showSlide(idx) {
+    function showSlide(idx) {
         var slides = document.querySelectorAll('.ss-photo-slide');
         var dots = document.querySelectorAll('.ss-photo-dot');
         var overlay = document.getElementById('ssPhotoOverlay');
@@ -5479,11 +5491,9 @@ function _renderVisionOSDisplay() {
         if (slides[ssSlideIndex]) slides[ssSlideIndex].classList.add('active');
         if (dots[ssSlideIndex]) dots[ssSlideIndex].classList.add('active');
         
-        // Update caption (read from attribute, decode entities)
         if (overlay && captionEl) {
             var cap = slides[ssSlideIndex] ? (slides[ssSlideIndex].getAttribute('data-caption') || '') : '';
             if (cap && cap.trim()) {
-                // Decode HTML entities
                 var txt = document.createElement('textarea');
                 txt.innerHTML = cap;
                 captionEl.textContent = txt.value;
