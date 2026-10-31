@@ -1179,7 +1179,7 @@
 <!-- PIN LOCK SCREEN -->
 <div id="pinOverlay" class="pin-overlay">
     <div class="pin-card">
-        <img src="logo.jpg" class="logo-large" alt="Clinic Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+        <img src="logo.png" class="logo-large" alt="Clinic Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
         <h2>Dr. Saad Sabry Alzubaidy</h2>
         <p>Enter PIN to access clinic system</p>
         <div class="pin-input-wrap">
@@ -1223,7 +1223,7 @@
 <div id="liveToast" class="toast" role="alert">&#128276; Notification</div>
 
 <header>
-    <img src="logo.jpg" class="logo-img" alt="Clinic Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+    <img src="logo.png" class="logo-img" alt="Clinic Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
     <h2>Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</h2>
 </header>
 
@@ -1422,6 +1422,28 @@
                         onblur="collapseLabFindings(this)"
                         oninput="autoExpand(this); autoSyncTrigger()"
                         aria-label="Laboratory findings quick notes"></textarea>
+                </div>
+
+                <!-- 🌐 Online Clinic & Prescriptions Section -->
+                <div class="section-block" id="onlineClinicSection" style="background:linear-gradient(135deg, rgba(10,132,255,0.06), rgba(94,92,230,0.04)); border-left:4px solid var(--primary); margin-top:14px; border-radius:16px; padding:16px 18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="section-label" style="color:var(--primary); margin-bottom:0; font-size:13px; font-weight:700;">🌐 Online Clinic &amp; Prescriptions (العيادة الإلكترونية)</span>
+                            <span id="onlineConsultCountBadge" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; background:rgba(10,132,255,0.15); color:var(--primary); display:none;">0 Records</span>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="action-btn" style="color:var(--primary); font-size:12px; font-weight:700; background:rgba(10,132,255,0.12); border:1px solid rgba(10,132,255,0.25); border-radius:10px; padding:6px 14px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="openOnlineConsultForActivePatient()">
+                                <span>➕</span> New Online Rx / Consultation
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Feed container -->
+                    <div id="onlineConsultFeed" style="margin-top:6px;">
+                        <div style="text-align:center; padding:16px; color:var(--text-tertiary); font-size:12px; font-style:italic;">
+                            No online prescriptions recorded yet for this patient. Click "New Online Rx" to generate a prescription or investigation sheet.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- AI Referral -->
@@ -1786,7 +1808,7 @@
         <div class="ss-content-new">
             <!-- Top Bar -->
             <div class="ss-top-bar">
-                <img src="logo.jpg" class="ss-logo" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+                <img src="logo.png" class="ss-logo" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
                 <span class="ss-clinic-title">Dr. Saad Sabry Alzubaidy &mdash; Surgical Clinic</span>
                 <div class="ss-clock-display">
                     <div class="ss-time-big" id="ssTime">00:00</div>
@@ -2574,6 +2596,7 @@
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
             renderImages(d.images || {}); 
+            renderOnlineConsultFeed(d.consultations || {}); 
 
         });
     }
@@ -2832,7 +2855,7 @@
             <div class="pdf-watermark">SAAD CLINIC</div>
             
             <div class="pdf-header">
-                <img src="logo.jpg" class="pdf-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
+                <img src="logo.png" class="pdf-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3304/3304567.png'">
                 <div class="pdf-clinic-info">
                     <h1>Dr. Saad Sabry Alzubaidy</h1>
                     <p>Consultant General Surgeon | Surgical Clinic</p>
@@ -5302,9 +5325,94 @@ function _renderVisionOSDisplay() {
         document.getElementById('displaySettingsModal').style.display = 'none';
     }
 
-    /* ═══ ONLINE CONSULTATION GENERATOR (Dr. Saad on-the-go) ═══ */
+    /* ═══ ONLINE CONSULTATION SECTION & GENERATOR ═══ */
     function openOnlineConsult() {
         window.open('dr-saad-online.html', '_blank');
+    }
+
+    function openOnlineConsultForActivePatient() {
+        if (!activeId) {
+            window.open('dr-saad-online.html', '_blank');
+            return;
+        }
+        var pt = ptIdx[activeId] || {};
+        var d = ptDetails[activeId] || {};
+        var name = pt.name || d.name || '';
+        var age = pt.age || d.age || '';
+        var phone = pt.phone || d.phone || '';
+        var clinic = (pt.clinic || '').toLowerCase() === 'chamchamal' ? 'chamchamal' : 'baghdad';
+        var url = 'dr-saad-online.html?ptId=' + encodeURIComponent(activeId) + 
+                  '&name=' + encodeURIComponent(name) + 
+                  '&age=' + encodeURIComponent(age) + 
+                  '&phone=' + encodeURIComponent(phone) + 
+                  '&clinic=' + encodeURIComponent(clinic);
+        window.open(url, '_blank');
+    }
+
+    function renderOnlineConsultFeed(consultations) {
+        var feed = document.getElementById('onlineConsultFeed');
+        var badge = document.getElementById('onlineConsultCountBadge');
+        if (!feed) return;
+        consultations = consultations || {};
+        var keys = Object.keys(consultations).sort(function(a, b) {
+            return Number(b) - Number(a);
+        });
+        
+        if (badge) {
+            badge.textContent = keys.length + (keys.length === 1 ? ' Record' : ' Records');
+            badge.style.display = keys.length > 0 ? 'inline-block' : 'none';
+        }
+
+        if (keys.length === 0) {
+            feed.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-tertiary); font-size:12px; font-style:italic; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--color-separator);">' +
+                'No online consultations or prescriptions recorded yet for this patient.<br>' +
+                '<button onclick="openOnlineConsultForActivePatient()" style="margin-top:10px; background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer;">➕ Generate First Online Rx</button>' +
+                '</div>';
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < keys.length; i++) {
+            var c = consultations[keys[i]];
+            html += '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--color-separator); border-radius:12px; padding:12px 14px; margin-bottom:8px; transition:0.2s;">';
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
+            html += '<span style="font-weight:700; font-size:12px; color:var(--primary);">📅 ' + escapeHtml(c.date || '—') + '</span>';
+            if (c.types) {
+                html += '<span style="font-size:10.5px; padding:2px 8px; border-radius:8px; background:rgba(100,210,255,0.12); color:var(--lab); font-weight:600;">' + escapeHtml(c.types) + '</span>';
+            }
+            html += '</div>';
+
+            if (c.clinicalHistory) {
+                html += '<div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:6px; line-height:1.5;"><strong>📋 Clinical History:</strong> ' + escapeHtml(c.clinicalHistory) + '</div>';
+            }
+
+            if (c.investigations && c.investigations.length > 0) {
+                html += '<div style="margin-bottom:6px;"><span style="font-size:11px; font-weight:700; color:var(--lab);">🔬 Requested: </span>';
+                html += '<span style="font-size:11.5px; color:var(--text-primary);">' + c.investigations.map(escapeHtml).join(' &bull; ') + '</span></div>';
+            }
+
+            if (c.medications && c.medications.length > 0) {
+                html += '<div style="margin-bottom:6px;"><span style="font-size:11px; font-weight:700; color:var(--img);">💊 Prescribed: </span>';
+                var medStrs = c.medications.map(function(m) {
+                    var s = escapeHtml(m.name || '');
+                    if (m.dose) s += ' ' + escapeHtml(m.dose);
+                    if (m.freq) s += ' (' + escapeHtml(m.freq) + ')';
+                    return s;
+                });
+                html += '<span style="font-size:11.5px; color:var(--text-primary);">' + medStrs.join(' &bull; ') + '</span></div>';
+            }
+
+            if (c.note) {
+                html += '<div style="font-size:11.5px; color:var(--text-tertiary); font-style:italic; margin-top:4px; padding-top:4px; border-top:1px dashed rgba(255,255,255,0.06);">📝 ' + escapeHtml(c.note) + '</div>';
+            }
+            html += '</div>';
+        }
+
+        html += '<div style="text-align:right; margin-top:8px;">' +
+            '<button onclick="openOnlineConsultForActivePatient()" style="background:transparent; color:var(--primary); border:none; font-size:11px; font-weight:600; cursor:pointer; text-decoration:underline;">+ Add New Online Prescription</button>' +
+            '</div>';
+
+        feed.innerHTML = html;
     }
 
     function handleDisplayPhotoUpload(input) {
