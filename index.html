@@ -1413,7 +1413,18 @@
                         aria-label="Laboratory findings quick notes"></textarea>
                 </div>
 
-
+                <!-- 🌐 Online Clinic Consultations Section (Baghdad Clinic) -->
+                <div class="section-block" id="secOnlineClinic" style="background:rgba(10,132,255,0.04); border-left:4px solid var(--primary); margin-top:14px; border-radius:14px; padding:14px 16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="section-label" style="color:var(--primary); margin-bottom:0; font-size:13px; font-weight:700;">🌐 Online Clinic Consultations — Baghdad (الاستشارات والراشتات الإلكترونية)</span>
+                            <span id="onlineConsultCountBadge" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:12px; background:rgba(10,132,255,0.18); color:var(--primary); display:none;">0 Consultations</span>
+                        </div>
+                    </div>
+                    <div id="onlineConsultFeed" style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="text-align:center; padding:14px; color:var(--text-tertiary); font-size:12px; font-style:italic;">No online consultations recorded for this patient.</div>
+                    </div>
+                </div>
 
                 <!-- AI Referral -->
                 <div class="section-block" style="background:rgba(10,132,255,0.04); border-left:4px solid var(--primary);">
@@ -1940,6 +1951,7 @@
             for (var i = 0; i < currentIds.length; i++) {
                 var id = currentIds[i];
                 var p = ptIdx[id];
+                if (p.clinic === 'Chamchamal' || p.clinic === 'chamchamal') continue;
                 var status = p.clinicStatus || (p.isWaiting ? 'waiting' : 'none');
                 
                 var wasNew = !_knownPatientIds[id];
@@ -2506,7 +2518,8 @@
             document.getElementById('viewContact').innerHTML =
                 'Age: <span>' + escapeHtml(b.age || '--') + '</span> &nbsp;|&nbsp; 📞 <span>' + escapeHtml(b.phone || '--') + '</span>';
             document.getElementById('viewRegDate').innerText = b.dateAdded || '--';
-            var isOnlinePt = b.onlineApp || (b.addedBy && b.addedBy.indexOf('Online') !== -1);
+            var hasConsults = d.consultations && Object.keys(d.consultations).length > 0;
+            var isOnlinePt = b.onlineApp || b.hasOnlineConsult || (b.addedBy && b.addedBy.indexOf('Online') !== -1) || hasConsults;
             var onlineBadgeEl = document.getElementById('viewOnlineBadge');
             if (onlineBadgeEl) onlineBadgeEl.style.display = isOnlinePt ? 'inline-flex' : 'none';
 
@@ -2568,6 +2581,11 @@
             renderVitals(d.vitals || []);
             renderOpHistory(d.surgicalHistory || []);
             renderImages(d.images || {}); 
+            renderOnlineConsultFeed(d.consultations || {});
+
+            if (d.consultations && Object.keys(d.consultations).length > 0 && (!ptIdx[id] || !ptIdx[id].hasOnlineConsult)) {
+                db.ref('patientIndex/' + id).update({ hasOnlineConsult: true }).catch(function(){});
+            }
 
         });
     }
@@ -2601,7 +2619,11 @@
         /* Also update the home/sidebar reminder count in waitCounter */
         var waitingCount = 0;
         var allIds = Object.keys(ptIdx);
-        for (var j = 0; j < allIds.length; j++) { if (ptIdx[allIds[j]].isWaiting) waitingCount++; }
+        for (var j = 0; j < allIds.length; j++) {
+            var pCheck = ptIdx[allIds[j]];
+            if (pCheck.clinic === 'Chamchamal' || pCheck.clinic === 'chamchamal') continue;
+            if (pCheck.isWaiting) waitingCount++;
+        }
         var wc = document.getElementById('waitCounter');
         if (wc) wc.innerText = waitingCount;
     }
@@ -2616,9 +2638,10 @@
         setTimeout(function() {
             var overdue = Object.keys(ptIdx).map(function(id) {
                 var p = ptIdx[id];
+                if (p.clinic === 'Chamchamal' || p.clinic === 'chamchamal') return null;
                 var lastV = p.lastVisit || p.dateAdded || "N/A";
                 return { id: id, p: p, lastV: lastV, days: getDaysSince(lastV) };
-            }).filter(function(d) { return d.days >= 25 && d.p.dismissedVisit !== d.lastV; })
+            }).filter(function(d) { return d && d.days >= 25 && d.p.dismissedVisit !== d.lastV; })
               .sort(function(a, b) { return b.days - a.days; });
 
             if (!overdue.length) {
@@ -3604,6 +3627,124 @@ function resetPendingLabs(ptId) {
         db.ref('patientDetails/' + activeId + '/images/' + key).remove().catch(handleFirebaseError);
         showToast("Image removed from file.");
     }
+
+    /* ================================================================
+       ONLINE CONSULTATIONS (BAGHDAD CLINIC)
+    ================================================================ */
+    function renderOnlineConsultFeed(consultations) {
+        var feed = document.getElementById('onlineConsultFeed');
+        var badge = document.getElementById('onlineConsultCountBadge');
+        if (!feed) return;
+
+        var keys = Object.keys(consultations || {});
+        if (keys.length === 0) {
+            if (badge) badge.style.display = 'none';
+            feed.innerHTML = '<div style="text-align:center; padding:14px; color:var(--text-tertiary); font-size:12px; font-style:italic;">No online consultations recorded for this patient.</div>';
+            return;
+        }
+
+        if (badge) {
+            badge.innerText = keys.length + (keys.length === 1 ? ' Consultation' : ' Consultations');
+            badge.style.display = 'inline-block';
+        }
+
+        // Sort descending by timestamp key (newest first)
+        keys.sort(function(a, b) {
+            var tA = Number(a) || 0;
+            var tB = Number(b) || 0;
+            return tB - tA;
+        });
+
+        var html = '';
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            var c = consultations[k];
+            if (!c) continue;
+
+            var consultDate = escapeHtml(c.date || 'Unknown Date');
+            var consultType = escapeHtml(c.types || 'Online Rx / Consultation');
+
+            html += '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.12); margin-bottom:4px;">';
+            
+            // Header Row
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">';
+            html += '  <div style="display:flex; align-items:center; gap:8px;">';
+            html += '    <span style="font-weight:700; font-size:12px; color:var(--text-primary); display:flex; align-items:center; gap:4px;">📅 ' + consultDate + '</span>';
+            html += '    <span style="background:rgba(10,132,255,0.15); color:var(--primary); font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; border:1px solid rgba(10,132,255,0.3);">' + consultType + '</span>';
+            html += '  </div>';
+            html += '  <button onclick="deleteOnlineConsult(\'' + k + '\')" title="Delete consultation entry" style="background:transparent; border:none; color:var(--text-tertiary); cursor:pointer; font-size:13px; padding:2px 6px; border-radius:6px; width:auto; margin:0;" onmouseover="this.style.color=\'var(--danger)\'" onmouseout="this.style.color=\'var(--text-tertiary)\'">🗑️</button>';
+            html += '</div>';
+
+            // Clinical History
+            if (c.clinicalHistory && c.clinicalHistory.trim()) {
+                html += '<div style="font-size:12px; margin-bottom:8px; color:var(--text-secondary); line-height:1.4;">';
+                html += '  <strong style="color:var(--text-primary);">Clinical History:</strong> ' + escapeHtml(c.clinicalHistory);
+                html += '</div>';
+            }
+
+            // Requested Investigations
+            if (c.investigations && c.investigations.length > 0) {
+                html += '<div style="margin-bottom:8px;">';
+                html += '  <div style="font-size:11.5px; font-weight:700; color:var(--lab); margin-bottom:4px; display:flex; align-items:center; gap:4px;">🔬 Requested Investigations:</div>';
+                html += '  <div style="display:flex; flex-wrap:wrap; gap:6px;">';
+                for (var j = 0; j < c.investigations.length; j++) {
+                    html += '    <span style="background:rgba(100,210,255,0.12); color:var(--lab); font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; border:1px solid rgba(100,210,255,0.25);">' + escapeHtml(c.investigations[j]) + '</span>';
+                }
+                html += '  </div>';
+                html += '</div>';
+            }
+
+            // Prescribed Medications
+            if (c.medications && c.medications.length > 0) {
+                html += '<div style="margin-bottom:8px;">';
+                html += '  <div style="font-size:11.5px; font-weight:700; color:var(--success); margin-bottom:4px; display:flex; align-items:center; gap:4px;">💊 Prescribed Medications:</div>';
+                html += '  <div style="display:flex; flex-direction:column; gap:4px;">';
+                for (var m = 0; m < c.medications.length; m++) {
+                    var med = c.medications[m];
+                    if (!med) continue;
+                    var medName = escapeHtml(med.name || 'Medication');
+                    var medDose = med.dose ? ' <span style="color:var(--text-secondary); font-size:11px;">(' + escapeHtml(med.dose) + ')</span>' : '';
+                    var medFreq = med.freq ? ' <span style="background:rgba(255,255,255,0.06); font-size:10.5px; padding:1px 6px; border-radius:4px; color:var(--text-primary);">' + escapeHtml(med.freq) + '</span>' : '';
+                    var medDur = med.duration ? ' <span style="color:var(--text-tertiary); font-size:11px;">• ' + escapeHtml(med.duration) + '</span>' : '';
+                    var medNote = med.note ? '<div style="font-size:11px; color:var(--text-tertiary); margin-left:14px; font-style:italic;">Note: ' + escapeHtml(med.note) + '</div>' : '';
+
+                    html += '    <div style="padding:4px 8px; background:rgba(48,209,88,0.06); border-radius:6px; border-left:2px solid var(--success);">';
+                    html += '      <span style="font-weight:700; font-size:12px; color:var(--text-primary);">' + medName + '</span>' + medDose + medFreq + medDur;
+                    html += medNote;
+                    html += '    </div>';
+                }
+                html += '  </div>';
+                html += '</div>';
+            }
+
+            // Doctor Advice / Note
+            if (c.note && c.note.trim()) {
+                html += '<div style="font-size:11.5px; padding:6px 10px; background:rgba(10,132,255,0.06); border-left:3px solid var(--primary); border-radius:6px; color:var(--text-primary); line-height:1.4; margin-top:6px;">';
+                html += '  <strong style="color:var(--primary);">📝 Note / Instructions:</strong> ' + escapeHtml(c.note);
+                html += '</div>';
+            }
+
+            html += '</div>';
+        }
+
+        feed.innerHTML = html;
+    }
+
+    function deleteOnlineConsult(consultKey) {
+        if (!activeId || !consultKey) return;
+        if (!confirm('Are you sure you want to delete this online consultation record?')) return;
+        db.ref('patientDetails/' + activeId + '/consultations/' + consultKey).remove().then(function() {
+            showToast('Online consultation deleted', 'success');
+            db.ref('patientDetails/' + activeId + '/consultations').once('value').then(function(snap) {
+                var val = snap.val() || {};
+                if (Object.keys(val).length === 0) {
+                    if (!ptIdx[activeId] || !ptIdx[activeId].onlineApp) {
+                        db.ref('patientIndex/' + activeId).update({ hasOnlineConsult: false }).catch(function(){});
+                    }
+                }
+            });
+        }).catch(handleFirebaseError);
+    }
     
     /* ================================================================
        VITALS
@@ -3755,7 +3896,7 @@ function resetPendingLabs(ptId) {
                 var pinClass = p.pinned ? 'pinned' : '';
                 var isActive = activeId == id ? ' active' : '';
                 var mjBadge = monjaroData[id] ? ' <span style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.06em;vertical-align:middle;margin-left:4px;box-shadow:0 2px 6px rgba(167,139,250,0.4);">MONJARO</span>' : '';
-                var isOnlinePt = p.onlineApp || (p.addedBy && p.addedBy.indexOf('Online') !== -1);
+                var isOnlinePt = p.onlineApp || p.hasOnlineConsult || (p.addedBy && p.addedBy.indexOf('Online') !== -1);
                 var onlineBadge = isOnlinePt ? ' <span style="background:linear-gradient(135deg,#0A84FF,#5E5CE6);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.06em;vertical-align:middle;margin-left:4px;box-shadow:0 2px 6px rgba(10,132,255,0.4);">ONLINE</span>' : '';
 
                 list.innerHTML += '<div id="pt-' + id + '" class="pt-item' + isActive + '" onclick="loadFullData(\'' + id + '\')">' +
@@ -4747,6 +4888,7 @@ function saveAll(manual, targetId) {
             var id = pending[i];
             var r = allReminders[id];
             var targetId = r.ptId || r.patientId;
+            if (targetId && ptIdx[targetId] && (ptIdx[targetId].clinic === 'Chamchamal' || ptIdx[targetId].clinic === 'chamchamal')) continue;
             html += '<div class="rem-item" onclick="loadFullData(\'' + targetId + '\')">' +
                 '<button style="float:right;background:var(--success);color:white;border:none;border-radius:10px;padding:7px 12px;font-size:13px;cursor:pointer;width:auto;" onclick="event.stopPropagation();db.ref(\'reminders/' + id + '\').update({status:\'done\'})">&#10003;</button>' +
                 '<strong style="color:var(--warning);display:block;margin-bottom:4px;">' + escapeHtml(r.date) + '</strong> ' + escapeHtml(r.text) + '</div>';
@@ -5208,6 +5350,7 @@ function _renderVisionOSDisplay() {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
             var p = ptIdx[id];
+            if (p.clinic === 'Chamchamal' || p.clinic === 'chamchamal') continue;
             var pName = p.name || '';
             var pTime = p.queueTime || 0;
 
