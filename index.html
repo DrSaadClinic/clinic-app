@@ -243,10 +243,334 @@
         .btn-del-pt { color: var(--danger); font-size: 15px; opacity: 0.35; cursor: pointer; transition: 0.2s; }
         .btn-del-pt:hover { opacity: 1; }
 
-        .web-req-item { background: rgba(0,0,0,0.15); border: 1px solid var(--card-border); padding: 14px; border-radius: 14px; margin-bottom: 10px; }
-        [data-theme="glass"] .web-req-item { background: rgba(0,0,0,0.02); border: 0.5px solid rgba(0,0,0,0.06); }
-        .web-req-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .web-req-actions button { padding: 8px; font-size: 13px; border-radius: 12px; }
+        /* ════════════════════════════════════════════════════════════
+           MOBILE-OPTIMIZED WEB & PHONE REQUESTS INBOX (ANTI-SLOP)
+        ════════════════════════════════════════════════════════════ */
+        .web-inbox-card-wrap {
+            padding: 14px;
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+            margin-bottom: 14px;
+            transition: all 0.2s ease;
+        }
+        [data-theme="dark"] .web-inbox-card-wrap {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .web-inbox-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--separator);
+        }
+        @media (min-width: 480px) {
+            .web-inbox-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+        .web-inbox-title-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .web-inbox-title-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .web-inbox-badge-pill {
+            background: #0284C7;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.2px;
+        }
+        /* Mobile Segmented Switch (Easy Thumb Tap) */
+        .web-inbox-segmented-control {
+            display: flex;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 3px;
+            border-radius: 11px;
+            gap: 2px;
+            width: 100%;
+        }
+        [data-theme="dark"] .web-inbox-segmented-control {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .web-inbox-seg-btn {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.16s ease;
+            text-align: center;
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .web-inbox-seg-btn:active {
+            transform: scale(0.97);
+        }
+        .web-inbox-seg-btn.active {
+            background: #FFFFFF;
+            color: #0F172A;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            font-weight: 700;
+        }
+        [data-theme="dark"] .web-inbox-seg-btn.active {
+            background: #334155;
+            color: #F8FAFC;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .web-inbox-seg-count {
+            background: rgba(0,0,0,0.07);
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        [data-theme="dark"] .web-inbox-seg-count {
+            background: rgba(255,255,255,0.15);
+        }
+        .web-inbox-list-scroll {
+            max-height: 480px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        /* Mobile Request Card */
+        .web-req-item {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: transform 0.15s ease;
+        }
+        [data-theme="dark"] .web-req-item {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .web-req-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .web-req-pt-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .web-req-slot-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            border: 1px solid #DBEAFE;
+        }
+        [data-theme="dark"] .web-req-slot-chip {
+            background: rgba(30, 58, 138, 0.4);
+            color: #93C5FD;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .web-req-meta-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .web-req-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 7px;
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        [data-theme="dark"] .web-req-chip {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .web-req-chip.phone {
+            color: #0284C7;
+            font-weight: 700;
+            border: 1px solid #BAE6FD;
+            background: #F0F9FF;
+        }
+        [data-theme="dark"] .web-req-chip.phone {
+            background: rgba(2, 132, 199, 0.15);
+            border-color: rgba(2, 132, 199, 0.4);
+            color: #38BDF8;
+        }
+        .web-req-complaint-box {
+            background: rgba(0, 0, 0, 0.02);
+            border-left: 3px solid #0284C7;
+            padding: 6px 10px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+        [data-theme="dark"] .web-req-complaint-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left-color: #38BDF8;
+        }
+        /* Mobile Touch Actions (Min 44px Height) */
+        .web-req-actions {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .web-req-btn-accept {
+            min-height: 44px;
+            padding: 8px 12px;
+            background: #059669;
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 11px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .web-req-btn-accept:active {
+            transform: scale(0.97);
+            background: #047857;
+        }
+        .web-req-btn-decline {
+            min-height: 44px;
+            padding: 8px 12px;
+            background: transparent;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        [data-theme="dark"] .web-req-btn-decline {
+            border-color: rgba(220, 38, 38, 0.35);
+        }
+        .web-req-btn-decline:active {
+            background: rgba(220, 38, 38, 0.1);
+            transform: scale(0.97);
+        }
+        /* Return to Pending (Revert) Button */
+        .web-req-btn-revert {
+            width: 100%;
+            min-height: 42px;
+            padding: 8px 12px;
+            background: #FFFBEB;
+            color: #B45309;
+            border: 1px solid #FDE68A;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 6px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        [data-theme="dark"] .web-req-btn-revert {
+            background: rgba(180, 83, 9, 0.15);
+            border-color: rgba(253, 230, 138, 0.25);
+            color: #FCD34D;
+        }
+        .web-req-btn-revert:active {
+            transform: scale(0.97);
+            background: #FEF3C7;
+        }
+        /* Floating Undo Action Toast */
+        .undo-floating-toast {
+            position: fixed;
+            bottom: calc(var(--safe-bottom, 16px) + 16px);
+            left: 16px;
+            right: 16px;
+            max-width: 440px;
+            margin: 0 auto;
+            background: #0F172A;
+            color: #FFFFFF;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            z-index: 99999;
+            animation: slideUpToast 220ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        @keyframes slideUpToast {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .undo-toast-btn {
+            background: #0284C7;
+            color: #FFFFFF;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .undo-toast-btn:active {
+            transform: scale(0.95);
+        }
 
         [contenteditable="true"] { transition: 0.2s; border-bottom: 1px dashed transparent; }
         [contenteditable="true"]:hover { border-bottom: 1px dashed var(--primary); }
@@ -1247,13 +1571,24 @@
 
 
 
-        <!-- Web Booking Inbox -->
-        <div class="card" id="webInboxCard" style="display:none; background:rgba(255,159,10,0.08); border-color:rgba(255,159,10,0.35);">
-            <h3 style="color:var(--warning); margin-bottom:10px; border:none;">
-                Web Requests
-                <span id="webReqCount" style="background:var(--danger); color:white; padding:3px 10px; border-radius:12px; font-size:11px;">0</span>
-            </h3>
-            <div id="webReqList" style="max-height:280px; overflow-y:auto; padding-right:4px;"></div>
+        <!-- Web & Phone Booking Inbox (Mobile-First) -->
+        <div class="card web-inbox-card-wrap" id="webInboxCard" style="display:none;">
+            <div class="web-inbox-header">
+                <div class="web-inbox-title-box">
+                    <span class="web-inbox-title-text">📬 Booking Requests</span>
+                    <span id="webReqCount" class="web-inbox-badge-pill">0 New</span>
+                </div>
+                <!-- Segmented Control for Phone Comfort -->
+                <div class="web-inbox-segmented-control" role="tablist">
+                    <button type="button" class="web-inbox-seg-btn active" id="btnWebTabPending" onclick="switchWebReqTab('pending')">
+                        Pending
+                    </button>
+                    <button type="button" class="web-inbox-seg-btn" id="btnWebTabAccepted" onclick="switchWebReqTab('accepted')">
+                        Accepted <span id="webAcceptedCount" class="web-inbox-seg-count">0</span>
+                    </button>
+                </div>
+            </div>
+            <div id="webReqList" class="web-inbox-list-scroll"></div>
         </div>
 
         <!-- Registration & Check-in -->
@@ -2429,28 +2764,40 @@
                 switchMainTab('patient');
         switchSubTab('clinical');
 
-        // 🆕 SMART STATUS: Only update queue if the patient was actually waiting
-        if (previousId && previousId !== id) {
-            var prevPt = ptIdx[previousId];
-            // If previous patient was in clinic, mark them as "Seen Today" to advance the queue
-            if (prevPt && prevPt.clinicStatus === 'inclinic') {
-                db.ref('patientIndex/' + previousId).update({
-                    clinicStatus: 'seentoday',
-                    isWaiting: false
-                }).catch(handleFirebaseError);
-            }
-        }
-        
-                 var pt = ptIdx[id];
+        // 🛡️ PERMANENT FIX: Global In-Clinic Management (Strictly 1 patient in clinic at a time)
+        var pt = ptIdx[id];
         if (pt) {
-            // 🆕 FIX: ALWAYS set the patient to 'inclinic' when their file is opened.
-            // This ensures the TV display updates immediately to show who the doctor is looking at.
-            if (pt.clinicStatus !== 'inclinic') {
-                db.ref('patientIndex/' + id).update({
-                    clinicStatus: 'inclinic',
-                    isWaiting: false,
-                    queueTime: Date.now()
-                }).catch(handleFirebaseError);
+            var todayStr = new Date().toLocaleDateString("en-GB");
+            var isPatientHereToday = pt.isWaiting || pt.clinicStatus === "waiting" || pt.clinicStatus === "inclinic" || pt.lastVisit === todayStr;
+
+            // Only promote to in-clinic if patient is active/waiting today (prevents browsing old archives from polluting live queue)
+            if (isPatientHereToday) {
+                // 1. GLOBAL SWEEP: Demote ANY OTHER patient across the database who is currently marked "inclinic"
+                for (var otherId in ptIdx) {
+                    if (otherId !== id && ptIdx[otherId].clinicStatus === "inclinic") {
+                        db.ref("patientIndex/" + otherId).update({
+                            clinicStatus: "seentoday",
+                            isWaiting: false
+                        }).catch(handleFirebaseError);
+                    }
+                }
+
+                // 2. Set this patient to "inclinic"
+                if (pt.clinicStatus !== "inclinic") {
+                    db.ref("patientIndex/" + id).update({
+                        clinicStatus: "inclinic",
+                        isWaiting: false,
+                        queueTime: Date.now()
+                    }).catch(handleFirebaseError);
+                }
+            } else {
+                // Browsing an old archive file: If the previous patient was in clinic, finish them
+                if (previousId && previousId !== id && ptIdx[previousId] && ptIdx[previousId].clinicStatus === "inclinic") {
+                    db.ref("patientIndex/" + previousId).update({
+                        clinicStatus: "seentoday",
+                        isWaiting: false
+                    }).catch(handleFirebaseError);
+                }
             }
         }
 
@@ -4058,12 +4405,11 @@ function saveAll(manual, targetId) {
         }
         
         db.ref('patientIndex/' + targetId).update(idxUpdates).catch(handleFirebaseError);
-        
-        // 🆕 If this patient just entered the clinic, mark any OTHER inclinic patients as seentoday
-        if (targetId === activeId && isFirstEditToday) {
-            for (var id in ptIdx) {
-                if (id !== targetId && ptIdx[id].clinicStatus === 'inclinic') {
-                    db.ref('patientIndex/' + id).update({
+        // 🛡️ Ensure strictly 1 patient in clinic: If this patient is marked inclinic, demote any others
+        if (idxUpdates.clinicStatus === 'inclinic') {
+            for (var otherPtId in ptIdx) {
+                if (otherPtId !== targetId && ptIdx[otherPtId].clinicStatus === 'inclinic') {
+                    db.ref('patientIndex/' + otherPtId).update({
                         clinicStatus: 'seentoday',
                         isWaiting: false,
                         lastVisit: today
@@ -4639,109 +4985,161 @@ function saveAll(manual, targetId) {
     }
          /* ================================================================
           /* ================================================================
-       WEB BOOKING REQUESTS
+       WEB & PHONE BOOKING REQUESTS (MOBILE-FIRST & UNDO SYSTEM)
     ================================================================ */
+    var currentWebReqTab = 'pending';
+    var undoToastTimer = null;
+
+    function switchWebReqTab(tab) {
+        currentWebReqTab = tab;
+        var btnP = document.getElementById('btnWebTabPending');
+        var btnA = document.getElementById('btnWebTabAccepted');
+        if (btnP) btnP.classList.toggle('active', tab === 'pending');
+        if (btnA) btnA.classList.toggle('active', tab === 'accepted');
+        renderWebRequests();
+    }
+
     function renderWebRequests() {
         var card = document.getElementById('webInboxCard');
         var list = document.getElementById('webReqList');
         var countEl = document.getElementById('webReqCount');
+        var acceptedCountEl = document.getElementById('webAcceptedCount');
         if (!card || !list) return;
 
         var keys = Object.keys(pendingBookings);
         var pending = [];
+        var accepted = [];
+
         for (var i = 0; i < keys.length; i++) {
-            var b = pendingBookings[keys[i]];
-            if (b.status === 'pending') pending.push({ id: keys[i], data: b });
+            var k = keys[i];
+            var b = pendingBookings[k];
+            if (!b) continue;
+            if (b.status === 'pending') {
+                pending.push({ id: k, data: b });
+            } else if (b.status === 'accepted') {
+                accepted.push({ id: k, data: b });
+            }
         }
-        pending.sort(function(a, b) { return parseIraqiDate(b.data.dateBooked || b.data.timestamp) - parseIraqiDate(a.data.dateBooked || a.data.timestamp); });
 
-        countEl.textContent = pending.length;
+        // Sort pending by booking time (newest first)
+        pending.sort(function(a, b) {
+            var tA = parseIraqiDate(a.data.dateBooked || a.data.timestamp) || (a.data.timestamp || 0);
+            var tB = parseIraqiDate(b.data.dateBooked || b.data.timestamp) || (b.data.timestamp || 0);
+            return tB - tA;
+        });
 
-        if (pending.length === 0) {
+        // Sort accepted by acceptedAt or timestamp
+        accepted.sort(function(a, b) {
+            var tA = a.data.acceptedAt || (a.data.timestamp || 0);
+            var tB = b.data.acceptedAt || (b.data.timestamp || 0);
+            return tB - tA;
+        });
+
+        if (countEl) countEl.textContent = pending.length + ' New';
+        if (acceptedCountEl) acceptedCountEl.textContent = accepted.length;
+
+        // Show card if there are pending bookings OR accepted bookings
+        if (pending.length === 0 && accepted.length === 0) {
             card.style.display = 'none';
             return;
         }
         card.style.display = 'block';
 
-        /* Fields to show in the header row */
-        var headerFields = { name: 'Name', age: 'Age', phone: 'Phone', gender: 'Gender' };
-        /* Fields to show in the complaint area */
-        var complaintFields = ['complaint', 'reason', 'chiefComplaint', 'co'];
-        /* Fields to show as preferred slot */
-        var slotFields = { preferredDate: 'Preferred Date', preferredTime: 'Preferred Time', appointmentDate: 'Appointment Date', appointmentTime: 'Appointment Time' };
-        /* Fields that are system/internal and should never be displayed */
-        var skipFields = { status: 1, dateBooked: 1, timestamp: 1 };
-        /* Also skip fields already shown in header/complaint/slot */
-        var allShownKeys = Object.keys(headerFields).concat(complaintFields, Object.keys(slotFields));
-
         var html = '';
-        for (var j = 0; j < pending.length; j++) {
-            var bk = pending[j];
-            var d = bk.data;
-            var bookedDate = d.dateBooked || d.timestamp || 'N/A';
 
-            /* Header row */
-            html += '<div class="web-req-item">' +
-                '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">' +
-                '<strong style="color:var(--warning);font-size:15px;">' + escapeHtml(d.name || 'Unknown') + '</strong>' +
-                '<span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">' + escapeHtml(bookedDate) + '</span></div>';
+        if (currentWebReqTab === 'pending') {
+            if (pending.length === 0) {
+                html = '<div style="text-align:center; padding:24px 16px; color:var(--text-tertiary); font-size:13px;">' +
+                       '<div style="font-size:24px; margin-bottom:6px;">✓</div>' +
+                       '<div style="font-weight:700; color:var(--text-secondary); margin-bottom:3px;">No Pending Requests</div>' +
+                       '<div>All incoming bookings have been reviewed.</div>' +
+                       '</div>';
+            } else {
+                for (var j = 0; j < pending.length; j++) {
+                    var bk = pending[j];
+                    var d = bk.data;
+                    var ptName = d.name || 'Patient';
+                    var phone = d.phone || '';
+                    var age = d.age ? (d.age + ' yrs') : '';
+                    var complaint = d.complaint || d.reason || d.chiefComplaint || '';
+                    var slotDate = d.appointmentDate || d.preferredDate || d.date || '';
+                    var slotTime = d.appointmentTime || d.preferredTime || d.timeDisplay || d.time || '';
+                    var slotStr = (slotDate || slotTime) ? ((slotDate ? slotDate : '') + (slotTime ? ' · ' + slotTime : '')) : '';
+                    var source = d.source || (d.clinic ? d.clinic + ' Clinic' : 'Web Booking');
 
-            /* Header fields row (age, phone, gender, etc.) */
-            var headerParts = [];
-            var hKeys = Object.keys(headerFields);
-            for (var h = 0; h < hKeys.length; h++) {
-                var hKey = hKeys[h];
-                if (d[hKey] && d[hKey] !== '--') {
-                    headerParts.push(escapeHtml(headerFields[hKey]) + ': <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(d[hKey]) + '</span>');
+                    html += '<div class="web-req-item">';
+                    html += '<div class="web-req-top-row">';
+                    html += '<div class="web-req-pt-name">' + escapeHtml(ptName) + '</div>';
+                    if (slotStr) {
+                        html += '<div class="web-req-slot-chip">📅 ' + escapeHtml(slotStr) + '</div>';
+                    }
+                    html += '</div>';
+
+                    html += '<div class="web-req-meta-chips">';
+                    if (phone) {
+                        html += '<a href="tel:' + escapeHtml(phone) + '" class="web-req-chip phone" onclick="event.stopPropagation();">📞 ' + escapeHtml(phone) + '</a>';
+                    }
+                    if (age) {
+                        html += '<span class="web-req-chip">👤 ' + escapeHtml(age) + '</span>';
+                    }
+                    html += '<span class="web-req-chip">🏷️ ' + escapeHtml(source) + '</span>';
+                    html += '</div>';
+
+                    if (complaint && complaint !== '--') {
+                        html += '<div class="web-req-complaint-box">💬 <strong>Note:</strong> ' + escapeHtml(complaint) + '</div>';
+                    }
+
+                    html += '<div class="web-req-actions">';
+                    html += '<button type="button" class="web-req-btn-accept" onclick="acceptBooking(\x27' + bk.id + '\x27)">✓ Accept & Open</button>';
+                    html += '<button type="button" class="web-req-btn-decline" onclick="declineBooking(\x27' + bk.id + '\x27)">Decline</button>';
+                    html += '</div>';
+
+                    html += '</div>';
                 }
             }
-            if (headerParts.length > 0) {
-                html += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px;">' + headerParts.join(' &nbsp;|&nbsp; ') + '</div>';
-            }
+        } else {
+            // ACCEPTED TAB
+            if (accepted.length === 0) {
+                html = '<div style="text-align:center; padding:24px 16px; color:var(--text-tertiary); font-size:13px;">' +
+                       '<div style="font-size:24px; margin-bottom:6px;">📋</div>' +
+                       '<div style="font-weight:700; color:var(--text-secondary); margin-bottom:3px;">No Accepted Requests Yet</div>' +
+                       '<div>Accepted patients will appear here with an undo option.</div>' +
+                       '</div>';
+            } else {
+                var maxShow = Math.min(accepted.length, 20);
+                for (var k = 0; k < maxShow; k++) {
+                    var abk = accepted[k];
+                    var ad = abk.data;
+                    var aName = ad.name || 'Patient';
+                    var aPhone = ad.phone || '';
+                    var aSlotDate = ad.appointmentDate || ad.preferredDate || ad.date || '';
+                    var aSlotTime = ad.appointmentTime || ad.preferredTime || ad.timeDisplay || ad.time || '';
+                    var aSlot = (aSlotDate || aSlotTime) ? (aSlotDate + ' · ' + aSlotTime) : '';
 
-            /* Complaint */
-            var complaintVal = '';
-            for (var c = 0; c < complaintFields.length; c++) {
-                if (d[complaintFields[c]]) { complaintVal = d[complaintFields[c]]; break; }
-            }
-            if (complaintVal) {
-                html += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px;">' +
-                    'C/O: <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(complaintVal) + '</span></div>';
-            }
+                    html += '<div class="web-req-item" style="border-left: 3px solid #10B981;">';
+                    html += '<div class="web-req-top-row">';
+                    html += '<div class="web-req-pt-name">' + escapeHtml(aName) + '</div>';
+                    html += '<span style="font-size:11px; font-weight:700; color:#059669; background:#ECFDF5; padding:3px 8px; border-radius:8px;">✓ Accepted</span>';
+                    html += '</div>';
 
-            /* Preferred slot */
-            var slotParts = [];
-            var sKeys = Object.keys(slotFields);
-            for (var s = 0; s < sKeys.length; s++) {
-                if (d[sKeys[s]]) slotParts.push(escapeHtml(slotFields[sKeys[s]]) + ': <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(d[sKeys[s]]) + '</span>');
-            }
-            if (slotParts.length > 0) {
-                html += '<div style="font-size:12px;color:var(--text-tertiary);line-height:1.6;margin-bottom:6px;">' + slotParts.join(' &nbsp;|&nbsp; ') + '</div>';
-            }
+                    html += '<div class="web-req-meta-chips">';
+                    if (aPhone) {
+                        html += '<span class="web-req-chip phone">📞 ' + escapeHtml(aPhone) + '</span>';
+                    }
+                    if (aSlot) {
+                        html += '<span class="web-req-chip">📅 ' + escapeHtml(aSlot) + '</span>';
+                    }
+                    html += '</div>';
 
-            /* ALL remaining fields — show everything else the web form sent */
-            var extraParts = [];
-            var allDataKeys = Object.keys(d);
-            for (var k = 0; k < allDataKeys.length; k++) {
-                var dk = allDataKeys[k];
-                if (skipFields[dk]) continue;
-                if (allShownKeys.indexOf(dk) !== -1) continue;
-                var val = d[dk];
-                if (!val || val === '--' || val === '' || val === 'N/A') continue;
-                var label = dk.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) { return str.toUpperCase(); });
-                extraParts.push('<span style="color:var(--text-secondary);">' + escapeHtml(label) + ':</span> <span style="color:var(--text-primary);font-weight:600;">' + escapeHtml(val) + '</span>');
-            }
-            if (extraParts.length > 0) {
-                html += '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--separator);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:12px;line-height:1.8;">' +
-                    extraParts.join('<br>') + '</div>';
-            }
+                    html += '<button type="button" class="web-req-btn-revert" onclick="returnBookingToPending(\x27' + abk.id + '\x27)">';
+                    html += '↩ Return to Pending (Accepted by Mistake)';
+                    html += '</button>';
 
-            /* Action buttons */
-            html += '<div class="web-req-actions">' +
-                '<button onclick="acceptBooking(\'' + bk.id + '\')" style="background:var(--success);">Accept</button>' +
-                '<button onclick="declineBooking(\'' + bk.id + '\')" style="background:rgba(255,69,58,0.15);color:var(--danger);border:1px solid var(--danger);box-shadow:none;">Decline</button>' +
-                '</div></div>';
+                    html += '</div>';
+                }
+            }
         }
+
         list.innerHTML = html;
     }
 
@@ -4752,7 +5150,6 @@ function saveAll(manual, targetId) {
         var today = new Date().toLocaleDateString('en-GB');
         var newId = Date.now();
 
-        /* Build the index entry — pull every field the web form sent */
         var idxData = {
             name: bk.name || 'Web Patient',
             age: bk.age || '',
@@ -4764,22 +5161,21 @@ function saveAll(manual, targetId) {
             pinned: false
         };
 
-        /* Copy any extra matching fields from booking into the index */
-        var extraIndexFields = ['gender', 'city', 'address', 'email', 'preferredDate', 'preferredTime', 'appointmentDate', 'appointmentTime'];
+        var extraIndexFields = ['gender', 'city', 'address', 'email', 'preferredDate', 'preferredTime', 'appointmentDate', 'appointmentTime', 'source', 'clinic'];
         for (var e = 0; e < extraIndexFields.length; e++) {
-            if (bk[extraIndexFields[e]] && bk[extraIndexFields[e]] !== '--' && bk[extraIndexFields[e]] !== '') {
-                idxData[extraIndexFields[e]] = bk[extraIndexFields[e]];
+            var ef = extraIndexFields[e];
+            if (bk[ef] && bk[ef] !== '--' && bk[ef] !== '') {
+                idxData[ef] = bk[ef];
             }
         }
 
         db.ref('patientIndex/' + newId).set(idxData).catch(handleFirebaseError);
 
-        /* Build a detailed clinical note from ALL booking fields */
-        var noteLines = ['[Registered via web booking on ' + today + ']', 'Booking Ref: ' + bookingId, ''];
+        var noteLines = ['[Registered via booking on ' + today + ']', 'Booking Ref: ' + bookingId, ''];
         var allKeys = Object.keys(bk);
         for (var a = 0; a < allKeys.length; a++) {
             var key = allKeys[a];
-            if (key === 'status' || key === 'timestamp' || key === 'dateBooked') continue;
+            if (key === 'status' || key === 'timestamp' || key === 'dateBooked' || key === 'acceptedAt' || key === 'acceptedPatientId') continue;
             var val = bk[key];
             if (!val || val === '--' || val === '') continue;
             var label = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(str) { return str.toUpperCase(); });
@@ -4798,19 +5194,100 @@ function saveAll(manual, targetId) {
             webBookingRaw: bk
         }).catch(handleFirebaseError);
 
-        /* Mark booking as accepted */
-        db.ref('pendingBookings/' + bookingId).update({ status: 'accepted' }).catch(handleFirebaseError);
+        // Mark booking as accepted AND store patient link
+        db.ref('pendingBookings/' + bookingId).update({
+            status: 'accepted',
+            acceptedPatientId: String(newId),
+            acceptedAt: Date.now()
+        }).catch(handleFirebaseError);
 
-        showToast('\u2705 ' + (bk.name || 'Patient') + ' accepted — all booking data saved to file!');
-        setTimeout(function() { loadFullData(String(newId)); }, 600);
+        showFloatingUndoToast(bk.name || 'Patient', bookingId, String(newId));
+        setTimeout(function() { loadFullData(String(newId)); }, 500);
+    }
+
+    function returnBookingToPending(bookingId, skipConfirm) {
+        var bk = pendingBookings[bookingId];
+        if (!bk) return;
+
+        var ptName = bk.name || 'Patient';
+        if (!skipConfirm) {
+            var confirmed = confirm('Return "' + ptName + '" to pending requests?\n\nThis will remove the newly created file from the registry and restore the booking to your inbox.');
+            if (!confirmed) return;
+        }
+
+        var ptIdToRemove = bk.acceptedPatientId;
+        if (!ptIdToRemove) {
+            for (var pid in ptDetails) {
+                if (ptDetails[pid] && ptDetails[pid].webBookingRef === bookingId) {
+                    ptIdToRemove = pid;
+                    break;
+                }
+            }
+        }
+
+        // Delete the accidentally created patient from registry
+        if (ptIdToRemove) {
+            db.ref('patientIndex/' + ptIdToRemove).remove().catch(handleFirebaseError);
+            db.ref('patientDetails/' + ptIdToRemove).remove().catch(handleFirebaseError);
+
+            if (activeId === ptIdToRemove) {
+                activeId = null;
+                if (activeListener) activeListener.off();
+                switchMainTab('patient');
+            }
+        }
+
+        // Revert status in pendingBookings to pending
+        db.ref('pendingBookings/' + bookingId).update({
+            status: 'pending',
+            acceptedPatientId: null,
+            acceptedAt: null
+        }).then(function() {
+            dismissFloatingUndoToast();
+            showToast('↩ "' + ptName + '" returned to pending inbox.');
+            currentWebReqTab = 'pending';
+            renderWebRequests();
+        }).catch(handleFirebaseError);
+    }
+
+    function showFloatingUndoToast(name, bookingId, patientId) {
+        dismissFloatingUndoToast();
+
+        var div = document.createElement('div');
+        div.id = 'webReqUndoToast';
+        div.className = 'undo-floating-toast';
+        div.innerHTML = '<span>✓ <strong>' + escapeHtml(name) + '</strong> accepted</span>' +
+            '<button type="button" class="undo-toast-btn" onclick="returnBookingToPending(\x27' + bookingId + '\x27, true)">↩ Undo</button>';
+
+        document.body.appendChild(div);
+
+        undoToastTimer = setTimeout(function() {
+            dismissFloatingUndoToast();
+        }, 8000);
+    }
+
+    function dismissFloatingUndoToast() {
+        if (undoToastTimer) {
+            clearTimeout(undoToastTimer);
+            undoToastTimer = null;
+        }
+        var el = document.getElementById('webReqUndoToast');
+        if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
     }
 
     function declineBooking(bookingId) {
         var bk = pendingBookings[bookingId];
         if (!bk) return;
-        if (confirm('Decline booking request from ' + (bk.name || 'Unknown') + '?')) {
-            db.ref('pendingBookings/' + bookingId).update({ status: 'declined' }).catch(handleFirebaseError);
-            showToast('Booking from ' + (bk.name || 'Unknown') + ' declined.');
+        var name = bk.name || 'Patient';
+        if (confirm('Decline booking request from ' + name + '?')) {
+            db.ref('pendingBookings/' + bookingId).update({
+                status: 'declined',
+                declinedAt: Date.now()
+            }).then(function() {
+                showToast('Booking from ' + name + ' declined.');
+            }).catch(handleFirebaseError);
         }
     }
     /* ================================================================
