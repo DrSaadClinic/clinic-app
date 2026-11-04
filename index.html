@@ -1584,7 +1584,7 @@
                         Pending
                     </button>
                     <button type="button" class="web-inbox-seg-btn" id="btnWebTabAccepted" onclick="switchWebReqTab('accepted')">
-                        Accepted <span id="webAcceptedCount" class="web-inbox-seg-count">0</span>
+                        Recent Accepted <span id="webAcceptedCount" class="web-inbox-seg-count">0</span>
                     </button>
                 </div>
             </div>
@@ -4999,6 +4999,54 @@ function saveAll(manual, targetId) {
         renderWebRequests();
     }
 
+    function getArabicDayName(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') return '';
+        var daysAr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        for (var i = 0; i < daysAr.length; i++) {
+            if (dateStr.indexOf(daysAr[i]) !== -1) return daysAr[i];
+        }
+        var m = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (m) {
+            var d = new Date(+m[3], +m[2] - 1, +m[1]);
+            if (!isNaN(d.getTime())) return daysAr[d.getDay()];
+        }
+        var m2 = dateStr.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (m2) {
+            var d2 = new Date(+m2[1], +m2[2] - 1, +m2[3]);
+            if (!isNaN(d2.getTime())) return daysAr[d2.getDay()];
+        }
+        var parsed = new Date(dateStr);
+        if (!isNaN(parsed.getTime())) return daysAr[parsed.getDay()];
+        return '';
+    }
+
+    function formatSlotWithDay(slotDate, slotTime, dayArGiven) {
+        var dayAr = dayArGiven || getArabicDayName(slotDate);
+        var dateDisplay = slotDate || '';
+        if (dayAr && dateDisplay.indexOf(dayAr) === -1) {
+            dateDisplay = dayAr + ' ' + dateDisplay;
+        }
+        if (dateDisplay && slotTime) {
+            return dateDisplay + ' · ' + slotTime;
+        }
+        return dateDisplay || slotTime || '';
+    }
+
+    function formatAcceptedTimeAgo(timestamp) {
+        if (!timestamp) return '';
+        var date = new Date(timestamp);
+        if (isNaN(date.getTime())) return '';
+        var diffMs = Date.now() - date.getTime();
+        if (diffMs < 0) diffMs = 0;
+        var mins = Math.floor(diffMs / (60 * 1000));
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return mins + 'm ago';
+        var hours = Math.floor(mins / 60);
+        if (hours < 24) return hours + 'h ago';
+        var days = Math.floor(hours / 24);
+        return days + 'd ago';
+    }
+
     function renderWebRequests() {
         var card = document.getElementById('webInboxCard');
         var list = document.getElementById('webReqList');
@@ -5009,6 +5057,8 @@ function saveAll(manual, targetId) {
         var keys = Object.keys(pendingBookings);
         var pending = [];
         var accepted = [];
+        var now = Date.now();
+        var RECENT_MS = 48 * 60 * 60 * 1000; // Recent window: last 48 hours only
 
         for (var i = 0; i < keys.length; i++) {
             var k = keys[i];
@@ -5017,7 +5067,16 @@ function saveAll(manual, targetId) {
             if (b.status === 'pending') {
                 pending.push({ id: k, data: b });
             } else if (b.status === 'accepted') {
-                accepted.push({ id: k, data: b });
+                // Determine when it was accepted
+                var accTime = b.acceptedAt;
+                if (!accTime && b.timestamp) {
+                    var parsedTs = new Date(b.timestamp).getTime();
+                    if (!isNaN(parsedTs)) accTime = parsedTs;
+                }
+                // Only keep recent acceptances (last 48 hours)
+                if (accTime && (now - accTime <= RECENT_MS)) {
+                    accepted.push({ id: k, data: b, sortTime: accTime });
+                }
             }
         }
 
@@ -5028,17 +5087,20 @@ function saveAll(manual, targetId) {
             return tB - tA;
         });
 
-        // Sort accepted by acceptedAt or timestamp
+        // Sort accepted by sortTime (newest first)
         accepted.sort(function(a, b) {
-            var tA = a.data.acceptedAt || (a.data.timestamp || 0);
-            var tB = b.data.acceptedAt || (b.data.timestamp || 0);
-            return tB - tA;
+            return b.sortTime - a.sortTime;
         });
+
+        // Cap accepted at 5 most recent
+        if (accepted.length > 5) {
+            accepted = accepted.slice(0, 5);
+        }
 
         if (countEl) countEl.textContent = pending.length + ' New';
         if (acceptedCountEl) acceptedCountEl.textContent = accepted.length;
 
-        // Show card if there are pending bookings OR accepted bookings
+        // Show card if there are pending bookings OR recent accepted bookings
         if (pending.length === 0 && accepted.length === 0) {
             card.style.display = 'none';
             return;
@@ -5064,7 +5126,7 @@ function saveAll(manual, targetId) {
                     var complaint = d.complaint || d.reason || d.chiefComplaint || '';
                     var slotDate = d.appointmentDate || d.preferredDate || d.date || '';
                     var slotTime = d.appointmentTime || d.preferredTime || d.timeDisplay || d.time || '';
-                    var slotStr = (slotDate || slotTime) ? ((slotDate ? slotDate : '') + (slotTime ? ' · ' + slotTime : '')) : '';
+                    var slotStr = formatSlotWithDay(slotDate, slotTime, d.appointmentDayAr || d.dayAr);
                     var source = d.source || (d.clinic ? d.clinic + ' Clinic' : 'Web Booking');
 
                     html += '<div class="web-req-item">';
@@ -5090,31 +5152,31 @@ function saveAll(manual, targetId) {
                     }
 
                     html += '<div class="web-req-actions">';
-                    html += '<button type="button" class="web-req-btn-accept" onclick="acceptBooking(\x27' + bk.id + '\x27)">✓ Accept & Open</button>';
-                    html += '<button type="button" class="web-req-btn-decline" onclick="declineBooking(\x27' + bk.id + '\x27)">Decline</button>';
+                    html += '<button type="button" class="web-req-btn-accept" onclick="acceptBooking(\'' + bk.id + '\')">✓ Accept & Open</button>';
+                    html += '<button type="button" class="web-req-btn-decline" onclick="declineBooking(\'' + bk.id + '\')">Decline</button>';
                     html += '</div>';
 
                     html += '</div>';
                 }
             }
         } else {
-            // ACCEPTED TAB
+            // ACCEPTED TAB (RECENT ONLY)
             if (accepted.length === 0) {
                 html = '<div style="text-align:center; padding:24px 16px; color:var(--text-tertiary); font-size:13px;">' +
                        '<div style="font-size:24px; margin-bottom:6px;">📋</div>' +
-                       '<div style="font-weight:700; color:var(--text-secondary); margin-bottom:3px;">No Accepted Requests Yet</div>' +
-                       '<div>Accepted patients will appear here with an undo option.</div>' +
+                       '<div style="font-weight:700; color:var(--text-secondary); margin-bottom:3px;">No Recent Acceptances</div>' +
+                       '<div>Only bookings accepted within the last 48 hours appear here for quick undo if accepted by mistake.</div>' +
                        '</div>';
             } else {
-                var maxShow = Math.min(accepted.length, 20);
-                for (var k = 0; k < maxShow; k++) {
+                for (var k = 0; k < accepted.length; k++) {
                     var abk = accepted[k];
                     var ad = abk.data;
                     var aName = ad.name || 'Patient';
                     var aPhone = ad.phone || '';
                     var aSlotDate = ad.appointmentDate || ad.preferredDate || ad.date || '';
                     var aSlotTime = ad.appointmentTime || ad.preferredTime || ad.timeDisplay || ad.time || '';
-                    var aSlot = (aSlotDate || aSlotTime) ? (aSlotDate + ' · ' + aSlotTime) : '';
+                    var aSlot = formatSlotWithDay(aSlotDate, aSlotTime, ad.appointmentDayAr || ad.dayAr);
+                    var timeAgoStr = formatAcceptedTimeAgo(abk.sortTime);
 
                     html += '<div class="web-req-item" style="border-left: 3px solid #10B981;">';
                     html += '<div class="web-req-top-row">';
@@ -5124,14 +5186,17 @@ function saveAll(manual, targetId) {
 
                     html += '<div class="web-req-meta-chips">';
                     if (aPhone) {
-                        html += '<span class="web-req-chip phone">📞 ' + escapeHtml(aPhone) + '</span>';
+                        html += '<a href="tel:' + escapeHtml(aPhone) + '" class="web-req-chip phone" onclick="event.stopPropagation();">📞 ' + escapeHtml(aPhone) + '</a>';
                     }
                     if (aSlot) {
                         html += '<span class="web-req-chip">📅 ' + escapeHtml(aSlot) + '</span>';
                     }
+                    if (timeAgoStr) {
+                        html += '<span class="web-req-chip" style="color:#059669; background:#ECFDF5;">⏱️ ' + escapeHtml(timeAgoStr) + '</span>';
+                    }
                     html += '</div>';
 
-                    html += '<button type="button" class="web-req-btn-revert" onclick="returnBookingToPending(\x27' + abk.id + '\x27)">';
+                    html += '<button type="button" class="web-req-btn-revert" onclick="returnBookingToPending(\'' + abk.id + '\')">';
                     html += '↩ Return to Pending (Accepted by Mistake)';
                     html += '</button>';
 
